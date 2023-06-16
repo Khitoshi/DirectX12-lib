@@ -88,8 +88,7 @@ void Window::deinit() {
 /// <returns>
 /// 生成した新しいウィンドウへのハンドル
 /// </returns>
-HWND Window::create()
-{
+HWND Window::create(){
 	//windowクラスのパラメータ設定
 	WNDCLASSEX wc;
 	wc.cbSize			= sizeof(WNDCLASSEX);		//構造体サイズ
@@ -136,8 +135,7 @@ HWND Window::create()
 /// <summary>
 /// ウィンドウ 表示
 /// </summary>
-void Window::show()
-{
+void Window::show(){
 	//ウィンドウ表示
 	ShowWindow(this->hwnd, this->nCmdShow);
 }

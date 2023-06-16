@@ -3,8 +3,7 @@
 /// <summary>
 /// windowの設定
 /// </summary>
-struct WindowConfig
-{
+struct WindowConfig{
 	const TCHAR* appName;	//アプリケーションの名前
 	UINT width;				//windowウサイズ:幅
 	UINT height;			//windowサイズ:高さ
