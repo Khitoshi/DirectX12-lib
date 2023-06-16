@@ -5,6 +5,7 @@
 
 #include "ResourceManager.h"
 
+//デバッグ用出力関数
 void DebugOutputFormatString(const char* format, ...) {
 #ifdef _DEBUG
 	va_list valist;

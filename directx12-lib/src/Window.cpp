@@ -67,11 +67,6 @@ bool Window::processMessages(){
 void Window::init() {
 	this->hwnd = create();
 
-
-	if (this->hwnd == NULL) {
-		throw std::runtime_error("ウィンドウ生成失敗");
-	}
-
 	show();
 }
 
@@ -114,7 +109,7 @@ HWND Window::create()
 	RegisterClassEx(&wc);
 
 	//window生成 & 新しいウィンドウへのハンドルをreturn
-	return hwnd = CreateWindow(
+	hwnd = CreateWindow(
 		this->winConf.appName,	//ウィンドウクラスの名前
 		this->winConf.appName,	//ウィンドウの名前,ウィンドウクラスの名前と別名でok
 		WS_OVERLAPPEDWINDOW,	//ウィンドウスタイル
@@ -127,6 +122,13 @@ HWND Window::create()
 		this->hInstance,		//インスタンスのハンドル
 		NULL					//作成時の引数保存用ポインタ
 	);
+
+	//ウィンドウハンドル生成チェック
+	if (this->hwnd == NULL) {
+		throw std::runtime_error("ウィンドウ生成失敗");
+	}
+
+	return hwnd;
 }
 
 
