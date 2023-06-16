@@ -1,6 +1,7 @@
 #include <Windows.h>
 
 #include "Window.h"
+#include <stdexcept>
 
 
 /// <summary>
@@ -65,6 +66,12 @@ bool Window::processMessages(){
 /// </summary>
 void Window::init() {
 	this->hwnd = create();
+
+
+	if (this->hwnd == NULL) {
+		throw std::runtime_error("ウィンドウ生成失敗");
+	}
+
 	show();
 }
 
@@ -107,7 +114,7 @@ HWND Window::create()
 	RegisterClassEx(&wc);
 
 	//window生成 & 新しいウィンドウへのハンドルをreturn
-	return CreateWindow(
+	return hwnd = CreateWindow(
 		this->winConf.appName,	//ウィンドウクラスの名前
 		this->winConf.appName,	//ウィンドウの名前,ウィンドウクラスの名前と別名でok
 		WS_OVERLAPPEDWINDOW,	//ウィンドウスタイル
@@ -120,7 +127,6 @@ HWND Window::create()
 		this->hInstance,		//インスタンスのハンドル
 		NULL					//作成時の引数保存用ポインタ
 	);
-
 }
 
 
