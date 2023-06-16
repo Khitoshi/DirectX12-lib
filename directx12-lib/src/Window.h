@@ -6,6 +6,11 @@
 class Window
 {
 public:
+	/// <summary>
+	/// </summary>
+	/// <param name="winConf">ウィンドウの設定</param>
+	/// <param name="hInstance">インスタンスのハンドル</param>
+	/// <param name="nCmdShow">ウィンドウの表示方法を指定する値</param>
 	Window(WindowConfig winConf, HINSTANCE hInstance, int nCmdShow):
 		hwnd(),
 		winConf(winConf),
