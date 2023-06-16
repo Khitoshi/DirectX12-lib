@@ -18,7 +18,7 @@ public:
 		nCmdShow(nCmdShow)
 
 	{};
-	~Window() {};
+	~Window() { deinit(); };
 
 	//メッセージループ 処理
 	bool processMessages();
