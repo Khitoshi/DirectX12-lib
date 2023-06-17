@@ -135,6 +135,19 @@ public:
         this->commandList->ResourceBarrier(1, &barrier);
     }
 
+    /// <summary>
+    /// ディスクリプタヒープの登録
+    /// </summary>
+    /// <param name="descriptorHeap"></param>
+    void setDescriptorHeap(ID3D12DescriptorHeap* descriptorHeap)
+    {
+        ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap };
+        this->commandList->SetDescriptorHeaps(1, descriptorHeaps);
+    }
+
+public:
+    ID3D12GraphicsCommandList4* getCommandList() { return this->commandList; }
+
 private:
     enum { MAX_DESCRIPTOR_HEAP = 4 };	//ディスクリプタヒープの最大数
     enum { MAX_CONSTANT_BUFFER = 8 };	//定数バッファの最大数

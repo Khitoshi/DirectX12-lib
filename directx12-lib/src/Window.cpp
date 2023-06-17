@@ -3,6 +3,12 @@
 #include "Window.h"
 #include <stdexcept>
 
+#ifdef _DEBUG
+#include "imgui\imgui.h"
+//imguiのウィンドウプロシージャを呼び出すための宣言
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif
+
 /// <summary>
 /// ウィンドウプロシージャ
 /// ウィンドウメッセージをアプリケーション内で振り分けるための通関手続きを行う関数
@@ -18,6 +24,11 @@
 /// 行っていない :DefWIndowProcの戻り値
 /// </returns>
 LRESULT windowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+#ifdef _DEBUG
+    //imguiのウィンドウプロシージャを呼び出す
+    if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))return true;
+#endif // _DEBUG
+
     // ウィンドウが破棄された場合アプリケーションを終了
     if (msg == WM_DESTROY) {
         //OSに終了を伝える
