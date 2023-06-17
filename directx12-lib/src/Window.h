@@ -6,49 +6,50 @@
 class Window
 {
 public:
-	/// <summary>
-	/// </summary>
-	/// <param name="winConf">ウィンドウの設定</param>
-	/// <param name="hInstance">インスタンスのハンドル</param>
-	/// <param name="nCmdShow">ウィンドウの表示方法を指定する値</param>
-	Window(WindowConfig winConf, HINSTANCE hInstance, int nCmdShow):
-		hwnd(),
-		winConf(winConf),
-		hInstance(hInstance),
-		nCmdShow(nCmdShow)
+    /// <summary>
+    /// </summary>
+    /// <param name="winConf">ウィンドウの設定</param>
+    /// <param name="hInstance">インスタンスのハンドル</param>
+    /// <param name="nCmdShow">ウィンドウの表示方法を指定する値</param>
+    Window(WindowConfig winConf, HINSTANCE hInstance, int nCmdShow) :
+        hwnd(),
+        winConf(winConf),
+        hInstance(hInstance),
+        nCmdShow(nCmdShow)
 
-	{};
-	~Window() { deinit(); };
+    {};
+    ~Window() { deinit(); };
 
-	//メッセージループ 処理
-	bool processMessages();
+    //メッセージループ 処理
+    bool processMessages();
 
-	//初期化
-	void init();
+    //初期化
+    void init();
 
-	//終了
-	void deinit();
+    //終了
+    void deinit();
 
-
-private:
-	//ウィンドウ 生成
-	HWND create();
-
-	//ウィンドウ 表示
-	void show();
-
+public:
+    //ウィンドウハンドルの取得
+    HWND getHWND() const { return hwnd; };
 
 private:
-	//生成したウィンドウのハンドル
-	HWND hwnd;
+    //ウィンドウ 生成
+    HWND create();
 
-	//ウィンドウの設定
-	WindowConfig winConf;
+    //ウィンドウ 表示
+    void show();
 
-	//インスタンスのハンドル
-	HINSTANCE hInstance;
+private:
+    //生成したウィンドウのハンドル
+    HWND hwnd;
 
-	//ウィンドウの表示方法を指定する値
-	int nCmdShow;
+    //ウィンドウの設定
+    WindowConfig winConf;
+
+    //インスタンスのハンドル
+    HINSTANCE hInstance;
+
+    //ウィンドウの表示方法を指定する値
+    int nCmdShow;
 };
-
