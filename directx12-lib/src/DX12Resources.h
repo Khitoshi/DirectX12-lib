@@ -76,6 +76,11 @@ private://生成系
     //レンダーターゲットビューのハンドルを設定
     void setRTVHandle();
 
+public://取得系
+    //デバイス取得
+    ID3D12Device5* getDevice() const { return device.Get(); }
+    //レンダーコンテキスト取得
+    RenderContext* getRenderContext() const { return renderContext.get(); }
 private:
     ComPtr<ID3D12Device5>device;                                    //デバイス
     ComPtr<ID3D12CommandQueue>commandQueue;                         //コマンドキュー

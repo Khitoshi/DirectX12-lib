@@ -53,20 +53,20 @@
 struct ImGui_ImplDX12_RenderBuffers;
 struct ImGui_ImplDX12_Data
 {
-    ID3D12Device*               pd3dDevice;
-    ID3D12RootSignature*        pRootSignature;
-    ID3D12PipelineState*        pPipelineState;
+    ID3D12Device* pd3dDevice;
+    ID3D12RootSignature* pRootSignature;
+    ID3D12PipelineState* pPipelineState;
     DXGI_FORMAT                 RTVFormat;
-    ID3D12Resource*             pFontTextureResource;
+    ID3D12Resource* pFontTextureResource;
     D3D12_CPU_DESCRIPTOR_HANDLE hFontSrvCpuDescHandle;
     D3D12_GPU_DESCRIPTOR_HANDLE hFontSrvGpuDescHandle;
-    ID3D12DescriptorHeap*       pd3dSrvDescHeap;
+    ID3D12DescriptorHeap* pd3dSrvDescHeap;
     UINT                        numFramesInFlight;
 
     ImGui_ImplDX12_RenderBuffers* pFrameResources;
     UINT                        frameIndex;
 
-    ImGui_ImplDX12_Data()       { memset((void*)this, 0, sizeof(*this)); frameIndex = UINT_MAX; }
+    ImGui_ImplDX12_Data() { memset((void*)this, 0, sizeof(*this)); frameIndex = UINT_MAX; }
 };
 
 // Backend data stored in io.BackendRendererUserData to allow support for multiple Dear ImGui contexts
@@ -79,8 +79,8 @@ static ImGui_ImplDX12_Data* ImGui_ImplDX12_GetBackendData()
 // Buffers used during the rendering of a frame
 struct ImGui_ImplDX12_RenderBuffers
 {
-    ID3D12Resource*     IndexBuffer;
-    ID3D12Resource*     VertexBuffer;
+    ID3D12Resource* IndexBuffer;
+    ID3D12Resource* VertexBuffer;
     int                 IndexBufferSize;
     int                 VertexBufferSize;
 };
@@ -105,10 +105,10 @@ static void ImGui_ImplDX12_SetupRenderState(ImDrawData* draw_data, ID3D12Graphic
         float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
         float mvp[4][4] =
         {
-            { 2.0f/(R-L),   0.0f,           0.0f,       0.0f },
-            { 0.0f,         2.0f/(T-B),     0.0f,       0.0f },
+            { 2.0f / (R - L),   0.0f,           0.0f,       0.0f },
+            { 0.0f,         2.0f / (T - B),     0.0f,       0.0f },
             { 0.0f,         0.0f,           0.5f,       0.0f },
-            { (R+L)/(L-R),  (T+B)/(B-T),    0.5f,       1.0f },
+            { (R + L) / (L - R),  (T + B) / (B - T),    0.5f,       1.0f },
         };
         memcpy(&vertex_constant_buffer.mvp, mvp, sizeof(mvp));
     }
@@ -218,7 +218,7 @@ void ImGui_ImplDX12_RenderDrawData(ImDrawData* draw_data, ID3D12GraphicsCommandL
     }
 
     // Upload vertex/index data into a single contiguous GPU buffer
-    void* vtx_resource, *idx_resource;
+    void* vtx_resource, * idx_resource;
     D3D12_RANGE range;
     memset(&range, 0, sizeof(D3D12_RANGE));
     if (fr->VertexBuffer->Map(0, &range, &vtx_resource) != S_OK)
@@ -346,7 +346,7 @@ static void ImGui_ImplDX12_CreateFontsTexture()
         hr = uploadBuffer->Map(0, &range, &mapped);
         IM_ASSERT(SUCCEEDED(hr));
         for (int y = 0; y < height; y++)
-            memcpy((void*) ((uintptr_t) mapped + y * uploadPitch), pixels + y * width * 4, width * 4);
+            memcpy((void*)((uintptr_t)mapped + y * uploadPitch), pixels + y * width * 4, width * 4);
         uploadBuffer->Unmap(0, &range);
 
         D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
@@ -366,10 +366,10 @@ static void ImGui_ImplDX12_CreateFontsTexture()
         D3D12_RESOURCE_BARRIER barrier = {};
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        barrier.Transition.pResource   = pTexture;
+        barrier.Transition.pResource = pTexture;
         barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
         barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-        barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+        barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
         ID3D12Fence* fence = nullptr;
         hr = bd->pd3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
@@ -379,8 +379,8 @@ static void ImGui_ImplDX12_CreateFontsTexture()
         IM_ASSERT(event != nullptr);
 
         D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-        queueDesc.Type     = D3D12_COMMAND_LIST_TYPE_DIRECT;
-        queueDesc.Flags    = D3D12_COMMAND_QUEUE_FLAG_NONE;
+        queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+        queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
         queueDesc.NodeMask = 1;
 
         ID3D12CommandQueue* cmdQueue = nullptr;
@@ -695,7 +695,7 @@ void    ImGui_ImplDX12_InvalidateDeviceObjects()
 }
 
 bool ImGui_ImplDX12_Init(ID3D12Device* device, int num_frames_in_flight, DXGI_FORMAT rtv_format, ID3D12DescriptorHeap* cbv_srv_heap,
-                         D3D12_CPU_DESCRIPTOR_HANDLE font_srv_cpu_desc_handle, D3D12_GPU_DESCRIPTOR_HANDLE font_srv_gpu_desc_handle)
+    D3D12_CPU_DESCRIPTOR_HANDLE font_srv_cpu_desc_handle, D3D12_GPU_DESCRIPTOR_HANDLE font_srv_gpu_desc_handle)
 {
     ImGuiIO& io = ImGui::GetIO();
     IM_ASSERT(io.BackendRendererUserData == nullptr && "Already initialized a renderer backend!");
