@@ -35,10 +35,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         std::shared_ptr <DX12Resources> dx12Resources = std::make_shared<DX12Resources>();
         dx12Resources->init(ResourceManager::getInstance()->getResource<Window>("window")->getHWND(), winConf.width, winConf.height, 2);
         ResourceManager::getInstance()->registerResource("dx12Resources", dx12Resources);
-
+        ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources");
         //メッセージループ処理
         while (ResourceManager::getInstance()->getResource<Window>("window")->processMessages()) {
-            //TODO:ここで描画処理を行う
+            float color[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+            //描画開始処理
+            ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->beginRender(color);
+
+            //描画終了処理
+            ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->endRender();
         }
     }
     catch (const std::exception& e) {
