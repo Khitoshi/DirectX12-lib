@@ -65,11 +65,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         while (ResourceManager::getInstance()->getResource<Window>("window")->processMessages()) {
             //•`‰æŠJnˆ—
             ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->beginRender(color);
+
+            //TODO ‚±‚±‚É•`‰æˆ—‚ğ‘‚­
+
+
+#ifdef _DEBUG
             //FrameŠJnˆ—
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->beginFrame();
 
-#ifdef _DEBUG
-            //TODO ‚±‚±‚É•`‰æˆ—‚ğ‘‚­
+
             {
                 ImGui::Begin("System");
 
@@ -88,9 +92,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
                 ImGui::End();
             }
-#endif // _DEBUG
 
-#ifdef _DEBUG
             //FrameI—¹ˆ—
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->endFrame();
             //imgui•`‰æˆ—
