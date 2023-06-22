@@ -18,6 +18,10 @@ void DX12Resources::init(const HWND hWnd, const int width, const int height, con
     return;
 }
 
+/// <summary>
+/// レンダリング開始処理
+/// </summary>
+/// <param name="color">clearcolor</param>
 void DX12Resources::beginRender(const float color[4])
 {
     //バックバッファインデックスの取得
@@ -48,6 +52,9 @@ void DX12Resources::beginRender(const float color[4])
     this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, color);
 }
 
+/// <summary>
+/// レンダリング終了処理
+/// </summary>
 void DX12Resources::endRender()
 {
     //レンダーターゲットの描画完了を待つ
@@ -101,11 +108,23 @@ ComPtr<IDXGIFactory4> DX12Resources::createFactory() {
 
         //デバッグの場合デバッグフラグを立てる
         dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+
+#if 0 // GBV を有効化する場合.
+        ComPtr<ID3D12Debug3> debug3;
+        debug.As(&debug3);
+        if (debug3)
+        {
+            debug3->SetEnableGPUBasedValidation(true);
+        }
+#endif
     }
     else {
         throw std::runtime_error("failed to create debug Controller");
     }
+
+
 #endif
+
     ComPtr<IDXGIFactory4> factory;
 
     //factory生成
