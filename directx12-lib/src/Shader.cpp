@@ -14,7 +14,7 @@
 /// <param name="entryFuncName">シェーダーエントリー関数名</param>
 void Shader::LoadVS(const char* filePath, const char* entryFuncName)
 {
-    this->shaderBlob = load(filePath, entryFuncName, "vs_5_0");
+    load(filePath, entryFuncName, "vs_5_0");
 }
 
 
@@ -25,7 +25,7 @@ void Shader::LoadVS(const char* filePath, const char* entryFuncName)
 /// <param name="entryFuncName">シェーダーエントリー関数名</param>
 void Shader::LoadPS(const char* filePath, const char* entryFuncName)
 {
-    this->shaderBlob = load(filePath, entryFuncName, "ps_5_0");
+    load(filePath, entryFuncName, "ps_5_0");
 }
 
 
@@ -38,9 +38,8 @@ void Shader::LoadPS(const char* filePath, const char* entryFuncName)
 /// <returns>
 /// 正常にコンパイルされたシェーダー
 /// </returns>
-ComPtr<ID3D10Blob> Shader::load(const char* filePath, const char* entryFuncName, const char* shaderModel)
+void Shader::load(const char* filePath, const char* entryFuncName, const char* shaderModel)
 {
-    ID3DBlob* errorBlob;
 #ifdef _DEBUG
     //シェーダーのデバッグを有効にする
     UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
@@ -54,17 +53,30 @@ ComPtr<ID3D10Blob> Shader::load(const char* filePath, const char* entryFuncName,
     mbstowcs_s(nullptr, wfxFilePath, filePath, 256);
 
     //シェーダーのコンパイル
-    ComPtr<ID3D10Blob> shaderBlob;
-
-    HRESULT hr = D3DCompileFromFile(wfxFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "Main", entryFuncName, compileFlags, 0, shaderBlob.GetAddressOf(), &errorBlob);
+    ComPtr<ID3DBlob> errorBlob = nullptr;
+    HRESULT hr = D3DCompileFromFile(
+        wfxFilePath, 
+        nullptr,
+        D3D_COMPILE_STANDARD_FILE_INCLUDE,
+        entryFuncName,
+        shaderModel,
+        compileFlags,
+        0,
+        this->shaderBlob.GetAddressOf(),
+        &errorBlob);
     if (FAILED(hr)) {
         if (hr == STIERR_OBJECTNOTFOUND) {
             throw "FAILED shader load error: file not found";
         }
-        if (errorBlob != nullptr) {
+        if (errorBlob) {
             throw "FAILED shader load error: " + std::string((char*)errorBlob->GetBufferPointer());
         }
+        else {
+			throw "FAILED shader load error: unknown error";
+		}
     }
-
-    return shaderBlob;
+    else if (!shaderBlob) {
+        throw "FAILED shader load error: shaderBlob is nullptr";
+    }
+    return;
 }

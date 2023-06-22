@@ -45,6 +45,7 @@ void DX12Resources::beginRender(const float color[4])
     //レンダーターゲットのハンドルを設定
     this->setRTVHandle();
 
+
     //レンダーターゲットをセット
     this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle);
 
@@ -433,3 +434,9 @@ void DX12Resources::setRTVHandle()
     //フレームバッファ数分ずらす
     this->currentFrameBufferRTVHandle.ptr += this->renderTarget->getDescriptorHeapSize() * this->frameIndex;
 }
+
+void DX12Resources::setDSVHandle()
+{
+
+}
+

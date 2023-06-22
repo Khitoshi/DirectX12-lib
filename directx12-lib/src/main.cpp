@@ -6,6 +6,9 @@
 #include "ResourceManager.h"
 #include "DX12Resources.h"
 
+#include "RootSignature.h"
+#include "Triangle.h"
+
 #ifdef _DEBUG
 #include "imgui\ImGuiManager.h"
 #endif // !_DEBUG
@@ -53,8 +56,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         ResourceManager::getInstance()->registerResource("imguiManager", imguiManager);
 #endif // _DEBUG
 
+        //ルートシグネチャ
+        std::shared_ptr<RootSignature> rootSignature = std::make_shared<RootSignature>();
+        RootSignatureConf rootSignatureConf = {};
+        rootSignatureConf.device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
+        rootSignature->init(rootSignatureConf);
+        ResourceManager::getInstance()->registerResource("rootSignature", rootSignature);
+        
         //三角形
-
+        std::shared_ptr<Triangle> triangle = std::make_shared<Triangle>();
+        TriangleConf triangleConf = {};
+        triangleConf.device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
+        triangleConf.rootSignature = ResourceManager::getInstance()->getResource<RootSignature>("rootSignature").get();
+        triangle->init(triangleConf);
+        ResourceManager::getInstance()->registerResource("triangle", triangle);
 
 
         //メッセージループ処理
@@ -69,9 +84,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         while (ResourceManager::getInstance()->getResource<Window>("window")->processMessages()) {
             //描画開始処理
             ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->beginRender(color);
-
+            ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext()->setRootSignature(ResourceManager::getInstance()->getResource<RootSignature>("rootSignature").get());
             //TODO ここに描画処理を書く
-
+            ResourceManager::getInstance()->getResource<Triangle>("triangle")->draw(ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext());
 
 #ifdef _DEBUG
             //Frame開始処理

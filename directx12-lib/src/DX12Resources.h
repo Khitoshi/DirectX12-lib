@@ -10,6 +10,7 @@
 #include "RenderTarget.h"
 #include "RenderContext.h"
 #include "Fence.h"
+#include "RootSignature.h"
 
 using namespace Microsoft::WRL;
 
@@ -75,6 +76,9 @@ private://生成系
 
     //レンダーターゲットビューのハンドルを設定
     void setRTVHandle();
+
+    //深度ステンシルビューのハンドルを設定
+    void setDSVHandle();
 
 public://取得系
     //デバイス取得

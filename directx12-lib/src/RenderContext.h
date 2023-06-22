@@ -1,8 +1,11 @@
 #pragma once
 
+#include "PipelineStateObject.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 #include "d3dx12.h"
 #include <dxgi1_4.h>
-
+#include "RootSignature.h"
 using namespace Microsoft::WRL;
 
 /// <summary>
@@ -143,6 +146,48 @@ public:
     {
         ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap };
         this->commandList->SetDescriptorHeaps(1, descriptorHeaps);
+    }
+
+    /// <summary>
+    /// パイプラインステート登録
+    /// </summary>
+    /// <param name="pso"></param>
+    void setPipelineState(PipelineStateObject* pso) 
+    {
+        this->commandList->SetPipelineState(pso->getPipelineStateObject());
+    }
+
+
+    /// <summary>
+    /// プリミティブトポロジーの設定
+    /// </summary>
+    /// <param name="topology"></param>
+    void setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY topology)
+    {
+        this->commandList->IASetPrimitiveTopology(topology);
+    }
+
+
+    ///
+    void setVertexBuffer(VertexBuffer* vb)
+    {
+        D3D12_VERTEX_BUFFER_VIEW vbView = vb->getVertexBufferView();
+		this->commandList->IASetVertexBuffers(0, 1, &vbView);
+    }
+
+    void setIndexBuffer(IndexBuffer* ib)
+    {
+		D3D12_INDEX_BUFFER_VIEW ibView = ib->getIndexBufferView();
+		this->commandList->IASetIndexBuffer(&ibView);
+	}
+
+    void drawIndexed(UINT indexCount) {
+        this->commandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+    }
+
+
+    void setRootSignature(RootSignature* rootSignature) {
+        this->commandList->SetGraphicsRootSignature(rootSignature->getRootSignature());
     }
 
 public:
