@@ -16,6 +16,7 @@ struct DepthStencilConf
 
 class DepthStencil
 {
+public:
     DepthStencil() {};
     ~DepthStencil() {};
 
@@ -26,14 +27,17 @@ private:
     ComPtr<ID3D12DescriptorHeap> createDescriptorHeap(const DepthStencilConf depthStencilConf);
 
     //ディスクリプタヒープのサイズの取得
-    int createDescriptorHeapSize(const DepthStencilConf depthStencilConf);
+    //int createDescriptorHeapSize(const DepthStencilConf depthStencilConf);
 
     //リソースの生成
-    ComPtr<ID3D12Resource> createResource(const DepthStencilConf depthStencilConf);
+    void createResource(const DepthStencilConf depthStencilConf);
 
-
+public:
+    ID3D12DescriptorHeap* getDescriptorHeap() const { return descriptorHeap.Get(); } //ディスクリプタヒープの取得
+    //int getDescriptorHeapSize() const { return descriptorHeapSize; } //ディスクリプタヒープのサイズの取得
+    ID3D12Resource* getResource() const { return resource.Get(); } //リソースの取得
 private:
     ComPtr<ID3D12DescriptorHeap> descriptorHeap;    //ディスクリプタヒープ
-    int descriptorHeapSize;                         //ディスクリプタヒープのサイズ
+    //int descriptorHeapSize;                         //ディスクリプタヒープのサイズ
     ComPtr<ID3D12Resource> resource;   //リソース
 };

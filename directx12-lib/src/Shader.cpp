@@ -55,7 +55,7 @@ void Shader::load(const char* filePath, const char* entryFuncName, const char* s
     //シェーダーのコンパイル
     ComPtr<ID3DBlob> errorBlob = nullptr;
     HRESULT hr = D3DCompileFromFile(
-        wfxFilePath, 
+        wfxFilePath,
         nullptr,
         D3D_COMPILE_STANDARD_FILE_INCLUDE,
         entryFuncName,
@@ -72,8 +72,8 @@ void Shader::load(const char* filePath, const char* entryFuncName, const char* s
             throw "FAILED shader load error: " + std::string((char*)errorBlob->GetBufferPointer());
         }
         else {
-			throw "FAILED shader load error: unknown error";
-		}
+            throw "FAILED shader load error: unknown error";
+        }
     }
     else if (!shaderBlob) {
         throw "FAILED shader load error: shaderBlob is nullptr";

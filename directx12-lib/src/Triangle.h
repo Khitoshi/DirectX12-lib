@@ -9,11 +9,11 @@
 #include<DirectXMath.h>
 struct TriangleConf
 {
-	ID3D12Device* device;
+    ID3D12Device* device;
     RootSignature* rootSignature;
-	//UINT frameBufferCount;
-	//UINT width;
-	//UINT height;
+    //UINT frameBufferCount;
+    //UINT width;
+    //UINT height;
 };
 
 
@@ -21,12 +21,12 @@ struct TriangleConf
 class Triangle
 {
 public:
-    Triangle(): 
+    Triangle() :
         vertexShader(),
-		pixelShader(),
-		pipelineStateObject(),
-		vertexBuffer(),
-		indexBuffer(),
+        pixelShader(),
+        pipelineStateObject(),
+        vertexBuffer(),
+        indexBuffer(),
         vertices()
     {};
     ~Triangle() {};
@@ -47,8 +47,7 @@ private:
     struct Vertex
     {
         DirectX::XMFLOAT3 position;
-        DirectX::XMFLOAT3 color;
-        DirectX::XMFLOAT2 texcoord;
+        DirectX::XMFLOAT4 color;
     };
 
     std::shared_ptr<Shader> vertexShader;                       //頂点シェーダー

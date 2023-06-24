@@ -11,6 +11,7 @@ void DX12Resources::init(const HWND hWnd, const int width, const int height, con
     this->commandAllocator = createCommandAllocator();
     this->commandList = createCommandList();
     this->renderTarget = createRenderTarget(width, height, frameBufferCount);
+    this->depthStencil = createDepthStencil(width, height, frameBufferCount);
     this->fence = createFence();
     this->renderContext = createRenderContext();
     this->viewport = createViewport(width, height);
@@ -44,13 +45,15 @@ void DX12Resources::beginRender(const float color[4])
 
     //レンダーターゲットのハンドルを設定
     this->setRTVHandle();
-
+    this->setDSVHandle();
 
     //レンダーターゲットをセット
-    this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle);
+    this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
 
     //レンダーターゲットのクリア
     this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, color);
+    //深度ステンシルのクリア
+    this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
 }
 
 /// <summary>
@@ -116,9 +119,9 @@ ComPtr<IDXGIFactory4> DX12Resources::createFactory() {
         if (debug3)
         {
             debug3->SetEnableGPUBasedValidation(true);
-        }
-#endif
     }
+#endif
+}
     else {
         throw std::runtime_error("failed to create debug Controller");
     }
@@ -363,6 +366,18 @@ std::shared_ptr<RenderTarget> DX12Resources::createRenderTarget(const int width,
     return renderTarget;
 }
 
+std::shared_ptr<DepthStencil> DX12Resources::createDepthStencil(const int width, const int height, const UINT frameBufferCount)
+{
+    std::shared_ptr<DepthStencil> depthStencil = std::make_shared<DepthStencil>();
+    DepthStencilConf conf = {};
+    conf.device = this->device.Get();
+    conf.width = width;
+    conf.height = height;
+    conf.frameBufferCount = frameBufferCount;
+    depthStencil->init(conf);
+    return depthStencil;
+}
+
 /// <summary>
 /// GPUとCPUの同期オブジェクト(fence)生成
 /// </summary>
@@ -437,6 +452,6 @@ void DX12Resources::setRTVHandle()
 
 void DX12Resources::setDSVHandle()
 {
-
+    this->currentFrameBufferDSVHandle = this->depthStencil->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
 }
 

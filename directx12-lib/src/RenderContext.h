@@ -66,6 +66,16 @@ public:
     }
 
     /// <summary>
+    /// 深度ステンシルビューのクリア
+    /// </summary>
+    /// <param name="dsvHandle">深度ステンシルのハンドル</param>
+    /// <param name="clearValue">クリア値</param>
+    void clearDepthStencil(D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, float clearValue)
+    {
+        this->commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearValue, 0, 0, nullptr);
+    }
+
+    /// <summary>
     /// ビューポートの設定
     /// 3Dレンダリングされたシーンがウィンドウ上のどの部分に表示されるべきかを定義
     /// つまり、3Dワールドのどの部分が最終的に2D画面に投影されるかを決定している
@@ -85,7 +95,7 @@ public:
     void setScissorRect(const D3D12_VIEWPORT& viewport)
     {
         //シザリング矩形を設定
-        D3D12_RECT scissorRect;
+        D3D12_RECT scissorRect = {};
         scissorRect.bottom = static_cast<LONG>(viewport.Height);
         scissorRect.top = 0;
         scissorRect.left = 0;
@@ -100,10 +110,10 @@ public:
     /// <param name="rtvHandle">レンダーターゲットのハンドル</param>
     /// <param name="dsvHandle">深度ステンシルビューのハンドル</param>
     //void setRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle)
-    void setRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle)
+    void setRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle)
     {
         //レンダーターゲットの設定
-        this->commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+        this->commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
     }
 
     /// <summary>
@@ -152,7 +162,7 @@ public:
     /// パイプラインステート登録
     /// </summary>
     /// <param name="pso"></param>
-    void setPipelineState(PipelineStateObject* pso) 
+    void setPipelineState(PipelineStateObject* pso)
     {
         this->commandList->SetPipelineState(pso->getPipelineStateObject());
     }
@@ -172,17 +182,18 @@ public:
     void setVertexBuffer(VertexBuffer* vb)
     {
         D3D12_VERTEX_BUFFER_VIEW vbView = vb->getVertexBufferView();
-		this->commandList->IASetVertexBuffers(0, 1, &vbView);
+        this->commandList->IASetVertexBuffers(0, 1, &vbView);
     }
 
     void setIndexBuffer(IndexBuffer* ib)
     {
-		D3D12_INDEX_BUFFER_VIEW ibView = ib->getIndexBufferView();
-		this->commandList->IASetIndexBuffer(&ibView);
-	}
+        D3D12_INDEX_BUFFER_VIEW ibView = ib->getIndexBufferView();
+        this->commandList->IASetIndexBuffer(&ibView);
+    }
 
     void drawIndexed(UINT indexCount) {
-        this->commandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+        //this->commandList->DrawIndexedInstanced(indexCount, 1, 0, 0);
+        this->commandList->DrawInstanced(indexCount, 1, 0, 0);
     }
 
 

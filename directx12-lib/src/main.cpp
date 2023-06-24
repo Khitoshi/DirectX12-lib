@@ -45,6 +45,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         dx12Resources->init(ResourceManager::getInstance()->getResource<Window>("window")->getHWND(), winConf.width, winConf.height, FRAMEBUFFERCOUNT);
         ResourceManager::getInstance()->registerResource("dx12Resources", dx12Resources);
 
+        auto device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
 
 #ifdef _DEBUG//imgui初期化処理
         ImGuiManagerConf imguiConf = {};
@@ -59,14 +60,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         //ルートシグネチャ
         std::shared_ptr<RootSignature> rootSignature = std::make_shared<RootSignature>();
         RootSignatureConf rootSignatureConf = {};
-        rootSignatureConf.device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
+        rootSignatureConf.device = device;
         rootSignature->init(rootSignatureConf);
         ResourceManager::getInstance()->registerResource("rootSignature", rootSignature);
-        
+
         //三角形
         std::shared_ptr<Triangle> triangle = std::make_shared<Triangle>();
         TriangleConf triangleConf = {};
-        triangleConf.device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
+        triangleConf.device = device;
         triangleConf.rootSignature = ResourceManager::getInstance()->getResource<RootSignature>("rootSignature").get();
         triangle->init(triangleConf);
         ResourceManager::getInstance()->registerResource("triangle", triangle);
