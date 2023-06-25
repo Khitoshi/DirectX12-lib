@@ -8,6 +8,8 @@
 
 #include "RootSignature.h"
 #include "Triangle.h"
+#include "SceneTriangle.h"
+#include "SceneManager.h"
 
 #ifdef _DEBUG
 #include "imgui\ImGuiManager.h"
@@ -45,7 +47,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         dx12Resources->init(ResourceManager::getInstance()->getResource<Window>("window")->getHWND(), winConf.width, winConf.height, FRAMEBUFFERCOUNT);
         ResourceManager::getInstance()->registerResource("dx12Resources", dx12Resources);
 
-        auto device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
+
 
 #ifdef _DEBUG//imgui初期化処理
         ImGuiManagerConf imguiConf = {};
@@ -57,13 +59,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         ResourceManager::getInstance()->registerResource("imguiManager", imguiManager);
 #endif // _DEBUG
 
-        //三角形
-        //TODO:Sceneクラスを作ってそこに登録する
-        std::shared_ptr<Triangle> triangle = std::make_shared<Triangle>();
-        TriangleConf triangleConf = {};
-        triangleConf.device = device;
-        triangle->init(triangleConf);
-        ResourceManager::getInstance()->registerResource("triangle", triangle);
+        auto device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
+        auto rc = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext();
+
+
+        SceneConf conf = {};
+        conf.device = device;
+        conf.renderContext = rc;
+        std::shared_ptr<SceneTriangle> sceneTriangle = std::make_shared<SceneTriangle>(conf);
+        SceneManager<SceneTriangle>::getInstance().changeScene(sceneTriangle.get());
+
+
 
         //メッセージループ処理
         float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -79,7 +85,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->beginRender(color);
             //三角形描画
             //TODO:Sceneクラスを作ってそこに登録する
-            ResourceManager::getInstance()->getResource<Triangle>("triangle")->draw(ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext());
+            //ResourceManager::getInstance()->getResource<Triangle>("triangle")->draw(ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext());
+            SceneManager<SceneTriangle>::getInstance().update();
+            SceneManager<SceneTriangle>::getInstance().render();
 
 #ifdef _DEBUG
             //Frame開始処理
