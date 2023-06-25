@@ -1,23 +1,25 @@
 #pragma once
+#include "Scene.h"
 #include "Triangle.h"
 
-struct SceneConf {
-    ID3D12Device* device;
-    RenderContext* renderContext;
-};
-
-class SceneTriangle
+/// <summary>
+/// 三角形描画用シーン
+/// </summary>
+class SceneTriangle : public Scene
 {
 public:
-    SceneTriangle(const SceneConf c) :conf(c) {};
+    SceneTriangle() {};
     ~SceneTriangle() {};
 
-    void init();
+    //初期化処理
+    void init(SceneConf conf);
+    //終了処理
     void finalize();
+    //更新処理
     void update();
-    void render();
+    //描画処理
+    void render(SceneConf conf);
 
 private:
-    std::shared_ptr<Triangle> triangle;
-    SceneConf conf;
+    std::shared_ptr<Triangle> triangle;//三角形
 };

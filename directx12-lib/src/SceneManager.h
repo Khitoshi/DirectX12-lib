@@ -3,34 +3,31 @@
 #include <vector>
 #include <memory>
 #include <concepts>
-
-//シーンのインターフェース
-template<typename T>
-concept Scene = requires(T & value)
-{
-    {value.init()}      -> std::convertible_to<void>;//初期化処理
-    {value.finalize()}  -> std::convertible_to<void>;//終了化処理
-    {value.update()}    -> std::convertible_to<void>;//更新処理
-    {value.render()}    -> std::convertible_to<void>;//描画処理
-};
+#include "Scene.h"
 
 
-template<Scene T>
+/// <summary>
+/// シーン管理クラス
+/// </summary>
 class SceneManager
 {
 private:
-    SceneManager() {};
+    SceneManager() :currentScene() {};
     ~SceneManager() {};
 public:
-
-    //シングルトン
+    /// <summary>
+    /// シングルトンなインスタンスを取得
+    /// </summary>
+    /// <returns></returns>
     static SceneManager& getInstance()
     {
         static SceneManager instance;
         return instance;
     }
 
-    //初期化処理
+    /// <summary>
+    /// 初期化処理
+    /// </summary>
     void clear()
     {
         if (this->currentScene) {
@@ -38,7 +35,9 @@ public:
         }
     }
 
-    //初期化処理
+    /// <summary>
+    /// 初期化処理
+    /// </summary>
     void update()
     {
         if (currentScene) {
@@ -46,25 +45,33 @@ public:
         }
     }
 
-    //描画処理
-    void render()
+    /// <summary>
+    /// 描画処理
+    /// </summary>
+    /// <param name="conf"></param>
+    void render(SceneConf conf)
     {
         if (currentScene) {
-            currentScene->render();
+            currentScene->render(conf);
         }
     }
 
-    //変更処理
-    void changeScene(T* scene)
+    /// <summary>
+    /// シーン変更処理
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="conf"></param>
+    template<class T>
+    void changeScene(SceneConf conf)
     {
-        if (scene) {
-            currentScene->finalize();
-            currentScene = scene;
-            currentScene->init();
-        }
+
+        clear();
+        currentScene = std::make_shared<T>();
+        currentScene->init(conf);
+
     }
+
 private:
-    //現在のシーン
-    T* currentScene;
+    std::shared_ptr<Scene> currentScene = nullptr;//現在のシーン
 };
 

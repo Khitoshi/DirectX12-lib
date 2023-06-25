@@ -176,6 +176,9 @@
     <ClInclude Include="src\SceneTriangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TriangleVS.hlsl">

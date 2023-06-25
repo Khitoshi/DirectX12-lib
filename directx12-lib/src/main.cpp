@@ -47,8 +47,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         dx12Resources->init(ResourceManager::getInstance()->getResource<Window>("window")->getHWND(), winConf.width, winConf.height, FRAMEBUFFERCOUNT);
         ResourceManager::getInstance()->registerResource("dx12Resources", dx12Resources);
 
-
-
 #ifdef _DEBUG//imgui初期化処理
         ImGuiManagerConf imguiConf = {};
         imguiConf.device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
@@ -59,17 +57,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         ResourceManager::getInstance()->registerResource("imguiManager", imguiManager);
 #endif // _DEBUG
 
+        //デバイス取得
         auto device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
+        //レンダーコンテキスト取得
         auto rc = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext();
 
-
+        //シーン初期化処理
         SceneConf conf = {};
         conf.device = device;
         conf.renderContext = rc;
-        std::shared_ptr<SceneTriangle> sceneTriangle = std::make_shared<SceneTriangle>(conf);
-        SceneManager<SceneTriangle>::getInstance().changeScene(sceneTriangle.get());
-
-
+        SceneManager::getInstance().changeScene<SceneTriangle>(conf);
 
         //メッセージループ処理
         float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -86,8 +83,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             //三角形描画
             //TODO:Sceneクラスを作ってそこに登録する
             //ResourceManager::getInstance()->getResource<Triangle>("triangle")->draw(ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext());
-            SceneManager<SceneTriangle>::getInstance().update();
-            SceneManager<SceneTriangle>::getInstance().render();
+            SceneManager::getInstance().update();
+            SceneManager::getInstance().render(conf);
 
 #ifdef _DEBUG
             //Frame開始処理
