@@ -5,6 +5,9 @@
 #include <vector>
 using namespace Microsoft::WRL;
 
+/// <summary>
+/// 深度ステンシルバッファ生成時に使用する設定
+/// </summary>
 struct DepthStencilConf
 {
     ID3D12Device* device;
@@ -13,31 +16,30 @@ struct DepthStencilConf
     UINT height;
 };
 
-
+/// <summary>
+/// 深度ステンシルバッファ生成用クラス
+/// </summary>
 class DepthStencil
 {
 public:
-    DepthStencil() {};
+    DepthStencil() :descriptorHeap(), resource() {};
     ~DepthStencil() {};
 
+    //初期化処理
     void init(const DepthStencilConf depthStencilConf);
 
 private:
     //ディスクリプタヒープの生成
     ComPtr<ID3D12DescriptorHeap> createDescriptorHeap(const DepthStencilConf depthStencilConf);
 
-    //ディスクリプタヒープのサイズの取得
-    //int createDescriptorHeapSize(const DepthStencilConf depthStencilConf);
-
     //リソースの生成
     void createResource(const DepthStencilConf depthStencilConf);
 
 public:
-    ID3D12DescriptorHeap* getDescriptorHeap() const { return descriptorHeap.Get(); } //ディスクリプタヒープの取得
-    //int getDescriptorHeapSize() const { return descriptorHeapSize; } //ディスクリプタヒープのサイズの取得
-    ID3D12Resource* getResource() const { return resource.Get(); } //リソースの取得
+    ID3D12DescriptorHeap* getDescriptorHeap() const { return descriptorHeap.Get(); }    //ディスクリプタヒープの取得
+    ID3D12Resource* getResource() const { return resource.Get(); }                      //リソースの取得
+
 private:
-    ComPtr<ID3D12DescriptorHeap> descriptorHeap;    //ディスクリプタヒープ
-    //int descriptorHeapSize;                         //ディスクリプタヒープのサイズ
-    ComPtr<ID3D12Resource> resource;   //リソース
+    ComPtr<ID3D12DescriptorHeap>    descriptorHeap;         //ディスクリプタヒープ
+    ComPtr<ID3D12Resource>          resource;               //リソース
 };

@@ -12,9 +12,9 @@
 /// </summary>
 /// <param name="filePath">ファイルパス</param>
 /// <param name="entryFuncName">シェーダーエントリー関数名</param>
-void Shader::LoadVS(const char* filePath, const char* entryFuncName)
+void Shader::LoadVS(ShaderConf conf)
 {
-    load(filePath, entryFuncName, "vs_5_0");
+    load(conf, "vs_5_0");
 }
 
 
@@ -23,9 +23,9 @@ void Shader::LoadVS(const char* filePath, const char* entryFuncName)
 /// </summary>
 /// <param name="filePath">ファイルパス</param>
 /// <param name="entryFuncName">シェーダーエントリー関数名</param>
-void Shader::LoadPS(const char* filePath, const char* entryFuncName)
+void Shader::LoadPS(ShaderConf conf)
 {
-    load(filePath, entryFuncName, "ps_5_0");
+    load(conf, "ps_5_0");
 }
 
 
@@ -38,7 +38,7 @@ void Shader::LoadPS(const char* filePath, const char* entryFuncName)
 /// <returns>
 /// 正常にコンパイルされたシェーダー
 /// </returns>
-void Shader::load(const char* filePath, const char* entryFuncName, const char* shaderModel)
+void Shader::load(ShaderConf conf, const char* shaderModel)
 {
 #ifdef _DEBUG
     //シェーダーのデバッグを有効にする
@@ -50,7 +50,7 @@ void Shader::load(const char* filePath, const char* entryFuncName, const char* s
     //ファイルパスの変換
     wchar_t wfxFilePath[256] = { L"" };
     //mbstowcs(wfxFilePath, filePath, 256);
-    mbstowcs_s(nullptr, wfxFilePath, filePath, 256);
+    mbstowcs_s(nullptr, wfxFilePath, conf.filePath, 256);
 
     //シェーダーのコンパイル
     ComPtr<ID3DBlob> errorBlob = nullptr;
@@ -58,7 +58,7 @@ void Shader::load(const char* filePath, const char* entryFuncName, const char* s
         wfxFilePath,
         nullptr,
         D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        entryFuncName,
+        conf.entryFuncName,
         shaderModel,
         compileFlags,
         0,
@@ -78,5 +78,4 @@ void Shader::load(const char* filePath, const char* entryFuncName, const char* s
     else if (!shaderBlob) {
         throw "FAILED shader load error: shaderBlob is nullptr";
     }
-    return;
 }

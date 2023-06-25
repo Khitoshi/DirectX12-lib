@@ -57,21 +57,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         ResourceManager::getInstance()->registerResource("imguiManager", imguiManager);
 #endif // _DEBUG
 
-        //ルートシグネチャ
-        std::shared_ptr<RootSignature> rootSignature = std::make_shared<RootSignature>();
-        RootSignatureConf rootSignatureConf = {};
-        rootSignatureConf.device = device;
-        rootSignature->init(rootSignatureConf);
-        ResourceManager::getInstance()->registerResource("rootSignature", rootSignature);
-
         //三角形
+        //TODO:Sceneクラスを作ってそこに登録する
         std::shared_ptr<Triangle> triangle = std::make_shared<Triangle>();
         TriangleConf triangleConf = {};
         triangleConf.device = device;
-        triangleConf.rootSignature = ResourceManager::getInstance()->getResource<RootSignature>("rootSignature").get();
         triangle->init(triangleConf);
         ResourceManager::getInstance()->registerResource("triangle", triangle);
-
 
         //メッセージループ処理
         float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -85,8 +77,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         while (ResourceManager::getInstance()->getResource<Window>("window")->processMessages()) {
             //描画開始処理
             ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->beginRender(color);
-            ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext()->setRootSignature(ResourceManager::getInstance()->getResource<RootSignature>("rootSignature").get());
-            //TODO ここに描画処理を書く
+            //三角形描画
+            //TODO:Sceneクラスを作ってそこに登録する
             ResourceManager::getInstance()->getResource<Triangle>("triangle")->draw(ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext());
 
 #ifdef _DEBUG

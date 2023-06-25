@@ -4,27 +4,35 @@
 
 using namespace Microsoft::WRL;
 
+struct ShaderConf
+{
+    const char* filePath;
+    const char* entryFuncName;
+};
 
-    class Shader
-    {
-    public:
-        Shader() :shaderBlob() {};
-        ~Shader() {};
+/// <summary>
+/// シェーダーのコンパイル用クラス
+/// </summary>
+class Shader
+{
+public:
+    Shader() :shaderBlob() {};
+    ~Shader() {};
 
+    //頂点シェーダーのロード
+    void LoadVS(ShaderConf conf);
+    //ピクセルシェーダーのロード
+    void LoadPS(ShaderConf conf);
 
+private:
+    //シェーダーのロード
+    void load(ShaderConf conf, const char* shaderModel);
 
-        //頂点シェーダーのロード
-        void LoadVS(const char* filePath, const char* entryFuncName);
-        //ピクセルシェーダーのロード
-        void LoadPS(const char* filePath, const char* entryFuncName);
-    private:
-        //シェーダーのロード
-        void load(const char* filePath, const char* entryFuncName, const char* shaderModel);
+public:
+    //シェーダーバイナリの取得
+    ID3D10Blob* getShaderBlob() const { return shaderBlob.Get(); }
 
-    public:
-	    //シェーダーバイナリの取得
-	    ID3D10Blob* getShaderBlob() const { return shaderBlob.Get(); }
-    private:
-        ComPtr<ID3D10Blob> shaderBlob;//シェーダーバイナリ
-    };
+private:
+    ComPtr<ID3D10Blob> shaderBlob;  //シェーダーバイナリ
+};
 

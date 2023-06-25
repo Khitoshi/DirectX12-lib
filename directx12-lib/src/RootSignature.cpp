@@ -1,21 +1,25 @@
 #include "RootSignature.h"
 #include <stdexcept>
 
+/// <summary>
+/// ルートシグニチャの初期化処理
+/// </summary>
+/// <param name="conf">ルートシグニチャ生成用設定</param>
 void RootSignature::init(RootSignatureConf conf)
 {
     createRootSignature(conf);
 }
 
 /// <summary>
-/// ルートシグネチャの作成
+/// ルートシグニチャの作成
 /// </summary>
-/// <param name="rootSignatureConf">ルートシグネチャ設定</param>
+/// <param name="rootSignatureConf">ルートシグニチャ設定</param>
 /// <returns>
-/// 生成したルートシグネチャ
+/// 生成したルートシグニチャ
 /// </returns>
 void RootSignature::createRootSignature(RootSignatureConf rootSignatureConf)
 {
-    //ルートシグネチャの設定
+    //ルートシグニチャの設定
     D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
     rootSignatureDesc.NumParameters = 0;
     rootSignatureDesc.pParameters = nullptr;

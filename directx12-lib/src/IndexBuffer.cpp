@@ -1,16 +1,14 @@
 #include "IndexBuffer.h"
 
+/// <summary>
+/// インデクスバッファの初期化
+/// </summary>
+/// <param name="conf">インデックスバッファ生成用設定</param>
 void IndexBuffer::init(IndexBufferConf conf)
 {
-    if (conf.stride == 2) {
-        sizeInBytes = conf.size * 2;
-    }
-    else {
-        sizeInBytes = conf.size;
-    }
-
+    this->sizeInBytes = conf.size;
     auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    auto rDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeInBytes);
+    auto rDesc = CD3DX12_RESOURCE_DESC::Buffer(this->sizeInBytes);
 
     auto hr = conf.device->CreateCommittedResource(
         &heapProp,
@@ -18,39 +16,46 @@ void IndexBuffer::init(IndexBufferConf conf)
         &rDesc,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS(&indexBuffer));
+        IID_PPV_ARGS(&this->indexBuffer));
 
     //インデックスバッファのビューを作成。
-    indexBufferView.BufferLocation = indexBuffer->GetGPUVirtualAddress();
+    this->indexBufferView.BufferLocation = indexBuffer->GetGPUVirtualAddress();
 
     //ストライドは４バイト固定。
-    strideInBytes = 4;
-    indexBufferView.Format = DXGI_FORMAT_R32_UINT;
-    indexBufferView.SizeInBytes = sizeInBytes;
-    count = sizeInBytes / strideInBytes;
+    this->strideInBytes = 4;
+    this->indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+    this->indexBufferView.SizeInBytes = sizeof(uint32_t) * conf.count;;
+    this->count = conf.count;
 }
 
+
+/// <summary>
+/// リソースにインデックスデータをコピーする。
+/// </summary>
+/// <param name="srcIndices">インデックスデータの配列</param>
 void IndexBuffer::copy(uint16_t* srcIndices)
 {
     uint32_t* pData = nullptr;
-    if (FAILED(this->indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
+    if (SUCCEEDED(this->indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
         for (int i = 0; i < count; i++) {
-            pData[i] = srcIndices[i];
+            pData[i] = static_cast<uint32_t>(srcIndices[i]);
         }
     }
     this->indexBuffer->Unmap(0, nullptr);
 
 }
 
+/// <summary>
+/// リソースにインデックスデータをコピーする。
+/// </summary>
+/// <param name="srcIndices">インデックスデータの配列</param>
 void IndexBuffer::copy(uint32_t* srcIndices)
 {
     uint32_t* pData = nullptr;
-
-    if (FAILED(this->indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
+    if (SUCCEEDED(this->indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
         for (int i = 0; i < count; i++) {
             pData[i] = srcIndices[i];
         }
     }
     this->indexBuffer->Unmap(0, nullptr);
-
 }

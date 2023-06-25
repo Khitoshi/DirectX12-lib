@@ -178,31 +178,45 @@ public:
     }
 
 
-    ///
+    /// <summary>
+    /// 頂点バッファを設定
+    /// </summary>
+    /// <param name="vb">頂点バッファ</param>
     void setVertexBuffer(VertexBuffer* vb)
     {
         D3D12_VERTEX_BUFFER_VIEW vbView = vb->getVertexBufferView();
         this->commandList->IASetVertexBuffers(0, 1, &vbView);
     }
 
+    /// <summary>
+    /// インデックスバッファを設定
+    /// </summary>
+    /// <param name="ib">インデックスバッファ</param>
     void setIndexBuffer(IndexBuffer* ib)
     {
         D3D12_INDEX_BUFFER_VIEW ibView = ib->getIndexBufferView();
         this->commandList->IASetIndexBuffer(&ibView);
     }
 
+    /// <summary>
+    /// インデックス付きの描画コールを実行
+    /// </summary>
+    /// <param name="indexCount">インデックスの要素数</param>
     void drawIndexed(UINT indexCount) {
-        //this->commandList->DrawIndexedInstanced(indexCount, 1, 0, 0);
-        this->commandList->DrawInstanced(indexCount, 1, 0, 0);
+        this->commandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+        //this->commandList->DrawInstanced(indexCount, 1, 0, 0);
     }
 
-
+    /// <summary>
+    /// ルートシグシグニチャを設定
+    /// </summary>
+    /// <param name="rootSignature">ルートシグニチャ</param>
     void setRootSignature(RootSignature* rootSignature) {
         this->commandList->SetGraphicsRootSignature(rootSignature->getRootSignature());
     }
 
 public:
-    ID3D12GraphicsCommandList4* getCommandList() { return this->commandList; }
+    ID3D12GraphicsCommandList4* getCommandList() { return this->commandList; }//コマンドリストの取得
 
 private:
     enum { MAX_DESCRIPTOR_HEAP = 4 };	//ディスクリプタヒープの最大数

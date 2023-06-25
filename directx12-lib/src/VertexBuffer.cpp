@@ -1,6 +1,10 @@
 #include "VertexBuffer.h"
 #include <stdexcept>
 
+/// <summary>
+/// 頂点バッファの初期化
+/// </summary>
+/// <param name="conf">頂点バッファ生成用の設定</param>
 void VertexBuffer::init(VertexBufferConf conf)
 {
     //ヒープの設定
@@ -24,7 +28,6 @@ void VertexBuffer::init(VertexBufferConf conf)
     desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
     desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-
     if (FAILED(
         conf.device->CreateCommittedResource(
             &heapProp,
@@ -45,7 +48,10 @@ void VertexBuffer::init(VertexBufferConf conf)
     vertexBufferView.StrideInBytes = conf.stride;
 }
 
-
+/// <summary>
+/// リソースに頂点データをコピーする。
+/// </summary>
+/// <param name="srcVertices">頂点データ配列</param>
 void VertexBuffer::copy(void* srcVertices)
 {
     uint8_t* pData = nullptr;

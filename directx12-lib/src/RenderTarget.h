@@ -16,6 +16,9 @@ struct RenderTargetConf {
     IDXGISwapChain3* swapChain;
 };
 
+/// <summary>
+/// レンダーターゲット生成用クラス
+/// </summary>
 class RenderTarget
 {
 public:
@@ -39,9 +42,9 @@ private:
     std::vector<ComPtr<ID3D12Resource>> createResource(const RenderTargetConf renderTargetConf);
 
 public:
-    ID3D12DescriptorHeap* getDescriptorHeap() const { return descriptorHeap.Get(); } //ディスクリプタヒープの取得
-    int getDescriptorHeapSize() const { return descriptorHeapSize; } //ディスクリプタヒープのサイズの取得
-    ID3D12Resource* getResource(int index) const { return resource[index].Get(); } //リソースの取得
+    ID3D12DescriptorHeap* getDescriptorHeap() const { return descriptorHeap.Get(); }    //ディスクリプタヒープの取得
+    int getDescriptorHeapSize() const { return descriptorHeapSize; }                    //ディスクリプタヒープのサイズの取得
+    ID3D12Resource* getResource(int index) const { return resource[index].Get(); }      //リソースの取得
 
 private:
     ComPtr<ID3D12DescriptorHeap> descriptorHeap;    //ディスクリプタヒープ

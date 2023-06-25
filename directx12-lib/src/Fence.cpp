@@ -4,7 +4,7 @@
 /// <summary>
 /// GPUと同期オブジェクトの初期化
 /// </summary>
-/// <param name="device"></param>
+/// <param name="device">デバイスインターフェース</param>
 void Fence::init(ID3D12Device* device)
 {
     fence = createFence(device);

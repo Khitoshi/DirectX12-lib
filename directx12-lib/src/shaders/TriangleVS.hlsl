@@ -1,7 +1,7 @@
 #include "./Triangle.hlsli"
 
 
-    // 頂点シェーダーへの入力頂点構造体
+// 頂点シェーダーへの入力頂点構造体
 struct VSInput
 {
     float4 pos : POSITION; //XYZW

@@ -3,12 +3,19 @@
 
 using namespace Microsoft::WRL;
 
+/// <summary>
+/// インデックスバッファ生成時に使用する設定
+/// </summary>
 struct IndexBufferConf {
     ID3D12Device* device;
     int size;
     int stride;
+    int count;
 };
 
+/// <summary>
+/// インデックスバッファ生成用&copyするクラス
+/// </summary>
 class IndexBuffer
 {
 public:
@@ -22,7 +29,10 @@ public:
     {}
     ~IndexBuffer() {}
 
+    //初期化処理
     void init(IndexBufferConf conf);
+
+    //リソースにコピー
     void copy(uint16_t* srcIndices);
     void copy(uint32_t* srcIndices);
 
@@ -39,7 +49,7 @@ public:
     //インデックスバッファのサイズの取得
     int getSizeInBytes() const { return sizeInBytes; }
 private:
-    ComPtr<ID3D12Resource> indexBuffer;		//インデックスバッファ。
+    ComPtr<ID3D12Resource>  indexBuffer;		//インデックスバッファ。
     D3D12_INDEX_BUFFER_VIEW indexBufferView;	//インデックスバッファビュー。
     int strideInBytes;							//インデックスバッファのストライド。
     int count;									//インデックスバッファの数。
