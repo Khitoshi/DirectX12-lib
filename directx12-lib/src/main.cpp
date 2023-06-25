@@ -85,7 +85,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             //FrameŠJŽnˆ—
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->beginFrame();
 
-
             {
                 ImGui::Begin("System");
 

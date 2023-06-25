@@ -6,7 +6,6 @@
 #include <fstream>
 #include <atlbase.h>
 
-
 /// <summary>
 /// 頂点シェーダーの読み込み
 /// </summary>
@@ -17,7 +16,6 @@ void Shader::LoadVS(ShaderConf conf)
     load(conf, "vs_5_0");
 }
 
-
 /// <summary>
 /// ピクセルシェーダーの読み込み
 /// </summary>
@@ -27,7 +25,6 @@ void Shader::LoadPS(ShaderConf conf)
 {
     load(conf, "ps_5_0");
 }
-
 
 /// <summary>
 /// シェーダーの読み込み

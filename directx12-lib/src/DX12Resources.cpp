@@ -125,7 +125,6 @@ ComPtr<IDXGIFactory4> DX12Resources::createFactory() {
         throw std::runtime_error("failed to create debug Controller");
     }
 
-
 #endif
 
     ComPtr<IDXGIFactory4> factory;
@@ -459,4 +458,3 @@ void DX12Resources::setDSVHandle()
 {
     this->currentFrameBufferDSVHandle = this->depthStencil->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
 }
-

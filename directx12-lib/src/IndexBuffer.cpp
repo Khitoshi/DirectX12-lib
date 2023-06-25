@@ -28,7 +28,6 @@ void IndexBuffer::init(IndexBufferConf conf)
     this->count = conf.count;
 }
 
-
 /// <summary>
 /// リソースにインデックスデータをコピーする。
 /// </summary>
@@ -42,7 +41,6 @@ void IndexBuffer::copy(uint16_t* srcIndices)
         }
     }
     this->indexBuffer->Unmap(0, nullptr);
-
 }
 
 /// <summary>

@@ -34,5 +34,4 @@ public:
 
 private:
     ComPtr<ID3D12PipelineState> pipelineStateObject;    //パイプラインステートオブジェクト
-
 };

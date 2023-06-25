@@ -19,7 +19,6 @@ struct TriangleConf
     //UINT height;
 };
 
-
 /// <summary>
 /// シンプルな三角形を描画するクラス
 /// </summary>
