@@ -6,6 +6,9 @@
 #include "ResourceManager.h"
 #include "DX12Resources.h"
 
+#include "RootSignature.h"
+#include "Triangle.h"
+
 #ifdef _DEBUG
 #include "imgui\ImGuiManager.h"
 #endif // !_DEBUG
@@ -27,7 +30,7 @@ void DebugOutputFormatString(const char* format, ...) {
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
     try {
         //windows初期化処理
-        WindowConfig winConf;
+        WindowConfig winConf = {};
         winConf.appName = TEXT("DirectX12");
         winConf.x = 0;
         winConf.y = 0;
@@ -42,9 +45,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         dx12Resources->init(ResourceManager::getInstance()->getResource<Window>("window")->getHWND(), winConf.width, winConf.height, FRAMEBUFFERCOUNT);
         ResourceManager::getInstance()->registerResource("dx12Resources", dx12Resources);
 
-        //imgui初期化処理
-#ifdef _DEBUG
-        ImGuiManagerConf imguiConf;
+        auto device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
+
+#ifdef _DEBUG//imgui初期化処理
+        ImGuiManagerConf imguiConf = {};
         imguiConf.device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
         imguiConf.frameBufferCount = FRAMEBUFFERCOUNT;
         imguiConf.hWnd = ResourceManager::getInstance()->getResource<Window>("window")->getHWND();
@@ -53,21 +57,29 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         ResourceManager::getInstance()->registerResource("imguiManager", imguiManager);
 #endif // _DEBUG
 
+        //三角形
+        //TODO:Sceneクラスを作ってそこに登録する
+        std::shared_ptr<Triangle> triangle = std::make_shared<Triangle>();
+        TriangleConf triangleConf = {};
+        triangleConf.device = device;
+        triangle->init(triangleConf);
+        ResourceManager::getInstance()->registerResource("triangle", triangle);
+
         //メッセージループ処理
         float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 #ifdef _DEBUG
         //FPS計測用
         const int FRAMERATE_BUFFER_SIZE = 1000;
-        float frameRates[FRAMERATE_BUFFER_SIZE];
+        float frameRates[FRAMERATE_BUFFER_SIZE] = {};
         int currentFrameRateIndex = 0;
 
 #endif // _DEBUG
         while (ResourceManager::getInstance()->getResource<Window>("window")->processMessages()) {
             //描画開始処理
             ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->beginRender(color);
-
-            //TODO ここに描画処理を書く
-
+            //三角形描画
+            //TODO:Sceneクラスを作ってそこに登録する
+            ResourceManager::getInstance()->getResource<Triangle>("triangle")->draw(ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext());
 
 #ifdef _DEBUG
             //Frame開始処理

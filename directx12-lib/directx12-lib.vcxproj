@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DepthStencil.cpp" />
     <ClCompile Include="src\DX12Resources.cpp" />
     <ClCompile Include="src\Fence.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
@@ -29,13 +30,21 @@
     <ClCompile Include="src\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\PipelineStateObject.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
+    <ClCompile Include="src\RootSignature.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
+    <ClCompile Include="src\Triangle.cpp" />
+    <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\d3dx12.h" />
+    <ClInclude Include="src\DepthStencil.h" />
     <ClInclude Include="src\DX12Resources.h" />
     <ClInclude Include="src\Fence.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
@@ -47,12 +56,39 @@
     <ClInclude Include="src\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\IndexBuffer.h" />
+    <ClInclude Include="src\PipelineStateObject.h" />
     <ClInclude Include="src\RenderContext.h" />
     <ClInclude Include="src\RenderTarget.h" />
     <ClInclude Include="src\ResourceManager.h" />
+    <ClInclude Include="src\RootSignature.h" />
+    <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\SwapChain.h" />
+    <ClInclude Include="src\Triangle.h" />
+    <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\Window.h" />
     <ClInclude Include="src\WindowConfig.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\shaders\TrianglePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PSMain</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\TriangleVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\Triangle.hlsli" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

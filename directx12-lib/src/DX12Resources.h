@@ -8,8 +8,10 @@
 
 #include "SwapChain.h"
 #include "RenderTarget.h"
+#include "DepthStencil.h"
 #include "RenderContext.h"
 #include "Fence.h"
+#include "RootSignature.h"
 
 using namespace Microsoft::WRL;
 
@@ -26,6 +28,7 @@ public:
         commandAllocator(),
         commandList(),
         renderTarget(),
+        depthStencil(),
         fence(),
         renderContext(),
         viewport(),
@@ -63,6 +66,7 @@ private://生成系
     ComPtr<ID3D12GraphicsCommandList4> createCommandList();
     //レンダーターゲット生成
     std::shared_ptr<RenderTarget> createRenderTarget(const int width, const int height, const UINT frameBufferCount);
+    std::shared_ptr<DepthStencil> createDepthStencil(const int width, const int height, const UINT frameBufferCount);
     //フェンス生成
     std::shared_ptr<Fence> createFence();
     //レンダーコンテキスト生成
@@ -76,6 +80,9 @@ private://生成系
     //レンダーターゲットビューのハンドルを設定
     void setRTVHandle();
 
+    //深度ステンシルビューのハンドルを設定
+    void setDSVHandle();
+
 public://取得系
     //デバイス取得
     ID3D12Device5* getDevice() const { return device.Get(); }
@@ -88,6 +95,8 @@ private:
     ComPtr<ID3D12CommandAllocator>commandAllocator;                 //コマンドアロケータ
     ComPtr<ID3D12GraphicsCommandList4>commandList;                  //コマンドリスト
     std::shared_ptr<RenderTarget>renderTarget;                      //レンダーターゲット
+    std::shared_ptr<DepthStencil>depthStencil;                      //深度ステンシル
+
     std::shared_ptr<Fence> fence;                                   //フェンス
     std::shared_ptr<RenderContext> renderContext;                   //レンダーコンテキスト
 

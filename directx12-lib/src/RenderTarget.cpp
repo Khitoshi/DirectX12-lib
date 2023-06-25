@@ -4,7 +4,7 @@
 /// <summary>
 /// èâä˙âªèàóù
 /// </summary>
-/// <param name="renderTargetConf"></param>
+/// <param name="renderTargetConf">RTVê∂ê¨ópê›íË</param>
 void RenderTarget::init(RenderTargetConf renderTargetConf)
 {
     this->descriptorHeap = createDescriptorHeap(renderTargetConf);
@@ -21,7 +21,7 @@ void RenderTarget::init(RenderTargetConf renderTargetConf)
 /// </returns>
 ComPtr<ID3D12DescriptorHeap> RenderTarget::createDescriptorHeap(const RenderTargetConf renderTargetConf)
 {
-    D3D12_DESCRIPTOR_HEAP_DESC desc;
+    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
     desc.NumDescriptors = renderTargetConf.frameBufferCount;
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;

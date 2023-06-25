@@ -11,6 +11,7 @@ void DX12Resources::init(const HWND hWnd, const int width, const int height, con
     this->commandAllocator = createCommandAllocator();
     this->commandList = createCommandList();
     this->renderTarget = createRenderTarget(width, height, frameBufferCount);
+    this->depthStencil = createDepthStencil(width, height, frameBufferCount);
     this->fence = createFence();
     this->renderContext = createRenderContext();
     this->viewport = createViewport(width, height);
@@ -18,12 +19,14 @@ void DX12Resources::init(const HWND hWnd, const int width, const int height, con
     return;
 }
 
+/// <summary>
+/// レンダリング開始処理
+/// </summary>
+/// <param name="color">clearcolor</param>
 void DX12Resources::beginRender(const float color[4])
 {
     //バックバッファインデックスの取得
     this->frameIndex = this->swapChain->getCurrentBackBufferIndex();
-
-    //TODO:カメラの処理の追加
 
     //コマンドアロケータのリセット
     this->commandAllocator->Reset();
@@ -40,14 +43,21 @@ void DX12Resources::beginRender(const float color[4])
 
     //レンダーターゲットのハンドルを設定
     this->setRTVHandle();
+    //深度ステンシルビューのハンドルを設定
+    this->setDSVHandle();
 
     //レンダーターゲットをセット
-    this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle);
+    this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
 
     //レンダーターゲットのクリア
     this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, color);
+    //深度ステンシルのクリア
+    this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
 }
 
+/// <summary>
+/// レンダリング終了処理
+/// </summary>
 void DX12Resources::endRender()
 {
     //レンダーターゲットの描画完了を待つ
@@ -101,11 +111,23 @@ ComPtr<IDXGIFactory4> DX12Resources::createFactory() {
 
         //デバッグの場合デバッグフラグを立てる
         dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+
+#if 0 // GBV を有効化する場合.
+        ComPtr<ID3D12Debug3> debug3;
+        debug.As(&debug3);
+        if (debug3)
+        {
+            debug3->SetEnableGPUBasedValidation(true);
+        }
+#endif
     }
     else {
         throw std::runtime_error("failed to create debug Controller");
     }
+
+
 #endif
+
     ComPtr<IDXGIFactory4> factory;
 
     //factory生成
@@ -268,7 +290,7 @@ ComPtr<ID3D12CommandQueue> DX12Resources::createCommandQueue()
 std::shared_ptr<SwapChain> DX12Resources::createSwapChain(const HWND hWnd, const int width, const int height, const int frameBufferCount, IDXGIFactory4* factory) {
     std::shared_ptr<SwapChain> swapChain(new SwapChain());
 
-    SwapChainConf conf;
+    SwapChainConf conf = {};
     conf.hWnd = hWnd;
     conf.width = width;
     conf.height = height;
@@ -331,7 +353,7 @@ ComPtr<ID3D12GraphicsCommandList4> DX12Resources::createCommandList()
 /// </returns>
 std::shared_ptr<RenderTarget> DX12Resources::createRenderTarget(const int width, const int height, const UINT frameBufferCount)
 {
-    RenderTargetConf rtc;
+    RenderTargetConf rtc = {};
     rtc.device = this->device.Get();
     rtc.frameBufferCount = frameBufferCount;
     rtc.width = width;
@@ -341,6 +363,18 @@ std::shared_ptr<RenderTarget> DX12Resources::createRenderTarget(const int width,
     std::shared_ptr<RenderTarget> renderTarget(new RenderTarget());
     renderTarget->init(rtc);
     return renderTarget;
+}
+
+std::shared_ptr<DepthStencil> DX12Resources::createDepthStencil(const int width, const int height, const UINT frameBufferCount)
+{
+    std::shared_ptr<DepthStencil> depthStencil = std::make_shared<DepthStencil>();
+    DepthStencilConf conf = {};
+    conf.device = this->device.Get();
+    conf.width = width;
+    conf.height = height;
+    conf.frameBufferCount = frameBufferCount;
+    depthStencil->init(conf);
+    return depthStencil;
 }
 
 /// <summary>
@@ -407,10 +441,22 @@ D3D12_RECT DX12Resources::createScissorRect(const int width, const int height)
     return rect;
 }
 
+/// <summary>
+/// RTVハンドルを設定する
+/// </summary>
 void DX12Resources::setRTVHandle()
 {
     //レンダーターゲットのディスクリプタヒープの先頭アドレスを取得
     this->currentFrameBufferRTVHandle = this->renderTarget->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
     //フレームバッファ数分ずらす
-    this->currentFrameBufferRTVHandle.ptr += this->renderTarget->getDescriptorHeapSize() * this->frameIndex;
+    this->currentFrameBufferRTVHandle.ptr += static_cast<unsigned long long>(this->renderTarget->getDescriptorHeapSize()) * this->frameIndex;
 }
+
+/// <summary>
+/// DSVハンドルを設定する
+/// </summary>
+void DX12Resources::setDSVHandle()
+{
+    this->currentFrameBufferDSVHandle = this->depthStencil->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+}
+

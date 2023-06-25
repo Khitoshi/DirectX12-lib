@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{038f9361-8139-40ef-86ef-f741640186dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\imgui">
+      <UniqueIdentifier>{4ea64c6e-f1b0-4857-b927-b2ffa3b15866}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\imgui">
+      <UniqueIdentifier>{9f9da3ba-ac69-416e-9dca-fb008e717eb0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -33,29 +42,50 @@
     <ClCompile Include="src\Fence.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui_impl_dx12.cpp">
+    <ClCompile Include="src\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui_impl_win32.cpp">
+    <ClCompile Include="src\PipelineStateObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui.cpp">
+    <ClCompile Include="src\Triangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui_demo.cpp">
+    <ClCompile Include="src\RootSignature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui_draw.cpp">
+    <ClCompile Include="src\DepthStencil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui_tables.cpp">
+    <ClCompile Include="src\VertexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui_widgets.cpp">
+    <ClCompile Include="src\IndexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\imgui\ImGuiManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui\imgui.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui\imgui_demo.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui\imgui_draw.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui\imgui_impl_dx12.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui\imgui_impl_win32.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui\imgui_tables.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui\imgui_widgets.cpp">
+      <Filter>Source Files\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,32 +116,69 @@
     <ClInclude Include="src\RenderContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imgui_impl_dx12.h">
+    <ClInclude Include="src\Triangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imgui_impl_win32.h">
+    <ClInclude Include="src\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imgui.h">
+    <ClInclude Include="src\PipelineStateObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imconfig.h">
+    <ClInclude Include="src\RootSignature.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imgui_internal.h">
+    <ClInclude Include="src\DepthStencil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imstb_textedit.h">
+    <ClInclude Include="src\VertexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imstb_rectpack.h">
+    <ClInclude Include="src\IndexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\imgui\imstb_truetype.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imconfig.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imgui.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imgui_impl_dx12.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imgui_impl_win32.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imgui_internal.h">
+      <Filter>Header Files\imgui</Filter>
     </ClInclude>
     <ClInclude Include="src\imgui\ImGuiManager.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imstb_rectpack.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imstb_textedit.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConstantBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\shaders\TriangleVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\TrianglePS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\Triangle.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
