@@ -35,4 +35,3 @@ public:
 private:
     ComPtr<ID3D10Blob> shaderBlob;  //シェーダーバイナリ
 };
-

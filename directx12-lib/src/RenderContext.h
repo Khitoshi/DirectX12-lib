@@ -167,7 +167,6 @@ public:
         this->commandList->SetPipelineState(pso->getPipelineStateObject());
     }
 
-
     /// <summary>
     /// プリミティブトポロジーの設定
     /// </summary>
@@ -176,7 +175,6 @@ public:
     {
         this->commandList->IASetPrimitiveTopology(topology);
     }
-
 
     /// <summary>
     /// 頂点バッファを設定

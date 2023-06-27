@@ -37,7 +37,7 @@ public:
         currentFrameBufferDSVHandle(),
         frameIndex(0)
     {}
-    ~DX12Resources() {}
+    ~DX12Resources() { waitEndOfDrawing(); }
 
     //‰Šú‰»ˆ—
     void init(const HWND hWnd, const int width, const int height, const int frameBufferCount);

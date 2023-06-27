@@ -35,6 +35,7 @@
     <ClCompile Include="src\PipelineStateObject.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\RootSignature.cpp" />
+    <ClCompile Include="src\SceneTriangle.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
     <ClCompile Include="src\Triangle.cpp" />
@@ -59,9 +60,14 @@
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\PipelineStateObject.h" />
     <ClInclude Include="src\RenderContext.h" />
+    <ClInclude Include="src\RenderMode.h" />
     <ClInclude Include="src\RenderTarget.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RootSignature.h" />
+    <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\SceneDefault.h" />
+    <ClInclude Include="src\SceneManager.h" />
+    <ClInclude Include="src\SceneTriangle.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\SwapChain.h" />
     <ClInclude Include="src\Triangle.h" />

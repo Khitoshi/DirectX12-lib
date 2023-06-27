@@ -10842,8 +10842,8 @@ static bool ImGui::NavScoreItem(ImGuiNavItemData* result)
                 if (((move_dir == ImGuiDir_Up || move_dir == ImGuiDir_Down) ? dby : dbx) < 0.0f) // moving bj to the right/down decreases distance
                     new_best = true;
             }
-}
-}
+        }
+    }
 
     // Axial check: if 'curr' has no link at all in some direction and 'cand' lies roughly in that direction, add a tentative link. This will only be kept if no "real" matches
     // are found, so it only augments the graph produced by the above method using extra links. (important, since it doesn't guarantee strong connectedness)
@@ -11399,7 +11399,7 @@ void ImGui::NavInitRequestApplyResult()
         g.NavJustMovedToId = result->ID;
         g.NavJustMovedToFocusScopeId = result->FocusScopeId;
         g.NavJustMovedToKeyMods = 0;
-}
+    }
 
     // Apply result from previous navigation init request (will typically select the first item, unless SetItemDefaultFocus() has been called)
     // FIXME-NAV: On _NavFlattened windows, g.NavWindow will only be updated during subsequent frame. Not a problem currently.
@@ -11607,7 +11607,7 @@ void ImGui::NavMoveRequestApplyResult()
         NavClearPreferredPosForAxis(axis); // On a failed move, clear preferred pos for this axis.
         IMGUI_DEBUG_LOG_NAV("[nav] NavMoveSubmitted but not led to a result!\n");
         return;
-}
+    }
 
     // PageUp/PageDown behavior first jumps to the bottom/top mostly visible item, _otherwise_ use the result from the previous/next page.
     if (g.NavMoveFlags & ImGuiNavMoveFlags_AlsoScoreVisibleSet)
