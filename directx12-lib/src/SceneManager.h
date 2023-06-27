@@ -7,6 +7,7 @@
 #include "imgui/imgui.h"
 
 #include "SceneTriangle.h"
+#include "SceneSprite.h"
 #include <functional>
 
 /// <summary>
@@ -106,8 +107,9 @@ public:
     void registerScene()
     {
        sceneFactories = {
-            {"Default", []() { return std::make_shared<SceneDefault>(); }},
-            {"Triangle", []() { return std::make_shared<SceneTriangle>(); }},
+            {"Default",     []() { return std::make_shared<SceneDefault>(); }},
+            {"Triangle",    []() { return std::make_shared<SceneTriangle>(); }},
+            {"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
        //シーンを追加する場合はここに追加
        };
 	}
@@ -127,6 +129,8 @@ private:
 
     //シーンのファクトリー
     using SceneFactory = std::function<std::shared_ptr<Scene>()>;
-    std::map<std::string, SceneFactory> sceneFactories;
+    using SceneEntry = std::pair<std::string, SceneFactory>;
+    //std::map<std::string, SceneFactory> sceneFactories;
+    std::vector<SceneEntry> sceneFactories;
 };
 

@@ -28,6 +28,12 @@
     <Filter Include="Source Files\Scenes">
       <UniqueIdentifier>{c2a3e602-2b66-40ab-97c6-2b5b382a6978}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Triangle">
+      <UniqueIdentifier>{c55ca0c7-94d0-4fdd-80de-eeac018621cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Sprite">
+      <UniqueIdentifier>{8bf8da65-8793-4a7b-830e-6ab5033bdcb4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -95,6 +101,12 @@
     </ClCompile>
     <ClCompile Include="src\SceneTriangle.cpp">
       <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneSprite.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -191,19 +203,34 @@
     <ClInclude Include="src\RenderMode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Sprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneSprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\shaders\TriangleVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\Triangle</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\TriangleVS.hlsl">
+      <Filter>Shaders\Triangle</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\SpriteVS.hlsl">
+      <Filter>Shaders\Sprite</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\SpritePS.hlsl">
+      <Filter>Shaders\Sprite</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\Triangle.hlsli">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="packages.config" />
+    <None Include="src\shaders\Triangle.hlsli">
+      <Filter>Shaders\Triangle</Filter>
+    </None>
+    <None Include="src\shaders\Sprite.hlsli">
+      <Filter>Shaders\Sprite</Filter>
+    </None>
   </ItemGroup>
 </Project>

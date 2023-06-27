@@ -37,6 +37,8 @@
     <ClCompile Include="src\RootSignature.cpp" />
     <ClCompile Include="src\SceneTriangle.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Sprite.cpp" />
+    <ClCompile Include="src\SceneSprite.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
     <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
@@ -69,6 +71,8 @@
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\SceneTriangle.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\Sprite.h" />
+    <ClInclude Include="src\SceneSprite.h" />
     <ClInclude Include="src\SwapChain.h" />
     <ClInclude Include="src\Triangle.h" />
     <ClInclude Include="src\VertexBuffer.h" />
@@ -76,6 +80,26 @@
     <ClInclude Include="src\WindowConfig.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="src\shaders\SpritePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\SpriteVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
@@ -95,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="src\shaders\Sprite.hlsli" />
     <None Include="src\shaders\Triangle.hlsli" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
