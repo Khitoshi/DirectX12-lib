@@ -39,4 +39,10 @@ public:
     /// </summary>
     /// <param name="conf"></param>
     virtual void render(SceneConf conf) = 0;
+
+    /// <summary>
+    /// ‰¼‘z‚ÈImGuiƒƒjƒ…[
+    /// </summary>
+    virtual void updateImguiMenu() {};
+
 };

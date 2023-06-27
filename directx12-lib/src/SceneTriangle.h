@@ -8,7 +8,11 @@
 class SceneTriangle : public Scene
 {
 public:
-    SceneTriangle() {};
+    SceneTriangle() :
+        triangle(),
+        vertex(),
+        isChangeVertex(false)
+    {};
     ~SceneTriangle() {};
 
     //初期化処理
@@ -19,7 +23,10 @@ public:
     void update();
     //描画処理
     void render(SceneConf conf);
-
+    //imguiのmenuを表示
+    void updateImguiMenu();
 private:
-    std::shared_ptr<Triangle> triangle;//三角形
+    std::shared_ptr<Triangle> triangle;         //三角形
+    Triangle::Vertex vertex[3];                 //頂点座標
+    bool isChangeVertex;                        //頂点座標を変更したか
 };

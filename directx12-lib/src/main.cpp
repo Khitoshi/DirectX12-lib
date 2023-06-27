@@ -8,7 +8,7 @@
 
 #include "RootSignature.h"
 #include "Triangle.h"
-#include "SceneTriangle.h"
+#include "SceneDefault.h"
 #include "SceneManager.h"
 
 #ifdef _DEBUG
@@ -62,11 +62,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         //レンダーコンテキスト取得
         auto rc = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext();
 
-        //シーン初期化処理
-        SceneConf conf = {};
-        conf.device = device;
-        conf.renderContext = rc;
-        SceneManager::getInstance().changeScene<SceneTriangle>(conf);
+        //シーン共通の描画設定
+        SceneConf sceneConf = {};
+        sceneConf.device = device;
+        sceneConf.renderContext = rc;
+        //シーン登録処理
+        SceneManager::getInstance().registerScene();
 
         //メッセージループ処理
         float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -80,14 +81,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         while (ResourceManager::getInstance()->getResource<Window>("window")->processMessages()) {
             //描画開始処理
             ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->beginRender(color);
-            //三角形描画
-            //TODO:Sceneクラスを作ってそこに登録する
-            //ResourceManager::getInstance()->getResource<Triangle>("triangle")->draw(ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext());
+
             SceneManager::getInstance().update();
-            SceneManager::getInstance().render(conf);
+            SceneManager::getInstance().render(sceneConf);
 
 #ifdef _DEBUG
-            //Frame開始処理
+            //imguiFrame開始処理
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->beginFrame();
 
             {
@@ -109,6 +108,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
                 ImGui::End();
             }
 
+            //imguiメニュー更新処理
+            SceneManager::getInstance().updateImguiMenu();
+            //シーン選択
+            SceneManager::getInstance().sceneSelect();
+
             //Frame終了処理
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->endFrame();
             //imgui描画処理
@@ -117,6 +121,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
             //描画終了処理
             ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->endRender();
+
+            //描画終了処理後にシーン変更を行う
+            SceneManager::getInstance().changeScene(sceneConf);
         }
     }
     catch (const std::exception& e) {

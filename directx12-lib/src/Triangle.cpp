@@ -22,7 +22,7 @@ void Triangle::draw(RenderContext* rc)
     //ルートシグネチャを設定。
     rc->setRootSignature(this->rootSignature.get());
     //パイプラインステートを設定。
-    rc->setPipelineState(this->pipelineStateObject.get());
+    rc->setPipelineState(this->pipelineStateObject[(int)renderMode].get());
     //プリミティブのトポロジーを設定。
     rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -78,10 +78,6 @@ void Triangle::initPipelineStateObject(TriangleConf conf)
       { "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT,  0, 12,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
     };
 
-    //D3D12_RASTERIZER_DESC rasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    //rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
-    //rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-
     //パイプラインステートオブジェクトの設定
     D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = { 0 };
     desc.pRootSignature = this->rootSignature->getRootSignature();
@@ -90,7 +86,6 @@ void Triangle::initPipelineStateObject(TriangleConf conf)
     desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     desc.SampleMask = UINT_MAX;
     desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    //desc.RasterizerState = rasterizerDesc;
     desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     desc.InputLayout = { inputElementDesc, _countof(inputElementDesc) };
     desc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
@@ -103,12 +98,22 @@ void Triangle::initPipelineStateObject(TriangleConf conf)
     desc.NodeMask = 1;
     desc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-    //初期化
+    // ソリッドモード初期化
     PipelineStateObjectConf psoConf = {};
     psoConf.device = conf.device;
     psoConf.desc = desc;
-    pipelineStateObject = std::make_shared<PipelineStateObject>();
-    pipelineStateObject->init(psoConf);
+    pipelineStateObject[(int)RenderMode::Solid] = std::make_shared<PipelineStateObject>();
+    pipelineStateObject[(int)RenderMode::Solid]->init(psoConf);
+
+    // ワイヤーフレームモード初期化
+    D3D12_RASTERIZER_DESC rasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
+    rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+    desc.RasterizerState = rasterizerDesc;
+    psoConf.desc = desc;
+    pipelineStateObject[(int)RenderMode::WireFrame] = std::make_shared<PipelineStateObject>();
+    pipelineStateObject[(int)RenderMode::WireFrame]->init(psoConf);
+
 }
 
 /// <summary>
