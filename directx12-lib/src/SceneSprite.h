@@ -3,10 +3,17 @@
 #include "Scene.h"
 #include <memory>
 
+/// <summary>
+/// スプライト描画用シーン
+/// </summary>
 class SceneSprite : public Scene
 {
 public:
-    SceneSprite(){};
+    SceneSprite():
+        sprite(),
+		vertex(),
+		isChangeVertex(false)
+    {};
     ~SceneSprite(){};
 
     //初期化処理
@@ -20,5 +27,17 @@ public:
     //ImGuiメニュー
     void updateImguiMenu();
 private:
-    std::shared_ptr<Sprite> sprite;
+    enum ImageFeature
+    {
+        FEATURE_NONE = 0,
+        FEATURE_ROTATE = 1 << 0, // 0001
+        //FEATURE_SCALE = 1 << 1,  // 0010
+        //FEATURE_TRANSLATE = 1 << 2 // 0100
+        // 更に追加機能があればここに定義します...
+    };
+    unsigned int imageFeatures = FEATURE_NONE;
+
+    std::shared_ptr<Sprite> sprite;//スプライト
+    Sprite::Vertex vertex[4];                 //頂点座標
+    bool isChangeVertex;                        //頂点座標を変更したか
 };

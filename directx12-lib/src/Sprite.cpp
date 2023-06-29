@@ -11,8 +11,13 @@ void Sprite::init(const SpriteConf conf)
     initPipelineStateObject(conf);
     initVertexBuffer(conf);
     initIndexBuffer(conf);
+    initTexture(conf);
 }
 
+/// <summary>
+/// 描画処理
+/// </summary>
+/// <param name="rc"></param>
 void Sprite::draw(RenderContext* rc)
 {
     //ルートシグネチャを設定。
@@ -26,18 +31,55 @@ void Sprite::draw(RenderContext* rc)
     rc->setVertexBuffer(this->vertexBuffer.get());
     //インデックスバッファを設定。
     rc->setIndexBuffer(this->indexBuffer.get());
+
+    //テクスチャを設定。
+    rc->setTexture(this->texture.get());
+
     //ドローコール
     rc->drawIndexed(numIndices);
 }
 
+/// <summary>
+/// ルートシグニチャの初期化
+/// </summary>
+/// <param name="conf"></param>
 void Sprite::initRootSignature(SpriteConf conf)
 {
-    rootSignature = std::make_shared<RootSignature>();
+    //サンプラー
+    D3D12_STATIC_SAMPLER_DESC sampler = {};
+    sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+    sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    sampler.MipLODBias = 0;
+    sampler.MaxAnisotropy = 0;
+    sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+    sampler.BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
+    sampler.MinLOD = 0.0f;
+    sampler.MaxLOD = D3D12_FLOAT32_MAX;
+    sampler.ShaderRegister = 0;
+    sampler.RegisterSpace = 0;
+    sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+    //SRV
+    CD3DX12_DESCRIPTOR_RANGE1 srvRanges;
+    srvRanges.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
+    CD3DX12_ROOT_PARAMETER1 srvRootParameter;
+    srvRootParameter.InitAsDescriptorTable(1, &srvRanges);
+
     RootSignatureConf rootSignatureConf = {};
     rootSignatureConf.device = conf.device;
+    rootSignatureConf.rootParameters = { srvRootParameter };
+    rootSignatureConf.samplerDescArray = { sampler };
+    rootSignatureConf.rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+    rootSignature = std::make_shared<RootSignature>();
     rootSignature->init(rootSignatureConf);
 }
 
+/// <summary>
+/// シェーダーのロード(コンパイル)
+/// </summary>
 void Sprite::loadShader()
 {
     //頂点シェーダーのロード
@@ -55,6 +97,10 @@ void Sprite::loadShader()
     pixelShader->LoadPS(psConf);
 }
 
+/// <summary>
+/// psoの初期化
+/// </summary>
+/// <param name="conf"></param>
 void Sprite::initPipelineStateObject(SpriteConf conf)
 {
     // インプットレイアウト
@@ -83,7 +129,6 @@ void Sprite::initPipelineStateObject(SpriteConf conf)
     desc.NodeMask = 1;
     desc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-    // ソリッドモード初期化
     PipelineStateObjectConf psoConf = {};
     psoConf.device = conf.device;
     psoConf.desc = desc;
@@ -91,24 +136,30 @@ void Sprite::initPipelineStateObject(SpriteConf conf)
     pipelineStateObject->init(psoConf);
 }
 
+/// <summary>
+/// 頂点バッファの初期化
+/// </summary>
+/// <param name="conf"></param>
 void Sprite::initVertexBuffer(SpriteConf conf)
 {
     //頂点データ
-    
     vertices[0] = {
-        { -0.25f, -0.25f, 0.5f }, {0,1}, // 左下
+        //{ -0.25f, -0.25f, 0.5f }, {0,1}, // 左下
+        { -1.0f, -1.0f, 0.0f }, {0,1}, // 左下
     };
     vertices[1] = {
-        { -0.25f,  0.25f, 0.5f }, {0,0}, // 左上
+        //{ -0.25f,  0.25f, 0.5f }, {0,0}, // 左上
+        { -1.0f,  1.0f, 0.0f }, {0,0}, // 左上
     };
     vertices[2] = {
-        {  0.25f,  0.25f, 0.5f }, {1,1}, // 右上
+        //{  0.25f,  0.25f, 0.5f }, {1,0}, // 右上
+        {  1.0f,  1.0f, 0.0f }, {1,0}, // 右上
     };
     vertices[3] = {
-        {  0.25f, -0.25f, 0.5f }, {1,0}, // 右下
+        //{  0.25f, -0.25f, 0.5f }, {1,1}, // 右下
+        {  1.0f, -1.0f, 0.0f }, {1,1}, // 右下
     };
     
-
     //頂点バッファの設定
     VertexBufferConf vertexBufferConf = {};
     vertexBufferConf.device = conf.device;
@@ -118,17 +169,20 @@ void Sprite::initVertexBuffer(SpriteConf conf)
     //初期化
     vertexBuffer = std::make_shared<VertexBuffer>();
     vertexBuffer->init(vertexBufferConf);
-
     //コピー
     vertexBuffer->copy(vertices);
 }
 
+/// <summary>
+/// インデックスバッファの初期化
+/// </summary>
+/// <param name="conf"></param>
 void Sprite::initIndexBuffer(SpriteConf conf)
 {
+    //インデックスデータ
     unsigned short indices[] = {
         0, 1, 2, 0, 2, 3
     };
-    //unsigned short* indices = new unsigned short[6] { 0, 1, 2, 0, 2, 3 };
 
     //インデックスバッファの設定
     numIndices = sizeof(indices) / sizeof(unsigned short);
@@ -143,4 +197,18 @@ void Sprite::initIndexBuffer(SpriteConf conf)
     indexBuffer->init(indexBufferConf);
     //コピー
     indexBuffer->copy(static_cast<uint16_t*>(indices));
+}
+
+/// <summary>
+/// テクスチャの初期化
+/// </summary>
+/// <param name="conf"></param>
+void Sprite::initTexture(SpriteConf conf)
+{
+    //テクスチャの初期化
+	Texture::TextureConf textureConf = {};
+	textureConf.device = conf.device;
+    textureConf.filePath = conf.filePath;
+	texture = std::make_shared<Texture>(textureConf);
+	texture->Load();
 }

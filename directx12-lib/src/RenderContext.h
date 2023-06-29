@@ -4,10 +4,10 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "d3dx12.h"
-#include <dxgi1_4.h>
+#include "Texture.h"
 #include "RootSignature.h"
+#include <dxgi1_4.h>
 using namespace Microsoft::WRL;
-
 /// <summary>
 /// レンダーコンテキスト
 /// コマンドリスト関係の処理をまとめたクラス
@@ -211,6 +211,13 @@ public:
     /// <param name="rootSignature">ルートシグニチャ</param>
     void setRootSignature(RootSignature* rootSignature) {
         this->commandList->SetGraphicsRootSignature(rootSignature->getRootSignature());
+    }
+
+
+    void setTexture(Texture* texture) {
+        auto ds = texture->GetDescriptorHeap();
+        this->commandList->SetDescriptorHeaps(1, &ds);
+        this->commandList->SetGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
     }
 
 public:

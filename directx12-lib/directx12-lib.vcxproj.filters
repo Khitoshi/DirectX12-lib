@@ -34,6 +34,9 @@
     <Filter Include="Shaders\Sprite">
       <UniqueIdentifier>{8bf8da65-8793-4a7b-830e-6ab5033bdcb4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Rotation">
+      <UniqueIdentifier>{cc199299-98b2-4bf3-a5c0-28abac6490a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -106,6 +109,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SceneSprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -209,6 +215,9 @@
     <ClInclude Include="src\SceneSprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">
@@ -223,14 +232,23 @@
     <FxCompile Include="src\shaders\SpritePS.hlsl">
       <Filter>Shaders\Sprite</Filter>
     </FxCompile>
+    <FxCompile Include="src\shaders\RotationVS.hlsl">
+      <Filter>Shaders\Rotation</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\RotationPS.hlsl">
+      <Filter>Shaders\Rotation</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="src\shaders\Triangle.hlsli">
       <Filter>Shaders\Triangle</Filter>
     </None>
     <None Include="src\shaders\Sprite.hlsli">
       <Filter>Shaders\Sprite</Filter>
+    </None>
+    <None Include="packages.config" />
+    <None Include="src\shaders\Rotation.hlsli">
+      <Filter>Shaders\Rotation</Filter>
     </None>
   </ItemGroup>
 </Project>

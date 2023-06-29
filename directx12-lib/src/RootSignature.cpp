@@ -16,27 +16,27 @@ void RootSignature::init(RootSignatureConf conf)
 /// <param name="rootSignatureConf">ルートシグニチャ設定</param>
 /// <returns>
 /// 生成したルートシグニチャ
-/// </returns>
-void RootSignature::createRootSignature(RootSignatureConf rootSignatureConf)
+/// </returns>   
+void RootSignature::createRootSignature(RootSignatureConf conf)
 {
     //ルートシグニチャの設定
-    D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
-    rootSignatureDesc.NumParameters = 0;
-    rootSignatureDesc.pParameters = nullptr;
-    rootSignatureDesc.NumStaticSamplers = 0;
-    rootSignatureDesc.pStaticSamplers = nullptr;
-    rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+    CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
+    rootSignatureDesc.Init_1_1(conf.rootParameters.size(), conf.rootParameters.data(),
+        conf.samplerDescArray.size(), conf.samplerDescArray.data(),
+        conf.rootSignatureFlags);
 
-    ComPtr<ID3DBlob> serializeRootSignature = nullptr;
-    ComPtr<ID3DBlob> errBlob = nullptr;
-    if (FAILED(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &serializeRootSignature, &errBlob))) {
-        throw std::runtime_error("D3D12SerializeRootSignature failed");
-        if (errBlob) {
-            OutputDebugStringA((char*)errBlob->GetBufferPointer());
-        }
+    //シリアライズ
+    ComPtr<ID3DBlob> signature;
+    ComPtr<ID3DBlob> error;
+    if (FAILED(D3DX12SerializeVersionedRootSignature(&rootSignatureDesc,
+        D3D_ROOT_SIGNATURE_VERSION_1,
+        &signature, &error))) {
+        throw std::runtime_error("D3DX12SerializeVersionedRootSignature failed");
     }
 
-    if (FAILED(rootSignatureConf.device->CreateRootSignature(0, serializeRootSignature->GetBufferPointer(), serializeRootSignature->GetBufferSize(), IID_PPV_ARGS(&this->rootSignature)))) {
-        throw std::runtime_error("CreateRootSignature failed");
-    }
+    //ルートシグニチャの作成
+    if (FAILED(conf.device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&this->rootSignature)))) {
+		throw std::runtime_error("CreateRootSignature failed");
+	}
+
 }

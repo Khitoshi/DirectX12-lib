@@ -1,6 +1,6 @@
 #pragma once
 #include "d3dx12.h"
-
+#include <vector>
 using namespace Microsoft::WRL;
 
 /// <summary>
@@ -8,14 +8,9 @@ using namespace Microsoft::WRL;
 /// </summary>
 struct RootSignatureConf {
     ID3D12Device* device;
-    //UINT maxCbvDescriptor;
-    //UINT maxSrvDescriptor;
-    //UINT maxUavDescriptor;
-    //UINT offsetInDescriptorsFromTableStartCB	= D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-    //UINT offsetInDescriptorsFromTableStartSRV	= D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-    //UINT offsetInDescriptorsFromTableStartUAV	= D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-    //UINT maxSamplerDescriptor;
-    //D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
+    std::vector<CD3DX12_ROOT_PARAMETER1> rootParameters;
+    std::vector<D3D12_STATIC_SAMPLER_DESC> samplerDescArray;
+    D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags;
 };
 
 /// <summary>
@@ -32,8 +27,9 @@ public:
 
 private:
     //ルートシグネチャの作成
+    //void createRootSignature(RootSignatureConf conf);
+    //ルートシグニチャ生成
     void createRootSignature(RootSignatureConf conf);
-
 public:
     //ルートシグネチャの取得
     ID3D12RootSignature* getRootSignature() const { return rootSignature.Get(); }

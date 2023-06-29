@@ -40,9 +40,13 @@ void Triangle::draw(RenderContext* rc)
 /// <param name="conf">三角形の描画用設定</param>
 void Triangle::initRootSignature(TriangleConf conf)
 {
-    rootSignature = std::make_shared<RootSignature>();
+    //ルートシグネチャの設定(レジスタを使用しないので空にする)
     RootSignatureConf rootSignatureConf = {};
     rootSignatureConf.device = conf.device;
+    rootSignatureConf.rootParameters = {};
+    rootSignatureConf.rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+    rootSignatureConf.samplerDescArray = {};
+    rootSignature = std::make_shared<RootSignature>();
     rootSignature->init(rootSignatureConf);
 }
 
@@ -136,21 +140,6 @@ void Triangle::initVertexBuffer(TriangleConf conf)
         { 0.0f, 0.0f,   1.0f ,  1.0f},
     };
 
-    /*
-    vertices[0] = {
-    { -0.25f, -0.25f, 0.5f }, { 1.0f, 0.0f, 0.0f, 1.0f }, // 左下
-    };
-    vertices[1] = {
-        { -0.25f,  0.25f, 0.5f }, { 0.0f, 1.0f, 0.0f, 1.0f }, // 左上
-    };
-    vertices[2] = {
-        {  0.25f,  0.25f, 0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f }, // 右上
-    };
-    vertices[3] = {
-        {  0.25f, -0.25f, 0.5f }, { 0.0f, 0.0f, 0.0f, 1.0f }, // 右下
-    };
-    */
-
     //頂点バッファの設定
     VertexBufferConf vertexBufferConf = {};
     vertexBufferConf.device = conf.device;
@@ -174,8 +163,6 @@ void Triangle::initIndexBuffer(TriangleConf conf)
     unsigned short indices[] = {
         0,1,2
     };
-
-    //unsigned short* indices = new unsigned short[6] { 0, 1, 2, 0, 2, 3 };
 
     //インデックスバッファの設定
     const int numIndices = sizeof(indices) / sizeof(unsigned short);
