@@ -36,11 +36,10 @@ private:
     ComPtr<ID3D10Blob> shaderBlob;  //シェーダーバイナリ
 };
 
-
 /// <summary>
 /// 最低限のシェーダーのペア
 /// </summary>
-struct BasicShaderPair{
+struct BasicShaderPair {
     std::shared_ptr<Shader> pixelShader;
     std::shared_ptr<Shader> vertexShader;
 };

@@ -5,7 +5,7 @@
 /// <summary>
 /// ‰½‚Ìˆ—‚à‚µ‚È‚¢ƒV[ƒ“
 /// </summary>
-class SceneDefault: public Scene
+class SceneDefault : public Scene
 {
 public:
     SceneDefault() {};

@@ -79,12 +79,11 @@ public:
 
     //頂点データの設定
     void setVertices(Vertex vertices[3]) {
-		this->vertices[0] = vertices[0];
-		this->vertices[1] = vertices[1];
-		this->vertices[2] = vertices[2];
+        this->vertices[0] = vertices[0];
+        this->vertices[1] = vertices[1];
+        this->vertices[2] = vertices[2];
         vertexBuffer->copy(this->vertices);
-	};
-
+    };
 
 public:
 
@@ -100,11 +99,10 @@ public:
             throw std::out_of_range("index out of range");
         }
         return vertices[index];
-	};
-    
+    };
 
 private:
-    
+
     std::shared_ptr<RootSignature> rootSignature;                                   //ルートシグニチャ
     std::shared_ptr<Shader> vertexShader;                                           //頂点シェーダー
     std::shared_ptr<Shader> pixelShader;                                            //ピクセルシェーダー
@@ -113,6 +111,5 @@ private:
     std::shared_ptr<VertexBuffer> vertexBuffer;                                     //頂点バッファ
     std::shared_ptr<IndexBuffer> indexBuffer;                                       //インデックスバッファ
     Vertex vertices[3];										                        //頂点データ
-    RenderMode renderMode;														    //描画モード   
-
+    RenderMode renderMode;														    //描画モード
 };

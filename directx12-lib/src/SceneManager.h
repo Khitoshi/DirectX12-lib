@@ -67,7 +67,7 @@ public:
     void changeScene(SceneConf conf)
     {
         if (!isSceneChange) return;
-        
+
         //同じシーンの場合は変更しない
         if (typeid(*currentScene) == typeid(*nextScene)) {
             isSceneChange = false;
@@ -84,7 +84,7 @@ public:
     /// <summary>
     /// シーン選択
     /// </summary>
-    void sceneSelect() 
+    void sceneSelect()
     {
         ImGui::Begin("Scene Manager");
         //シーン選択loop
@@ -96,7 +96,7 @@ public:
                 this->isSceneChange = true;
             }
         }
-        
+
         ImGui::End();
     }
 
@@ -106,21 +106,20 @@ public:
     /// <param name="scene"></param>
     void registerScene()
     {
-       sceneFactories = {
-            {"Default",     []() { return std::make_shared<SceneDefault>(); }},
-            {"Triangle",    []() { return std::make_shared<SceneTriangle>(); }},
-            {"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
-       //シーンを追加する場合はここに追加
-       };
-	}
+        sceneFactories = {
+             {"Default",     []() { return std::make_shared<SceneDefault>(); }},
+             {"Triangle",    []() { return std::make_shared<SceneTriangle>(); }},
+             {"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
+             //シーンを追加する場合はここに追加
+        };
+    }
 
     void updateImguiMenu()
-	{
-		if (currentScene) {
-			currentScene->updateImguiMenu();
-		}
-	}
-    
+    {
+        if (currentScene) {
+            currentScene->updateImguiMenu();
+        }
+    }
 
 private:
     std::shared_ptr<Scene> currentScene = nullptr;  //現在のシーン
@@ -133,4 +132,3 @@ private:
     //std::map<std::string, SceneFactory> sceneFactories;
     std::vector<SceneEntry> sceneFactories;
 };
-

@@ -1,6 +1,5 @@
 #pragma once
 
-
 //•`‰æƒ‚[ƒh
 enum class RenderMode
 {

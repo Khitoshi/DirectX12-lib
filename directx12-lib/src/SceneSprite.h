@@ -9,12 +9,12 @@
 class SceneSprite : public Scene
 {
 public:
-    SceneSprite():
+    SceneSprite() :
         sprite(),
-		vertex(),
-		isChangeVertex(false)
+        vertex(),
+        isChangeVertex(false)
     {};
-    ~SceneSprite(){};
+    ~SceneSprite() {};
 
     //‰Šú‰»ˆ—
     void init(SceneConf conf);

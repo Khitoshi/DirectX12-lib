@@ -213,7 +213,6 @@ public:
         this->commandList->SetGraphicsRootSignature(rootSignature->getRootSignature());
     }
 
-
     void setTexture(Texture* texture) {
         auto ds = texture->GetDescriptorHeap();
         this->commandList->SetDescriptorHeaps(1, &ds);

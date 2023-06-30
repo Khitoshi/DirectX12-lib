@@ -11,7 +11,6 @@ struct SceneConf {
     RenderContext* renderContext;
 };
 
-
 /// <summary>
 /// 仮想的なscene
 /// </summary>
@@ -44,5 +43,4 @@ public:
     /// 仮想なImGuiメニュー
     /// </summary>
     virtual void updateImguiMenu() {};
-
 };

@@ -252,9 +252,9 @@
     <None Include="src\shaders\Sprite.hlsli">
       <Filter>Shaders\Sprite</Filter>
     </None>
-    <None Include="packages.config" />
     <None Include="src\shaders\Rotation.hlsli">
       <Filter>Shaders\Rotation</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
