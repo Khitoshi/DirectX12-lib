@@ -35,6 +35,7 @@
     <ClCompile Include="src\PipelineStateObject.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\RootSignature.cpp" />
+    <ClCompile Include="src\Rotation.cpp" />
     <ClCompile Include="src\SceneTriangle.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
@@ -67,6 +68,7 @@
     <ClInclude Include="src\RenderTarget.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RootSignature.h" />
+    <ClInclude Include="src\Rotation.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\SceneDefault.h" />
     <ClInclude Include="src\SceneManager.h" />

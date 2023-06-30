@@ -57,7 +57,7 @@ void SceneTriangle::updateImguiMenu()
     if (ImGui::Button("Solid")) {
         triangle->setRenderMode(RenderMode::Solid);
     }
-    else if (ImGui::Button("WireFrame")) {
+    if (ImGui::Button("WireFrame")) {
         triangle->setRenderMode(RenderMode::WireFrame);
     }
 

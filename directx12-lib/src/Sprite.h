@@ -7,9 +7,11 @@
 #include "RenderContext.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Rotation.h"
 #include <memory>
 #include <DirectXMath.h>
 #include <stdexcept>
+#include <map>
 using namespace Microsoft::WRL;
 
 /// <summary>
@@ -27,9 +29,8 @@ public:
 public:
 	Sprite():
 		rootSignature(),
-		vertexShader(),
-		pixelShader(),
-		pipelineStateObject(),
+		defaultShaderPair(),
+		defaultPipelineStateObject(),
 		vertexBuffer(),
 		indexBuffer(),
 		vertices(),
@@ -51,6 +52,10 @@ private:
 	void loadShader();
 	//パイプラインステートオブジェクトの作成
 	void initPipelineStateObject(SpriteConf conf);
+
+	//デフォルトパイプラインステートオブジェクトの作成
+	void initDefaultPipelineStateObject(SpriteConf conf);
+
 	//頂点バッファの作成
 	void initVertexBuffer(SpriteConf conf);
 	//インデックスバッファの作成
@@ -96,16 +101,24 @@ public:
 	};
 
 private:
+	enum class SpriteOptions : uint8_t {
+		None = 1 << 0, // 1
+		Rotated = 1 << 1, // 2
+		// 他のオプション...
+
+		Num,
+	};
+
 	std::shared_ptr<RootSignature> rootSignature;                                   //ルートシグニチャ
-	std::shared_ptr<Shader> vertexShader;                                           //頂点シェーダー
-	std::shared_ptr<Shader> pixelShader;                                            //ピクセルシェーダー
-	std::shared_ptr<PipelineStateObject> pipelineStateObject;                       //パイプラインステートオブジェクト
-	//std::shared_ptr<PipelineStateObject> pipelineStateObject[(int)RenderMode::Num]; //パイプラインステートオブジェクト
+	BasicShaderPair defaultShaderPair;												//デフォルトのシェーダー
+	std::shared_ptr<PipelineStateObject> defaultPipelineStateObject;                       //パイプラインステートオブジェクト
 	std::shared_ptr<VertexBuffer> vertexBuffer;                                     //頂点バッファ
 	std::shared_ptr<IndexBuffer> indexBuffer;                                       //インデックスバッファ
 	Vertex vertices[4];										                        //頂点データ
 	unsigned int numIndices;                                                        //インデックス数
-	
 	std::shared_ptr<Texture> texture;												//テクスチャ
+
+	std::shared_ptr<Rotation> rotation;												//回転
 };
+
 

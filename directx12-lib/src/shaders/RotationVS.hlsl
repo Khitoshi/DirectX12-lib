@@ -1,6 +1,12 @@
 
 #include "./Rotation.hlsli"
 
+//アフィン変換行列
+cbuffer ConstantBuffer : register(b0)
+{
+    float4x4 transformMatrix;
+}
+
 // 頂点シェーダーへの入力頂点構造体
 struct VSInput
 {

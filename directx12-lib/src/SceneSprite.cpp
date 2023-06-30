@@ -71,10 +71,9 @@ void SceneSprite::updateImguiMenu()
         }
     }
         
-    
-    static bool a = false;
-    if (ImGui::Checkbox("aaa", &a));
-    else;
+    static bool isRotation = false;
+    if (ImGui::Checkbox("Rotation", &isRotation))imageFeatures |= FEATURE_ROTATE;
+	else imageFeatures &= ~FEATURE_ROTATE;
 
 	ImGui::End();
 }

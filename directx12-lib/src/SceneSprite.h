@@ -37,7 +37,7 @@ private:
     };
     unsigned int imageFeatures = FEATURE_NONE;
 
-    std::shared_ptr<Sprite> sprite;//スプライト
-    Sprite::Vertex vertex[4];                 //頂点座標
-    bool isChangeVertex;                        //頂点座標を変更したか
+    std::shared_ptr<Sprite> sprite;         //スプライト
+    Sprite::Vertex vertex[4];               //頂点座標
+    bool isChangeVertex;                    //頂点座標を変更したか
 };

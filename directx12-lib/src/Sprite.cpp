@@ -23,7 +23,7 @@ void Sprite::draw(RenderContext* rc)
     //ルートシグネチャを設定。
     rc->setRootSignature(this->rootSignature.get());
     //パイプラインステートを設定。
-    rc->setPipelineState(this->pipelineStateObject.get());
+    rc->setPipelineState(this->defaultPipelineStateObject.get());
     //プリミティブのトポロジーを設定。
     rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -82,19 +82,23 @@ void Sprite::initRootSignature(SpriteConf conf)
 /// </summary>
 void Sprite::loadShader()
 {
-    //頂点シェーダーのロード
-    vertexShader = std::make_shared<Shader>();
-    ShaderConf vsConf = {};
-    vsConf.filePath = "./src/shaders/SpriteVS.hlsl";
-    vsConf.entryFuncName = "VSMain";
-    vertexShader->LoadVS(vsConf);
+    //defaultのロード
+    {
+        //defaultVertexShader = std::make_shared<Shader>();
+        defaultShaderPair.vertexShader = std::make_shared<Shader>();
+        ShaderConf vsConf = {};
+        vsConf.filePath = "./src/shaders/SpriteVS.hlsl";
+        vsConf.entryFuncName = "VSMain";
+        defaultShaderPair.vertexShader->LoadVS(vsConf);
 
-    //ピクセルシェーダーのロード
-    pixelShader = std::make_shared<Shader>();
-    ShaderConf psConf = {};
-    psConf.filePath = "./src/shaders/SpritePS.hlsl";
-    psConf.entryFuncName = "PSMain";
-    pixelShader->LoadPS(psConf);
+        defaultShaderPair.pixelShader = std::make_shared<Shader>();
+        ShaderConf psConf = {};
+        psConf.filePath = "./src/shaders/SpritePS.hlsl";
+        psConf.entryFuncName = "PSMain";
+        defaultShaderPair.pixelShader->LoadPS(psConf);
+    }
+
+    
 }
 
 /// <summary>
@@ -112,8 +116,8 @@ void Sprite::initPipelineStateObject(SpriteConf conf)
     //パイプラインステートオブジェクトの設定
     D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = { 0 };
     desc.pRootSignature = this->rootSignature->getRootSignature();
-    desc.VS = CD3DX12_SHADER_BYTECODE(vertexShader->getShaderBlob());
-    desc.PS = CD3DX12_SHADER_BYTECODE(pixelShader->getShaderBlob());
+    desc.VS = CD3DX12_SHADER_BYTECODE(defaultShaderPair.vertexShader->getShaderBlob());
+    desc.PS = CD3DX12_SHADER_BYTECODE(defaultShaderPair.pixelShader->getShaderBlob());
     desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     desc.SampleMask = UINT_MAX;
     desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
@@ -132,8 +136,8 @@ void Sprite::initPipelineStateObject(SpriteConf conf)
     PipelineStateObjectConf psoConf = {};
     psoConf.device = conf.device;
     psoConf.desc = desc;
-    pipelineStateObject = std::make_shared<PipelineStateObject>();
-    pipelineStateObject->init(psoConf);
+    defaultPipelineStateObject = std::make_shared<PipelineStateObject>();
+    defaultPipelineStateObject->init(psoConf);
 }
 
 /// <summary>
@@ -145,19 +149,19 @@ void Sprite::initVertexBuffer(SpriteConf conf)
     //頂点データ
     vertices[0] = {
         //{ -0.25f, -0.25f, 0.5f }, {0,1}, // 左下
-        { -1.0f, -1.0f, 0.0f }, {0,1}, // 左下
+        { -0.75f, -0.75f, 0.0f }, {0,1}, // 左下
     };
     vertices[1] = {
         //{ -0.25f,  0.25f, 0.5f }, {0,0}, // 左上
-        { -1.0f,  1.0f, 0.0f }, {0,0}, // 左上
+        { -0.75f,  0.75f, 0.0f }, {0,0}, // 左上
     };
     vertices[2] = {
         //{  0.25f,  0.25f, 0.5f }, {1,0}, // 右上
-        {  1.0f,  1.0f, 0.0f }, {1,0}, // 右上
+        {  0.75f,  0.75f, 0.0f }, {1,0}, // 右上
     };
     vertices[3] = {
         //{  0.25f, -0.25f, 0.5f }, {1,1}, // 右下
-        {  1.0f, -1.0f, 0.0f }, {1,1}, // 右下
+        {  0.75f, -0.75f, 0.0f }, {1,1}, // 右下
     };
     
     //頂点バッファの設定
