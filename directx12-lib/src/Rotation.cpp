@@ -16,14 +16,16 @@ void Rotation::loadShader()
     ShaderConf vsConf = {};
     vsConf.filePath = "./src/shaders/RotationVS.hlsl";
     vsConf.entryFuncName = "VSMain";
-    this->shaderPair.vertexShader->LoadVS(vsConf);
+    vsConf.currentShaderModelType = ShaderConf::ShaderModelType::Vertex;
+    this->shaderPair.vertexShader->load(vsConf);
 
     //ピクセルシェーダーのロード
     this->shaderPair.pixelShader = std::make_shared<Shader>();
     ShaderConf psConf = {};
     psConf.filePath = "./src/shaders/RotationPS.hlsl";
     psConf.entryFuncName = "PSMain";
-    this->shaderPair.pixelShader->LoadPS(psConf);
+    psConf.currentShaderModelType = ShaderConf::ShaderModelType::Pixel;
+    this->shaderPair.pixelShader->load(psConf);
 }
 
 void Rotation::initRootSignature()

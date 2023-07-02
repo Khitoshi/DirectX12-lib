@@ -42,12 +42,9 @@ void Triangle::initRootSignature(TriangleConf conf)
 {
     //ルートシグネチャの設定(レジスタを使用しないので空にする)
     RootSignatureConf rootSignatureConf = {};
-    rootSignatureConf.device = conf.device;
-    rootSignatureConf.rootParameters = {};
     rootSignatureConf.rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-    rootSignatureConf.samplerDescArray = {};
     rootSignature = std::make_shared<RootSignature>();
-    rootSignature->init(rootSignatureConf);
+    rootSignature->init(conf.device, rootSignatureConf);
 }
 
 /// <summary>
@@ -60,14 +57,16 @@ void Triangle::loadShader()
     ShaderConf vsConf = {};
     vsConf.filePath = "./src/shaders/TriangleVS.hlsl";
     vsConf.entryFuncName = "VSMain";
-    vertexShader->LoadVS(vsConf);
+    vsConf.currentShaderModelType = ShaderConf::ShaderModelType::Vertex;
+    vertexShader->load(vsConf);
 
     //ピクセルシェーダーのロード
     pixelShader = std::make_shared<Shader>();
     ShaderConf psConf = {};
     psConf.filePath = "./src/shaders/TrianglePS.hlsl";
     psConf.entryFuncName = "PSMain";
-    pixelShader->LoadPS(psConf);
+    psConf.currentShaderModelType = ShaderConf::ShaderModelType::Pixel;
+    pixelShader->load(psConf);
 }
 
 /// <summary>

@@ -7,26 +7,6 @@
 #include <atlbase.h>
 
 /// <summary>
-/// 頂点シェーダーの読み込み
-/// </summary>
-/// <param name="filePath">ファイルパス</param>
-/// <param name="entryFuncName">シェーダーエントリー関数名</param>
-void Shader::LoadVS(ShaderConf conf)
-{
-    load(conf, "vs_5_0");
-}
-
-/// <summary>
-/// ピクセルシェーダーの読み込み
-/// </summary>
-/// <param name="filePath">ファイルパス</param>
-/// <param name="entryFuncName">シェーダーエントリー関数名</param>
-void Shader::LoadPS(ShaderConf conf)
-{
-    load(conf, "ps_5_0");
-}
-
-/// <summary>
 /// シェーダーの読み込み
 /// </summary>
 /// <param name="filePath">シェーダーファイルパス</param>
@@ -35,7 +15,7 @@ void Shader::LoadPS(ShaderConf conf)
 /// <returns>
 /// 正常にコンパイルされたシェーダー
 /// </returns>
-void Shader::load(ShaderConf conf, const char* shaderModel)
+void Shader::load(ShaderConf conf)
 {
 #ifdef _DEBUG
     //シェーダーのデバッグを有効にする
@@ -47,7 +27,7 @@ void Shader::load(ShaderConf conf, const char* shaderModel)
     //ファイルパスの変換
     wchar_t wfxFilePath[256] = { L"" };
     //mbstowcs(wfxFilePath, filePath, 256);
-    mbstowcs_s(nullptr, wfxFilePath, conf.filePath, 256);
+    mbstowcs_s(nullptr, wfxFilePath, conf.filePath.c_str(), 256);
 
     //シェーダーのコンパイル
     ComPtr<ID3DBlob> errorBlob = nullptr;
@@ -55,8 +35,8 @@ void Shader::load(ShaderConf conf, const char* shaderModel)
         wfxFilePath,
         nullptr,
         D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        conf.entryFuncName,
-        shaderModel,
+        conf.entryFuncName.c_str(),
+        conf.ShaderModelNames[(int)conf.currentShaderModelType].c_str(),
         compileFlags,
         0,
         this->shaderBlob.GetAddressOf(),

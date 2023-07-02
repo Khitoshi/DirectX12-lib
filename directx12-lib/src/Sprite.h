@@ -2,10 +2,8 @@
 #include "d3dx12.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-#include "RootSignature.h"
-#include "PipelineStateObject.h"
+#include "PSOCacheManager.h"
 #include "RenderContext.h"
-#include "Shader.h"
 #include "Texture.h"
 #include "Rotation.h"
 #include <memory>
@@ -49,12 +47,9 @@ private:
     //ルートシグネチャの作成
     void initRootSignature(SpriteConf conf);
     //シェーダーのロード
-    void loadShader();
+    void initShader();
     //パイプラインステートオブジェクトの作成
     void initPipelineStateObject(SpriteConf conf);
-
-    //デフォルトパイプラインステートオブジェクトの作成
-    void initDefaultPipelineStateObject(SpriteConf conf);
 
     //頂点バッファの作成
     void initVertexBuffer(SpriteConf conf);
@@ -118,4 +113,6 @@ private:
     std::shared_ptr<Texture> texture;												//テクスチャ
 
     std::shared_ptr<Rotation> rotation;												//回転
+
+    PSOCacheManager::PSOParameters psoParameter;
 };
