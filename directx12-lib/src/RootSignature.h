@@ -9,13 +9,13 @@ using namespace Microsoft::WRL;
 /// </summary>
 struct RootSignatureConf {
     D3D12_FILTER samplerFilter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-    D3D12_TEXTURE_ADDRESS_MODE textureAdressModeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    D3D12_TEXTURE_ADDRESS_MODE textureAdressModeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    D3D12_TEXTURE_ADDRESS_MODE textureAdressModeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    D3D12_TEXTURE_ADDRESS_MODE textureAddressModeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    D3D12_TEXTURE_ADDRESS_MODE textureAddressModeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    D3D12_TEXTURE_ADDRESS_MODE textureAddressModeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     int numSampler = 0;
     UINT maxCbvDescriptor = 0;
     UINT maxSrvDescriptor = 0;
-    UINT maxUavDescritor = 0;
+    UINT maxUavDescriptor = 0;
     UINT offsetInDescriptorsFromTableStartCB = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
     UINT offsetInDescriptorsFromTableStartSRV = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
     UINT offsetInDescriptorsFromTableStartUAV = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -24,15 +24,15 @@ struct RootSignatureConf {
         return
             samplerFilter == other.samplerFilter &&
 
-            (int)textureAdressModeU == (int)other.textureAdressModeU &&
-            (int)textureAdressModeV == (int)other.textureAdressModeV &&
-            (int)textureAdressModeW == (int)other.textureAdressModeW &&
+            (int)textureAddressModeU == (int)other.textureAddressModeU &&
+            (int)textureAddressModeV == (int)other.textureAddressModeV &&
+            (int)textureAddressModeW == (int)other.textureAddressModeW &&
 
             numSampler == other.numSampler &&
 
             maxCbvDescriptor == other.maxCbvDescriptor &&
             maxSrvDescriptor == other.maxSrvDescriptor &&
-            maxUavDescritor == other.maxUavDescritor &&
+            maxUavDescriptor == other.maxUavDescriptor &&
 
             offsetInDescriptorsFromTableStartCB == other.offsetInDescriptorsFromTableStartCB &&
             offsetInDescriptorsFromTableStartSRV == other.offsetInDescriptorsFromTableStartSRV &&

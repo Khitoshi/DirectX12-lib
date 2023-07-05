@@ -117,6 +117,9 @@
     <ClCompile Include="src\Rotation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ShaderCacheManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -240,6 +243,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ShaderCacheManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PSOHashes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

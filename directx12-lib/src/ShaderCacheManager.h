@@ -16,27 +16,10 @@ public:
         return instance;
     }
 
-    std::shared_ptr<Shader> getOrCreate(ShaderConf conf)
-    {
-        auto it = shaderCache.find(conf);
-        //シェーダーがキャッシュにある場合
-        if (it != shaderCache.end())
-        {
-            return it->second;
-        }
-
-        //生成
-        create(conf);
-        return shaderCache[conf];
-    }
+    std::shared_ptr<Shader> getOrCreate(ShaderConf conf);
 
 private:
-    void create(ShaderConf conf)
-    {
-        std::shared_ptr<Shader> shader = std::make_shared<Shader>();
-        shader->load(conf);
-        shaderCache[conf] = shader;
-    }
+    void create(ShaderConf conf);
 
 private:
     //std::map<std::string, std::shared_ptr<Shader>> shaderCache;

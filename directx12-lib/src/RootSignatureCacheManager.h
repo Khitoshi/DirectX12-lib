@@ -4,36 +4,38 @@
 #include "HashCombine.h"
 #include <unordered_map>
 
-struct RootSignatureCacheKeyHasher
-{
-    std::size_t operator()(const RootSignatureConf& k) const
-    {
-        std::size_t seed = 0;
-        hash_combine(seed, k.samplerFilter);
-        hash_combine(seed, k.textureAdressModeU);
-        hash_combine(seed, k.textureAdressModeV);
-        hash_combine(seed, k.textureAdressModeW);
-        hash_combine(seed, k.numSampler);
-        hash_combine(seed, k.maxCbvDescriptor);
-        hash_combine(seed, k.maxSrvDescriptor);
-        hash_combine(seed, k.maxUavDescritor);
-        hash_combine(seed, k.offsetInDescriptorsFromTableStartCB);
-        hash_combine(seed, k.offsetInDescriptorsFromTableStartSRV);
-        hash_combine(seed, k.offsetInDescriptorsFromTableStartUAV);
-        hash_combine(seed, k.rootSignatureFlags);
-        return seed;
-    }
-};
+
 
 class RootSignatureCacheManager
 {
 public:
+    struct RootSignatureCacheKeyHasher
+    {
+        std::size_t operator()(const RootSignatureConf& k) const
+        {
+            std::size_t seed = 0;
+            hash_combine(seed, k.samplerFilter);
+            hash_combine(seed, k.textureAddressModeU);
+            hash_combine(seed, k.textureAddressModeV);
+            hash_combine(seed, k.textureAddressModeW);
+            hash_combine(seed, k.numSampler);
+            hash_combine(seed, k.maxCbvDescriptor);
+            hash_combine(seed, k.maxSrvDescriptor);
+            hash_combine(seed, k.maxUavDescriptor);
+            hash_combine(seed, k.offsetInDescriptorsFromTableStartCB);
+            hash_combine(seed, k.offsetInDescriptorsFromTableStartSRV);
+            hash_combine(seed, k.offsetInDescriptorsFromTableStartUAV);
+            hash_combine(seed, k.rootSignatureFlags);
+            return seed;
+        }
+    };
 
 private:
     RootSignatureCacheManager() {};
     ~RootSignatureCacheManager() {};
+
 public:
-    static RootSignatureCacheManager& GetInstance()
+    static RootSignatureCacheManager& getInstance()
     {
         static RootSignatureCacheManager instance;
         return instance;

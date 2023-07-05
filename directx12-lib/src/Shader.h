@@ -71,4 +71,10 @@ private:
 struct BasicShaderPair {
     std::shared_ptr<Shader> pixelShader;
     std::shared_ptr<Shader> vertexShader;
+
+bool operator==(const BasicShaderPair& other) const
+	{
+		return pixelShader == other.pixelShader &&
+			vertexShader == other.vertexShader;
+	}
 };

@@ -2,10 +2,12 @@
 #include "d3dx12.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-#include "PSOCacheManager.h"
 #include "RenderContext.h"
 #include "Texture.h"
 #include "Rotation.h"
+#include "RootSignatureCacheManager.h"
+#include "ShaderCacheManager.h"
+#include "PSOCacheManager.h"
 #include <memory>
 #include <DirectXMath.h>
 #include <stdexcept>
@@ -114,5 +116,4 @@ private:
 
     std::shared_ptr<Rotation> rotation;												//‰ñ“]
 
-    PSOCacheManager::PSOParameters psoParameter;
 };

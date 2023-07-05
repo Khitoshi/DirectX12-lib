@@ -102,11 +102,10 @@ void Triangle::initPipelineStateObject(TriangleConf conf)
     desc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
     // ソリッドモード初期化
-    PipelineStateObjectConf psoConf = {};
-    psoConf.device = conf.device;
+    PipelineStateObject::PipelineStateObjectConf psoConf = {};
     psoConf.desc = desc;
-    pipelineStateObject[(int)RenderMode::Solid] = std::make_shared<PipelineStateObject>();
-    pipelineStateObject[(int)RenderMode::Solid]->init(psoConf);
+    pipelineStateObject[(int)RenderMode::Solid] = std::make_shared<PipelineStateObject>(psoConf);
+    pipelineStateObject[(int)RenderMode::Solid]->init(conf.device);
 
     // ワイヤーフレームモード初期化
     D3D12_RASTERIZER_DESC rasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
@@ -114,8 +113,8 @@ void Triangle::initPipelineStateObject(TriangleConf conf)
     rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
     desc.RasterizerState = rasterizerDesc;
     psoConf.desc = desc;
-    pipelineStateObject[(int)RenderMode::WireFrame] = std::make_shared<PipelineStateObject>();
-    pipelineStateObject[(int)RenderMode::WireFrame]->init(psoConf);
+    pipelineStateObject[(int)RenderMode::WireFrame] = std::make_shared<PipelineStateObject>(psoConf);
+    pipelineStateObject[(int)RenderMode::WireFrame]->init(conf.device);
 
 }
 

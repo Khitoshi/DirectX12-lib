@@ -1,5 +1,5 @@
 #include "Sprite.h"
-
+//#include "ShaderCacheManager.h"
 /// <summary>
 /// 初期化処理
 /// </summary>
@@ -31,10 +31,8 @@ void Sprite::draw(RenderContext* rc)
     rc->setVertexBuffer(this->vertexBuffer.get());
     //インデックスバッファを設定。
     rc->setIndexBuffer(this->indexBuffer.get());
-
     //テクスチャを設定。
     rc->setTexture(this->texture.get());
-
     //ドローコール
     rc->drawIndexed(numIndices);
 }
@@ -48,16 +46,15 @@ void Sprite::initRootSignature(SpriteConf conf)
     RootSignatureConf rootSignatureConf = {};
 
     rootSignatureConf.samplerFilter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-    rootSignatureConf.textureAdressModeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    rootSignatureConf.textureAdressModeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    rootSignatureConf.textureAdressModeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    rootSignatureConf.textureAddressModeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    rootSignatureConf.textureAddressModeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    rootSignatureConf.textureAddressModeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rootSignatureConf.numSampler = 1;
     rootSignatureConf.maxSrvDescriptor = 1;
     rootSignatureConf.offsetInDescriptorsFromTableStartSRV = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
     rootSignatureConf.rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-    this->psoParameter.rootSignatureConf = rootSignatureConf;
-    //rootSignature = std::make_shared<RootSignature>();
-    //rootSignature->init(conf.device, rootSignatureConf);
+
+    this->rootSignature = RootSignatureCacheManager::getInstance().getOrCreate(conf.device, rootSignatureConf);  
 }
 
 /// <summary>
@@ -65,13 +62,21 @@ void Sprite::initRootSignature(SpriteConf conf)
 /// </summary>
 void Sprite::initShader()
 {
-    this->psoParameter.vertexShaderConf.filePath = "./src/shaders/SpriteVS.hlsl";
-    this->psoParameter.vertexShaderConf.entryFuncName = "VSMain";
-    this->psoParameter.vertexShaderConf.currentShaderModelType = ShaderConf::ShaderModelType::Vertex;
+    {
+        ShaderConf conf = {};
+        conf.filePath = "./src/shaders/SpriteVS.hlsl";
+        conf.entryFuncName = "VSMain";
+        conf.currentShaderModelType = ShaderConf::ShaderModelType::Vertex;
+        defaultShaderPair.vertexShader = ShaderCacheManager::getInstance().getOrCreate(conf);
+    }
 
-    this->psoParameter.pixelShaderConf.filePath = "./src/shaders/SpritePS.hlsl";
-    this->psoParameter.pixelShaderConf.entryFuncName = "PSMain";
-    this->psoParameter.pixelShaderConf.currentShaderModelType = ShaderConf::ShaderModelType::Pixel;
+    {
+        ShaderConf conf = {};
+        conf.filePath = "./src/shaders/SpritePS.hlsl";
+        conf.entryFuncName = "PSMain";
+        conf.currentShaderModelType = ShaderConf::ShaderModelType::Pixel;
+        defaultShaderPair.pixelShader = ShaderCacheManager::getInstance().getOrCreate(conf);
+    }
 }
 
 /// <summary>
@@ -80,34 +85,32 @@ void Sprite::initShader()
 /// <param name="conf"></param>
 void Sprite::initPipelineStateObject(SpriteConf conf)
 {
+    D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA } 
+    };
+
     // インプットレイアウト
-    PSOCacheManager::PipelineStateSettings settings = {};
+    PipelineStateObject::PipelineStateObjectConf PSOConf = {};
+    PSOConf.desc.pRootSignature = this->rootSignature->getRootSignature();
+    PSOConf.desc.VS = CD3DX12_SHADER_BYTECODE(defaultShaderPair.vertexShader->getShaderBlob());
+    PSOConf.desc.PS = CD3DX12_SHADER_BYTECODE(defaultShaderPair.pixelShader->getShaderBlob());
+    PSOConf.desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    PSOConf.desc.SampleMask = UINT_MAX;
+    PSOConf.desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    PSOConf.desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+    PSOConf.desc.InputLayout = { inputElementDesc, _countof(inputElementDesc) };
+    PSOConf.desc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
+    PSOConf.desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    PSOConf.desc.NumRenderTargets = 1;
+    PSOConf.desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    PSOConf.desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+    PSOConf.desc.SampleDesc.Count = 1;
+    PSOConf.desc.SampleDesc.Quality = 0;
+    PSOConf.desc.NodeMask = 1;
+    PSOConf.desc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-    settings.pipelineStateDesc.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    settings.pipelineStateDesc.sampleMask = UINT_MAX;
-    settings.pipelineStateDesc.rasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    settings.pipelineStateDesc.depthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-
-    D3D12_INPUT_ELEMENT_DESC inputElementDescPos = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA };
-    D3D12_INPUT_ELEMENT_DESC inputElementDescTex = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA };
-    settings.pipelineStateDesc.inputLayout.push_back(inputElementDescPos);
-    settings.pipelineStateDesc.inputLayout.push_back(inputElementDescTex);
-
-    settings.pipelineStateDesc.iBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
-    settings.pipelineStateDesc.primitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    settings.pipelineStateDesc.numRenderTargets = 1;
-    settings.pipelineStateDesc.rtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-    settings.pipelineStateDesc.dsvFormat = DXGI_FORMAT_D32_FLOAT;
-
-    settings.pipelineStateDesc.sampleDesc.Count = 1;
-    settings.pipelineStateDesc.sampleDesc.Quality = 0;
-
-    settings.pipelineStateDesc.nodeMask = 1;
-    settings.pipelineStateDesc.flags = D3D12_PIPELINE_STATE_FLAG_NONE;
-
-    this->psoParameter.pipelineStateSettings = settings;
-
-    this->defaultPipelineStateObject = PSOCacheManager::getInstance().getPSO(conf.device, this->psoParameter);
+    this->defaultPipelineStateObject = PSOCacheManager::getInstance().getPSO(conf.device, PSOConf);
 }
 
 /// <summary>

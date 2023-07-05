@@ -9,9 +9,9 @@ void RootSignature::init(ID3D12Device* device, const RootSignatureConf conf)
 {
     D3D12_STATIC_SAMPLER_DESC samplerDesc = {};
     samplerDesc.Filter = conf.samplerFilter;
-    samplerDesc.AddressU = conf.textureAdressModeU;
-    samplerDesc.AddressV = conf.textureAdressModeV;
-    samplerDesc.AddressW = conf.textureAdressModeW;
+    samplerDesc.AddressU = conf.textureAddressModeU;
+    samplerDesc.AddressV = conf.textureAddressModeV;
+    samplerDesc.AddressW = conf.textureAddressModeW;
     samplerDesc.MipLODBias = 0;
     samplerDesc.MaxAnisotropy = 0;
     samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
@@ -27,7 +27,7 @@ void RootSignature::init(ID3D12Device* device, const RootSignatureConf conf)
         &samplerDesc,
         conf.maxCbvDescriptor,
         conf.maxSrvDescriptor,
-        conf.maxUavDescritor,
+        conf.maxUavDescriptor,
         conf.numSampler,
         conf.offsetInDescriptorsFromTableStartCB,
         conf.offsetInDescriptorsFromTableStartSRV,
@@ -41,7 +41,7 @@ void RootSignature::createRootSignature(
     D3D12_STATIC_SAMPLER_DESC* sampler,
     const UINT maxCbvDescriptor,
     const UINT maxSrvDescriptor,
-    const UINT maxUavDescritor,
+    const UINT maxUavDescriptor,
     const UINT numSampler,
     const UINT offsetInDescriptorsFromTableStartCB,
     const UINT offsetInDescriptorsFromTableStartSRV,
@@ -49,35 +49,43 @@ void RootSignature::createRootSignature(
     const D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags
 )
 {
-    enum {
-        enDescriptorHeap_CB,    //定数バッファ
-        enDescriptorHeap_SRV,   //シェーダーリソースビュー
-        enDescriptorHeap_UAV,   //アンオーダードアクセスビュー
-
-        enNumDescriptorHeap     //ディスクリプタヒープの種類の数
-    };
-
-    CD3DX12_DESCRIPTOR_RANGE1 ranges[enNumDescriptorHeap] = {};
-    CD3DX12_ROOT_PARAMETER1 rootParameters[enNumDescriptorHeap] = {};
+    std::vector<CD3DX12_DESCRIPTOR_RANGE1> ranges = {};
+    std::vector<CD3DX12_ROOT_PARAMETER1> rootParameters = {};
 
     //CBV
-    ranges[enDescriptorHeap_CB].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, maxCbvDescriptor, offsetInDescriptorsFromTableStartCB);
-    rootParameters[enDescriptorHeap_CB].InitAsDescriptorTable(1, &ranges[enDescriptorHeap_CB], D3D12_SHADER_VISIBILITY_ALL);
+    if (maxCbvDescriptor > 0) {
+        ranges.emplace_back();
+        rootParameters.emplace_back();
+        ranges.back().Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, maxCbvDescriptor, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, offsetInDescriptorsFromTableStartCB);
+
+        rootParameters.back().InitAsDescriptorTable(1, &ranges.back(), D3D12_SHADER_VISIBILITY_ALL);
+
+    }
 
     //SRV
-    ranges[enDescriptorHeap_SRV].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, maxSrvDescriptor, offsetInDescriptorsFromTableStartSRV);
-    rootParameters[enDescriptorHeap_SRV].InitAsDescriptorTable(1, &ranges[enDescriptorHeap_SRV], D3D12_SHADER_VISIBILITY_ALL);
+    if (maxSrvDescriptor > 0) {
+        ranges.emplace_back();
+        rootParameters.emplace_back();  
+        ranges.back().Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, maxSrvDescriptor, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, offsetInDescriptorsFromTableStartSRV);
+        rootParameters.back().InitAsDescriptorTable(1, &ranges.back(), D3D12_SHADER_VISIBILITY_ALL);
+    }
 
     //UAV
-    ranges[enDescriptorHeap_UAV].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, maxUavDescritor, offsetInDescriptorsFromTableStartUAV);
-    rootParameters[enDescriptorHeap_UAV].InitAsDescriptorTable(1, &ranges[enDescriptorHeap_UAV], D3D12_SHADER_VISIBILITY_ALL);
-
+    if (maxUavDescriptor > 0) {
+        ranges.emplace_back();
+        rootParameters.emplace_back();
+        ranges.back().Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, maxUavDescriptor, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, offsetInDescriptorsFromTableStartUAV);
+        rootParameters.back().InitAsDescriptorTable(1, &ranges.back(), D3D12_SHADER_VISIBILITY_ALL);
+    }
     CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
-    rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, numSampler, sampler, rootSignatureFlags);
+    rootSignatureDesc.Init_1_1(rootParameters.size(), rootParameters.data(), numSampler, sampler, rootSignatureFlags);
 
     Microsoft::WRL::ComPtr<ID3DBlob> signature;
     Microsoft::WRL::ComPtr<ID3DBlob> error;
     if (FAILED(D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error))) {
+        if (error) {
+            OutputDebugStringA((char*)error->GetBufferPointer());
+        }
         throw std::runtime_error("D3DX12SerializeVersionedRootSignature failed");
     }
 

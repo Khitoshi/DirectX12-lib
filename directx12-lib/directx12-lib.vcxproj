@@ -38,6 +38,7 @@
     <ClCompile Include="src\Rotation.cpp" />
     <ClCompile Include="src\SceneTriangle.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\ShaderCacheManager.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\SceneSprite.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\PipelineStateObject.h" />
     <ClInclude Include="src\PSOCacheManager.h" />
+    <ClInclude Include="src\PSOHashes.h" />
     <ClInclude Include="src\RenderContext.h" />
     <ClInclude Include="src\RenderMode.h" />
     <ClInclude Include="src\RenderTarget.h" />
