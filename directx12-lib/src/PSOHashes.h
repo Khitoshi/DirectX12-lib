@@ -3,9 +3,8 @@
 #include <cstddef>
 #include "d3dx12.h"
 #include <string>
-//PSOの生成時に使用するhash化処理用
 
-
+//PSOの生成時に使用するhash化処理
 namespace std {
 
     template <>
@@ -21,36 +20,6 @@ namespace std {
         }
     };
 
-    /*
-    template<>
-    struct hash<D3D12_SHADER_BYTECODE> {
-        std::size_t operator()(const D3D12_SHADER_BYTECODE& obj) const {
-            // ハッシュ関数の実装を書く
-            // ここでは例として単純なハッシュを作成しますが、実際のハッシュはより複雑になる可能性があります。
-            return std::hash<std::string>{}(std::string(obj.pShaderBytecode, obj.BytecodeLength));
-        }
-    };
-    */
-
-    /*
-    template <>
-    struct hash<D3D12_RENDER_TARGET_BLEND_DESC> {
-        std::size_t operator()(const D3D12_RENDER_TARGET_BLEND_DESC& rtBlendDesc) const {
-            std::size_t seed = 0;
-            hash_combine(seed, rtBlendDesc.BlendEnable);
-            hash_combine(seed, rtBlendDesc.LogicOpEnable);
-            hash_combine(seed, rtBlendDesc.SrcBlend);
-            hash_combine(seed, rtBlendDesc.DestBlend);
-            hash_combine(seed, rtBlendDesc.BlendOp);
-            hash_combine(seed, rtBlendDesc.SrcBlendAlpha);
-            hash_combine(seed, rtBlendDesc.DestBlendAlpha);
-            hash_combine(seed, rtBlendDesc.BlendOpAlpha);
-            hash_combine(seed, rtBlendDesc.LogicOp);
-            hash_combine(seed, rtBlendDesc.RenderTargetWriteMask);
-            return seed;
-        }
-    };
-    */
     template<>
     struct hash<D3D12_RASTERIZER_DESC>
     {

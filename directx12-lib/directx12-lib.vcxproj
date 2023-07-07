@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\DepthStencil.cpp" />
     <ClCompile Include="src\DX12Resources.cpp" />
     <ClCompile Include="src\Fence.cpp" />
@@ -36,6 +38,7 @@
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\RootSignature.cpp" />
     <ClCompile Include="src\Rotation.cpp" />
+    <ClCompile Include="src\RotationEffect.cpp" />
     <ClCompile Include="src\SceneTriangle.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderCacheManager.cpp" />
@@ -48,6 +51,7 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\d3dx12.h" />
     <ClInclude Include="src\DepthStencil.h" />
@@ -76,6 +80,7 @@
     <ClInclude Include="src\RootSignatureCacheManager.h" />
     <ClInclude Include="src\RootSignatureConf.h" />
     <ClInclude Include="src\Rotation.h" />
+    <ClInclude Include="src\RotationEffect.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\SceneDefault.h" />
     <ClInclude Include="src\SceneManager.h" />
@@ -84,6 +89,7 @@
     <ClInclude Include="src\ShaderCacheManager.h" />
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\SceneSprite.h" />
+    <ClInclude Include="src\SpriteModifier.h" />
     <ClInclude Include="src\SwapChain.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Triangle.h" />

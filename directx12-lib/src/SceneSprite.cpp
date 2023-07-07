@@ -3,12 +3,16 @@
 
 void SceneSprite::init(SceneConf conf)
 {
+    camera = std::make_shared<Camera>(1280, 720);
+    camera->init();
+
     //3角形のリソースを作成&初期化
-    sprite = std::make_shared<Sprite>();
     Sprite::SpriteConf spriteConf = {};
     spriteConf.device = conf.device;
     spriteConf.filePath = "asset/img/test_image.png";
-    sprite->init(spriteConf);
+    spriteConf.camera = camera.get();
+    sprite = std::make_shared<Sprite>(spriteConf);
+    sprite->init();
 
     //頂点座標を設定
     vertex[0] = sprite->getVertices(0);
@@ -23,6 +27,7 @@ void SceneSprite::finalize()
 
 void SceneSprite::update()
 {
+    this->camera->update();
     /*
     switch (imageFeatures)
     {

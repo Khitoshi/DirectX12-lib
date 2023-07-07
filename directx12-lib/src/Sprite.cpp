@@ -4,14 +4,17 @@
 /// 初期化処理
 /// </summary>
 /// <param name="conf">テクスチャの設定</param>
-void Sprite::init(const SpriteConf conf)
+void Sprite::init()
 {
-    initRootSignature(conf);
+    initRootSignature();
     initShader();
-    initPipelineStateObject(conf);
-    initVertexBuffer(conf);
-    initIndexBuffer(conf);
-    initTexture(conf);
+    initPipelineStateObject();
+    initVertexBuffer();
+    initIndexBuffer();
+    initTexture();
+
+    this->rotationEffect = std::make_shared<RotationEffect>();
+    this->rotationEffect->init(conf.device, conf.camera);
 }
 
 /// <summary>
@@ -33,15 +36,18 @@ void Sprite::draw(RenderContext* rc)
     rc->setIndexBuffer(this->indexBuffer.get());
     //テクスチャを設定。
     rc->setTexture(this->texture.get());
+
     //ドローコール
     rc->drawIndexed(numIndices);
+
+    this->rotationEffect->update(rc,conf.camera);
 }
 
 /// <summary>
 /// ルートシグニチャの初期化
 /// </summary>
 /// <param name="conf"></param>
-void Sprite::initRootSignature(SpriteConf conf)
+void Sprite::initRootSignature()
 {
     RootSignatureConf rootSignatureConf = {};
 
@@ -83,7 +89,7 @@ void Sprite::initShader()
 /// psoの初期化
 /// </summary>
 /// <param name="conf"></param>
-void Sprite::initPipelineStateObject(SpriteConf conf)
+void Sprite::initPipelineStateObject()
 {
     D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
@@ -117,7 +123,7 @@ void Sprite::initPipelineStateObject(SpriteConf conf)
 /// 頂点バッファの初期化
 /// </summary>
 /// <param name="conf"></param>
-void Sprite::initVertexBuffer(SpriteConf conf)
+void Sprite::initVertexBuffer()
 {
     //頂点データ
     vertices[0] = {
@@ -154,7 +160,7 @@ void Sprite::initVertexBuffer(SpriteConf conf)
 /// インデックスバッファの初期化
 /// </summary>
 /// <param name="conf"></param>
-void Sprite::initIndexBuffer(SpriteConf conf)
+void Sprite::initIndexBuffer()
 {
     //インデックスデータ
     unsigned short indices[] = {
@@ -180,7 +186,7 @@ void Sprite::initIndexBuffer(SpriteConf conf)
 /// テクスチャの初期化
 /// </summary>
 /// <param name="conf"></param>
-void Sprite::initTexture(SpriteConf conf)
+void Sprite::initTexture()
 {
     //テクスチャの初期化
     Texture::TextureConf textureConf = {};

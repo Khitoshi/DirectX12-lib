@@ -1,6 +1,7 @@
 #pragma once
 #include "Sprite.h"
 #include "Scene.h"
+#include "Camera.h"
 #include <memory>
 
 /// <summary>
@@ -12,7 +13,8 @@ public:
     SceneSprite() :
         sprite(),
         vertex(),
-        isChangeVertex(false)
+        isChangeVertex(false),
+        camera()
     {};
     ~SceneSprite() {};
 
@@ -40,4 +42,5 @@ private:
     std::shared_ptr<Sprite> sprite;         //スプライト
     Sprite::Vertex vertex[4];               //頂点座標
     bool isChangeVertex;                    //頂点座標を変更したか
+    std::shared_ptr<Camera> camera;         //カメラ
 };

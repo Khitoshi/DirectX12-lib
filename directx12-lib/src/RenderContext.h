@@ -6,6 +6,7 @@
 #include "d3dx12.h"
 #include "Texture.h"
 #include "RootSignature.h"
+#include "ConstantBuffer.h"
 #include <dxgi1_4.h>
 using namespace Microsoft::WRL;
 /// <summary>
@@ -195,6 +196,14 @@ public:
         D3D12_INDEX_BUFFER_VIEW ibView = ib->getIndexBufferView();
         this->commandList->IASetIndexBuffer(&ibView);
     }
+
+    void setConstantBufferView(ConstantBuffer* cbv)
+	{
+        auto ds = cbv->getDescriptorHeap();
+        this->commandList->SetDescriptorHeaps(1, &ds);
+        //this->commandList->SetGraphicsRootConstantBufferView(0, cbv->getConstantBufferViewGPUVirtualAddress());
+        this->commandList->SetGraphicsRootDescriptorTable(0, cbv->getGPUDescriptorHandleForHeapStart());
+	}
 
     /// <summary>
     /// インデックス付きの描画コールを実行

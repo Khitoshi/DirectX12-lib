@@ -59,7 +59,7 @@ void RootSignature::createRootSignature(
         ranges.back().Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, maxCbvDescriptor, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, offsetInDescriptorsFromTableStartCB);
 
         rootParameters.back().InitAsDescriptorTable(1, &ranges.back(), D3D12_SHADER_VISIBILITY_ALL);
-
+        //rootParameters.back().InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC, D3D12_SHADER_VISIBILITY_ALL);
     }
 
     //SRV
@@ -77,6 +77,7 @@ void RootSignature::createRootSignature(
         ranges.back().Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, maxUavDescriptor, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, offsetInDescriptorsFromTableStartUAV);
         rootParameters.back().InitAsDescriptorTable(1, &ranges.back(), D3D12_SHADER_VISIBILITY_ALL);
     }
+
     CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
     rootSignatureDesc.Init_1_1(rootParameters.size(), rootParameters.data(), numSampler, sampler, rootSignatureFlags);
 

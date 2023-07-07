@@ -8,6 +8,7 @@
 #include "RootSignatureCacheManager.h"
 #include "ShaderCacheManager.h"
 #include "PSOCacheManager.h"
+#include "RotationEffect.h"
 #include <memory>
 #include <DirectXMath.h>
 #include <stdexcept>
@@ -24,10 +25,12 @@ public:
     {
         ID3D12Device* device;
         const char* filePath;
+        Camera* camera;
     };
 
 public:
-    Sprite() :
+    Sprite(SpriteConf c) :
+        conf(c),
         rootSignature(),
         defaultShaderPair(),
         defaultPipelineStateObject(),
@@ -40,25 +43,25 @@ public:
     ~Sprite() {};
 
     //初期化処理
-    void init(const SpriteConf conf);
+    void init();
     //描画処理
     void draw(RenderContext* rc);
 
 private:
 
     //ルートシグネチャの作成
-    void initRootSignature(SpriteConf conf);
+    void initRootSignature();
     //シェーダーのロード
     void initShader();
     //パイプラインステートオブジェクトの作成
-    void initPipelineStateObject(SpriteConf conf);
+    void initPipelineStateObject();
 
     //頂点バッファの作成
-    void initVertexBuffer(SpriteConf conf);
+    void initVertexBuffer();
     //インデックスバッファの作成
-    void initIndexBuffer(SpriteConf conf);
+    void initIndexBuffer();
     //テクスチャの作成
-    void initTexture(SpriteConf conf);
+    void initTexture();
 
 public:
     //頂点データ
@@ -104,7 +107,7 @@ private:
 
         Num,
     };
-
+    SpriteConf conf;
     std::shared_ptr<RootSignature> rootSignature;                                   //ルートシグニチャ
     BasicShaderPair defaultShaderPair;												//デフォルトのシェーダー
     std::shared_ptr<PipelineStateObject> defaultPipelineStateObject;                       //パイプラインステートオブジェクト
@@ -115,5 +118,7 @@ private:
     std::shared_ptr<Texture> texture;												//テクスチャ
 
     std::shared_ptr<Rotation> rotation;												//回転
+
+    std::shared_ptr<RotationEffect> rotationEffect;									//回転エフェクト
 
 };

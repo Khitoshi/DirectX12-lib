@@ -17,7 +17,8 @@ struct VSInput
 VSOutput VSMain(VSInput input) 
 {
     VSOutput output;
-    output.position = input.pos;
+    //output.position = input.pos;
+    output.position = mul(input.pos, transformMatrix);
     output.color = input.color;
     
 	return output;
