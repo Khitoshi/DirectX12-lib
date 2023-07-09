@@ -4,24 +4,21 @@
 void RotationEffect::init(ID3D12Device* device, const Camera const* camera)
 {
     this->createRootSignature(device);
-	this->createShader();
-	this->createPSO(device);
-	this->createConstantBuffer(device, camera);
+    this->createShader();
+    this->createPSO(device);
+
+    this->createConstantBuffer(device, camera);
 }
 
-void RotationEffect::update(RenderContext* renderContext, const Camera const* camera)
+void RotationEffect::update(RenderContext* renderContext, const Camera const* camera, VertexBuffer* vb, IndexBuffer* ib, int numIndices)
 {
     renderContext->setRootSignature(this->rootSignature.get());
-
-    /*
-    DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationY(3.14 / 2);
-    auto matrix = DirectX::XMMatrixMultiply(camera->getWorldMatrix(), rotationMatrix);
-    this->constantBuffer->copy(&matrix);
-    */
-
-    renderContext->setConstantBufferView(this->constantBuffer.get());
     renderContext->setPipelineState(this->pso.get());
-    //renderContext->drawIndexed(0);
+    renderContext->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    renderContext->setConstantBufferView(this->constantBuffer.get());
+    renderContext->setVertexBuffer(vb);
+    renderContext->setIndexBuffer(ib);
+    renderContext->drawIndexed(numIndices);
 }
 
 void RotationEffect::createRootSignature(ID3D12Device* device)
@@ -91,10 +88,29 @@ void RotationEffect::createConstantBuffer(ID3D12Device* device, const Camera con
 {
     this->constantBuffer = std::make_unique<ConstantBuffer>();
     this->constantBuffer->init(device);
-    DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationY(3.14 / 2);
-    auto matrix = DirectX::XMMatrixMultiply(camera->getWorldMatrix(), rotationMatrix);
+
+    constexpr float angle = DirectX::XMConvertToRadians(90.0f);
+
+    /*
+    //DirectX::XMMATRIX worldMat = camera->getWorldMatrix();
+    DirectX::XMMATRIX worldMat = DirectX::XMMatrixRotationZ(DirectX::XM_PIDIV2);
+    DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationZ(angle);
+    //DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationY(angle);
+    auto matrix = DirectX::XMMatrixMultiply(worldMat, rotationMatrix);
+    matrix = DirectX::XMMatrixTranspose(matrix);
     //auto matrix = camera->getWorldMatrix() * camera->getViewMatrix() * camera->getProjectionMatrix();
+    */
+
+    DirectX::XMMATRIX modelMatrix = DirectX::XMMatrixIdentity();
+    //DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixIdentity();
+    DirectX::XMMATRIX viewMatrix = camera->getViewMatrix();
+    //DirectX::XMMATRIX projectionMatrix = DirectX::XMMatrixIdentity();
+    DirectX::XMMATRIX projectionMatrix = camera->getProjectionMatrix();
+
+    DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationZ(angle);
+    //auto matrix = DirectX::XMMatrixMultiply(DirectX::XMMatrixMultiply(modelMatrix, rotationMatrix), DirectX::XMMatrixMultiply(viewMatrix, projectionMatrix));
+    auto matrix = (DirectX::XMMatrixRotationZ(DirectX::XM_PIDIV2) * angle) * viewMatrix * projectionMatrix;
+    //matrix = DirectX::XMMatrixTranspose(matrix);
 
     this->constantBuffer->copy(&matrix);
 }
-

@@ -91,6 +91,7 @@
     <ClInclude Include="src\SceneSprite.h" />
     <ClInclude Include="src\SpriteModifier.h" />
     <ClInclude Include="src\SwapChain.h" />
+    <ClInclude Include="src\TemporaryRenderTarget.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Triangle.h" />
     <ClInclude Include="src\VertexBuffer.h" />

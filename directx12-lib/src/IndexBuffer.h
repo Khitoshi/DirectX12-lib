@@ -38,7 +38,7 @@ public:
 
 public:
     //インデックスバッファビューの取得
-    D3D12_INDEX_BUFFER_VIEW getIndexBufferView() const { return indexBufferView; }
+    const D3D12_INDEX_BUFFER_VIEW& getIndexBufferView() const { return indexBufferView; }
 
     //インデックスバッファのストライドの取得
     int getStrideInBytes() const { return strideInBytes; }

@@ -28,7 +28,7 @@ public:
 
 public:
     //頂点バッファビューの取得
-    D3D12_VERTEX_BUFFER_VIEW getVertexBufferView() const { return vertexBufferView; }
+    const D3D12_VERTEX_BUFFER_VIEW& getVertexBufferView() const { return vertexBufferView; }
 
 private:
     ComPtr<ID3D12Resource>      vertexBuffer;		        //頂点バッファ。

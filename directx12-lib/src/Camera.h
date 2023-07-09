@@ -10,7 +10,7 @@ public:
 		up(0,1,0),
 		width(width),
 		height(height),
-		worldMatrix(DirectX::XMMatrixRotationY(DirectX::XM_PIDIV4))
+		worldMatrix(DirectX::XMMatrixRotationY(DirectX::XM_PIDIV2))
 	{};
 	~Camera() {};
 	void init();
@@ -23,7 +23,7 @@ public:
 	{
 		//âÊäp90Åã
 		return DirectX::XMMatrixPerspectiveFovLH(
-			DirectX::XM_PIDIV2, 
+			DirectX::XM_PIDIV2,
 			static_cast<float>(width) / static_cast<float>(height),//ÉAÉXî‰,
 			1.0f, 10.0f);
 	}
@@ -34,7 +34,7 @@ public:
 private:
 	DirectX::XMFLOAT3 eye;
 	DirectX::XMFLOAT3 target;
-	DirectX::XMFLOAT3 up;	
+	DirectX::XMFLOAT3 up;
 	int width;
 	int height;
 	DirectX::XMMATRIX worldMatrix;

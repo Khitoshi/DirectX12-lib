@@ -28,18 +28,11 @@ void SceneSprite::finalize()
 void SceneSprite::update()
 {
     this->camera->update();
-    /*
-    switch (imageFeatures)
-    {
-    case FEATURE_NONE:
-    case FEATURE_ROTATE:
-    };
-    */
 
     if (isChangeVertex) {
-		sprite->setVertices(vertex);
-		isChangeVertex = false;
-	}
+        sprite->setVertices(vertex);
+        isChangeVertex = false;
+    }
 }
 
 void SceneSprite::render(SceneConf conf)
@@ -66,7 +59,7 @@ void SceneSprite::updateImguiMenu()
 
     //’¸“_‚ÌˆÊ’u
     for (int i = 0; i < 4; ++i) {
-        float uv[2] = { vertex[i].uv.x, vertex[i].uv.y,};
+        float uv[2] = { vertex[i].uv.x, vertex[i].uv.y, };
         std::string label = "Vertex uv" + std::to_string(i + 1);
 
         if (ImGui::SliderFloat2(label.c_str(), uv, -1.0f, 1.0f)) {
@@ -75,10 +68,10 @@ void SceneSprite::updateImguiMenu()
             isChangeVertex = true;
         }
     }
-        
+
     static bool isRotation = false;
     if (ImGui::Checkbox("Rotation", &isRotation))imageFeatures |= FEATURE_ROTATE;
-	else imageFeatures &= ~FEATURE_ROTATE;
+    else imageFeatures &= ~FEATURE_ROTATE;
 
-	ImGui::End();
+    ImGui::End();
 }

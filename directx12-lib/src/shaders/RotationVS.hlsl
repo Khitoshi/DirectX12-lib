@@ -14,12 +14,13 @@ struct VSInput
     float4 color : COLOR; //RGBA
 };
 
-VSOutput VSMain(VSInput input) 
+VSOutput VSMain(VSInput input)
 {
     VSOutput output;
     //output.position = input.pos;
     output.position = mul(input.pos, transformMatrix);
+    //output.position = mul(transformMatrix, input.pos);
     output.color = input.color;
-    
-	return output;
+
+    return output;
 }

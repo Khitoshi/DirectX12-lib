@@ -38,9 +38,12 @@ void Sprite::draw(RenderContext* rc)
     rc->setTexture(this->texture.get());
 
     //ドローコール
-    rc->drawIndexed(numIndices);
+    rc->drawIndexed(this->numIndices);
 
-    this->rotationEffect->update(rc,conf.camera);
+
+    this->rotationEffect->update(rc, conf.camera, this->vertexBuffer.get(), this->indexBuffer.get(), this->numIndices);
+    //rc->setIndexBuffer(this->indexBuffer.get());
+    //rc->setVertexBuffer(this->vertexBuffer.get());
 }
 
 /// <summary>
@@ -60,7 +63,7 @@ void Sprite::initRootSignature()
     rootSignatureConf.offsetInDescriptorsFromTableStartSRV = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
     rootSignatureConf.rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-    this->rootSignature = RootSignatureCacheManager::getInstance().getOrCreate(conf.device, rootSignatureConf);  
+    this->rootSignature = RootSignatureCacheManager::getInstance().getOrCreate(conf.device, rootSignatureConf);
 }
 
 /// <summary>
@@ -93,7 +96,7 @@ void Sprite::initPipelineStateObject()
 {
     D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA } 
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA }
     };
 
     // インプットレイアウト

@@ -183,8 +183,8 @@ public:
     /// <param name="vb">頂点バッファ</param>
     void setVertexBuffer(VertexBuffer* vb)
     {
-        D3D12_VERTEX_BUFFER_VIEW vbView = vb->getVertexBufferView();
-        this->commandList->IASetVertexBuffers(0, 1, &vbView);
+        //D3D12_VERTEX_BUFFER_VIEW vbView = vb->getVertexBufferView();
+        this->commandList->IASetVertexBuffers(0, 1, &vb->getVertexBufferView());
     }
 
     /// <summary>
@@ -193,17 +193,21 @@ public:
     /// <param name="ib">インデックスバッファ</param>
     void setIndexBuffer(IndexBuffer* ib)
     {
-        D3D12_INDEX_BUFFER_VIEW ibView = ib->getIndexBufferView();
-        this->commandList->IASetIndexBuffer(&ibView);
+        //D3D12_INDEX_BUFFER_VIEW ibView = ib->getIndexBufferView();
+        this->commandList->IASetIndexBuffer(&ib->getIndexBufferView());
     }
 
+    /// <summary>
+    /// 定数バッファビューを設定
+    /// </summary>
+    /// <param name="cbv">定数バッファ</param>
     void setConstantBufferView(ConstantBuffer* cbv)
-	{
+    {
         auto ds = cbv->getDescriptorHeap();
         this->commandList->SetDescriptorHeaps(1, &ds);
         //this->commandList->SetGraphicsRootConstantBufferView(0, cbv->getConstantBufferViewGPUVirtualAddress());
         this->commandList->SetGraphicsRootDescriptorTable(0, cbv->getGPUDescriptorHandleForHeapStart());
-	}
+    }
 
     /// <summary>
     /// インデックス付きの描画コールを実行
