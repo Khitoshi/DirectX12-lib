@@ -37,6 +37,9 @@
     <Filter Include="Shaders\Rotation">
       <UniqueIdentifier>{cc199299-98b2-4bf3-a5c0-28abac6490a9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\FullScreenQuad">
+      <UniqueIdentifier>{72651c45-2c72-4f2b-aedd-15039fbccc05}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -127,6 +130,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OffScreenRenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FullScreenQuad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -266,7 +275,10 @@
     <ClInclude Include="src\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TemporaryRenderTarget.h">
+    <ClInclude Include="src\OffScreenRenderTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FullScreenQuad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -289,6 +301,12 @@
     <FxCompile Include="src\shaders\RotationPS.hlsl">
       <Filter>Shaders\Rotation</Filter>
     </FxCompile>
+    <FxCompile Include="src\shaders\FullScreenQuadPS.hlsl">
+      <Filter>Shaders\FullScreenQuad</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\FullScreenQuadVS.hlsl">
+      <Filter>Shaders\FullScreenQuad</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\Triangle.hlsli">
@@ -301,5 +319,8 @@
       <Filter>Shaders\Rotation</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="src\shaders\FullScreenQuad.hlsli">
+      <Filter>Shaders\FullScreenQuad</Filter>
+    </None>
   </ItemGroup>
 </Project>

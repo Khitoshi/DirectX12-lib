@@ -11,14 +11,14 @@ public:
     RotationEffect() {};
     ~RotationEffect() {};
 
-    void init(ID3D12Device* device, const Camera const* camera);
-    void update(RenderContext* renderContext, const Camera const* camera, VertexBuffer* vb, IndexBuffer* ib, int numIndices);
+    void init(ID3D12Device* device, const Camera* camera);
+    void update(RenderContext* renderContext, const Camera* camera, VertexBuffer* vb, IndexBuffer* ib, int numIndices);
 
 private:
     void createRootSignature(ID3D12Device* device);
     void createShader();
     void createPSO(ID3D12Device* device);
-    void createConstantBuffer(ID3D12Device* device, const Camera const* camera);
+    void createConstantBuffer(ID3D12Device* device, const Camera* camera);
 
 private:
     //頂点データ

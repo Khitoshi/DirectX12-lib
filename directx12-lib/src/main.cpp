@@ -70,7 +70,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         SceneManager::getInstance().registerScene();
 
         //メッセージループ処理
-        float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        //float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 #ifdef _DEBUG
         //FPS計測用
         const int FRAMERATE_BUFFER_SIZE = 1000;
@@ -80,10 +81,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif // _DEBUG
         while (ResourceManager::getInstance()->getResource<Window>("window")->processMessages()) {
             //描画開始処理
-            ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->beginRender(color);
+            ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->setBackGroundColor(color);
+            ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->beginRender();
 
-            SceneManager::getInstance().update();
-            SceneManager::getInstance().render(sceneConf);
+            //SceneManager::getInstance().update();
+            //SceneManager::getInstance().render(sceneConf);
 
 #ifdef _DEBUG
             //imguiFrame開始処理
@@ -109,9 +111,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             }
 
             //imguiメニュー更新処理
-            SceneManager::getInstance().updateImguiMenu();
+            //SceneManager::getInstance().updateImguiMenu();
             //シーン選択
-            SceneManager::getInstance().sceneSelect();
+            //SceneManager::getInstance().sceneSelect();
 
             //Frame終了処理
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->endFrame();

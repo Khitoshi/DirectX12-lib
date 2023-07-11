@@ -1,7 +1,7 @@
 #include "RotationEffect.h"
 #include <DirectXMath.h>
 
-void RotationEffect::init(ID3D12Device* device, const Camera const* camera)
+void RotationEffect::init(ID3D12Device* device, const Camera* camera)
 {
     this->createRootSignature(device);
     this->createShader();
@@ -10,7 +10,7 @@ void RotationEffect::init(ID3D12Device* device, const Camera const* camera)
     this->createConstantBuffer(device, camera);
 }
 
-void RotationEffect::update(RenderContext* renderContext, const Camera const* camera, VertexBuffer* vb, IndexBuffer* ib, int numIndices)
+void RotationEffect::update(RenderContext* renderContext, const Camera* camera, VertexBuffer* vb, IndexBuffer* ib, int numIndices)
 {
     renderContext->setRootSignature(this->rootSignature.get());
     renderContext->setPipelineState(this->pso.get());
@@ -84,7 +84,7 @@ void RotationEffect::createPSO(ID3D12Device* device)
     this->pso = PSOCacheManager::getInstance().getPSO(device, PSOConf);
 }
 
-void RotationEffect::createConstantBuffer(ID3D12Device* device, const Camera const* camera)
+void RotationEffect::createConstantBuffer(ID3D12Device* device, const Camera* camera)
 {
     this->constantBuffer = std::make_unique<ConstantBuffer>();
     this->constantBuffer->init(device);

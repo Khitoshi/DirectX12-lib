@@ -118,11 +118,11 @@ public:
     }
 
     /// <summary>
-    /// レンダーターゲットの状態遷移を待つ
+    /// レンダーターゲット(フロントバッファ)の状態遷移を待つ
     /// TARGET -> PRESENT
     /// </summary>
     /// <param name="renderTarget">状態遷移させるリソース</param>
-    void TransitionRenderTargetToRender(ID3D12Resource* renderTarget)
+    void TransitionMainRenderTargetAwait(ID3D12Resource* renderTarget)
     {
         //リソースバリアで、グラフィックスパイプラインでリソースの使用方法が変更されるタイミングを制御
         CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -134,17 +134,48 @@ public:
     }
 
     /// <summary>
-    /// レンダーターゲットへの描き込み待ち
+    /// レンダーターゲット(フロントバッファ)への描き込み待ち
     /// PRESENT -> TARGET
     /// に遷移
     /// </summary>
     /// <param name="renderTarget">状態遷移させるリソース</param>
-    void TransitionRenderTargetToPresent(ID3D12Resource* renderTarget) {
+    void TransitionMainRenderTargetBegin(ID3D12Resource* renderTarget) {
         //リソースバリアで、グラフィックスパイプラインでリソースの使用方法が変更されるタイミングを制御
         CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
             renderTarget,
             D3D12_RESOURCE_STATE_PRESENT,
             D3D12_RESOURCE_STATE_RENDER_TARGET);
+        //バリアをコマンドリストに追加
+        this->commandList->ResourceBarrier(1, &barrier);
+    }
+
+
+    /// <summary>
+    /// OffScreenRenderTargetへの描き込み開始
+    /// </summary>
+    /// <param name="renderTarget">レンダーターゲット</param>
+    void TransitionTemporaryRenderTargetBegin(ID3D12Resource* renderTarget)
+    {
+        //リソースバリアで、グラフィックスパイプラインでリソースの使用方法が変更されるタイミングを制御
+        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+            renderTarget,
+            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+            D3D12_RESOURCE_STATE_RENDER_TARGET);
+        //バリアをコマンドリストに追加
+        this->commandList->ResourceBarrier(1, &barrier);
+    }
+    
+    /// <summary>
+    /// OffScreenRenderTargetへの描き込み待ち
+    /// </summary>
+    /// <param name="renderTarget">レンダーターゲット</param>
+    void TransitionTemporaryRenderTargetAwait(ID3D12Resource* renderTarget)
+    {
+        //リソースバリアで、グラフィックスパイプラインでリソースの使用方法が変更されるタイミングを制御
+        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+            renderTarget,
+            D3D12_RESOURCE_STATE_RENDER_TARGET,
+            D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
         //バリアをコマンドリストに追加
         this->commandList->ResourceBarrier(1, &barrier);
     }

@@ -8,11 +8,12 @@
 
 #include "SwapChain.h"
 #include "RenderTarget.h"
+#include "OffScreenRenderTarget.h"
 #include "DepthStencil.h"
 #include "RenderContext.h"
 #include "Fence.h"
 #include "RootSignature.h"
-
+#include "FullScreenQuad.h"
 using namespace Microsoft::WRL;
 
 /// <summary>
@@ -28,6 +29,7 @@ public:
         commandAllocator(),
         commandList(),
         renderTarget(),
+        offScreenRenderTarget(),
         depthStencil(),
         fence(),
         renderContext(),
@@ -35,7 +37,9 @@ public:
         scissorRect(),
         currentFrameBufferRTVHandle(),
         currentFrameBufferDSVHandle(),
-        frameIndex(0)
+        frameIndex(0),
+        fullScreenQuad(),
+        backGroundColor()
     {}
     ~DX12Resources() { waitEndOfDrawing(); }
 
@@ -43,7 +47,7 @@ public:
     void init(const HWND hWnd, const int width, const int height, const int frameBufferCount);
 
     //レンダリング開始処理
-    void beginRender(const float color[4]);
+    void beginRender();
 
     //レンダリング終了処理
     void endRender();
@@ -66,6 +70,7 @@ private://生成系
     ComPtr<ID3D12GraphicsCommandList4> createCommandList();
     //レンダーターゲット生成
     std::shared_ptr<RenderTarget> createRenderTarget(const int width, const int height, const UINT frameBufferCount);
+    std::shared_ptr<OffScreenRenderTarget> createOffScreenRenderTarget();
     std::shared_ptr<DepthStencil> createDepthStencil(const int width, const int height, const UINT frameBufferCount);
     //フェンス生成
     std::shared_ptr<Fence> createFence();
@@ -78,11 +83,21 @@ private://生成系
     D3D12_RECT createScissorRect(const int width, const int height);
 
     //レンダーターゲットビューのハンドルを設定
-    void setRTVHandle();
+    void setMainRTVHandle();
+    void setTemporaryRTVHandle();
 
     //深度ステンシルビューのハンドルを設定
     void setDSVHandle();
 
+    void drawMainRenderTarget();
+public://設定系
+    void setBackGroundColor(const float color[4]) 
+    { 
+        this->backGroundColor[0] = color[0]; 
+        this->backGroundColor[1] = color[1]; 
+        this->backGroundColor[2] = color[2]; 
+        this->backGroundColor[3] = color[3]; 
+    };
 public://取得系
     //デバイス取得
     ID3D12Device5* getDevice() const { return device.Get(); }
@@ -95,6 +110,7 @@ private:
     ComPtr<ID3D12CommandAllocator>commandAllocator;                 //コマンドアロケータ
     ComPtr<ID3D12GraphicsCommandList4>commandList;                  //コマンドリスト
     std::shared_ptr<RenderTarget>renderTarget;                      //レンダーターゲット
+    std::shared_ptr<OffScreenRenderTarget>offScreenRenderTarget;    //オフスクリーンレンダーターゲット
     std::shared_ptr<DepthStencil>depthStencil;                      //深度ステンシル
 
     std::shared_ptr<Fence> fence;                                   //フェンス
@@ -107,4 +123,7 @@ private:
     D3D12_CPU_DESCRIPTOR_HANDLE currentFrameBufferDSVHandle;		//現在書き込み中のフレームバッファの深度ステンシルビューのハンドル
 
     int frameIndex;                                                 //フレームの番号
+    std::shared_ptr<FullScreenQuad> fullScreenQuad;                 //フルスクリーン四角形
+
+    float backGroundColor[4];                                       //背景色
 };
