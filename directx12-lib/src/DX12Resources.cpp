@@ -17,7 +17,7 @@ void DX12Resources::init(const HWND hWnd, const int width, const int height, con
     this->renderContext = createRenderContext();
     this->viewport = createViewport(width, height);
     this->scissorRect = createScissorRect(width, height);
-    
+
     fullScreenQuad = std::make_unique<FullScreenQuad>();
     fullScreenQuad->init(this->device.Get());
 
@@ -60,7 +60,7 @@ void DX12Resources::beginRender()
     //レンダーターゲットのクリア
     this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
     //深度ステンシルのクリア
-    //this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
+    this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
 }
 
 /// <summary>
@@ -73,14 +73,16 @@ void DX12Resources::endRender()
     //
     this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
 
-
+    //ビューポートとシザリング矩形の設定
+    this->renderContext->setViewport(this->viewport);
+    this->renderContext->setScissorRect(this->viewport);
     this->setMainRTVHandle();
     this->setDSVHandle();
     this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
     //レンダーターゲットのクリアa
-    this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
+    //this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
     //深度ステンシルのクリア
-    this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
+    //this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
     fullScreenQuad->draw(this->renderContext.get());
 
     //レンダーターゲットの描画完了を待つ
@@ -488,8 +490,8 @@ void DX12Resources::setMainRTVHandle()
 
 void DX12Resources::setTemporaryRTVHandle()
 {
-	this->currentFrameBufferRTVHandle = this->offScreenRenderTarget->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-    this->currentFrameBufferRTVHandle.ptr += static_cast<unsigned long long>(this->offScreenRenderTarget->getDescriptorHeapSize()) * this->frameIndex;
+    this->currentFrameBufferRTVHandle = this->offScreenRenderTarget->getRTVHeap()->GetCPUDescriptorHandleForHeapStart();
+    //this->currentFrameBufferRTVHandle.ptr += static_cast<unsigned long long>(this->offScreenRenderTarget->getDescriptorHeapSize()) * this->frameIndex;
 }
 
 /// <summary>

@@ -164,7 +164,7 @@ public:
         //バリアをコマンドリストに追加
         this->commandList->ResourceBarrier(1, &barrier);
     }
-    
+
     /// <summary>
     /// OffScreenRenderTargetへの描き込み待ち
     /// </summary>
@@ -247,6 +247,11 @@ public:
     void drawIndexed(UINT indexCount) {
         this->commandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
         //this->commandList->DrawInstanced(indexCount, 1, 0, 0);
+    }
+
+    void drawInstanced(UINT indexCount)
+    {
+        this->commandList->DrawInstanced(indexCount, 1, 0, 0);
     }
 
     /// <summary>
