@@ -26,9 +26,8 @@ void OffScreenRenderTarget::createResource(ID3D12Device* device)
     D3D12_RESOURCE_DESC desc = {};
     desc = this->conf.backBufferDesc;
     D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-    float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     D3D12_CLEAR_VALUE clearValue = {};
-    clearValue = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, color);
+    clearValue = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, conf.clearColor);
 
     if (FAILED(device->CreateCommittedResource(
         &heapProp,

@@ -43,22 +43,17 @@ void DX12Resources::beginRender()
     this->renderContext->setScissorRect(this->viewport);
 
     //レンダーターゲットの設定
-    //this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
     this->renderContext->TransitionTemporaryRenderTargetBegin(this->offScreenRenderTarget->getResource());
 
-    //レンダーターゲットのハンドルを設定
-    //this->setRTVHandle();
-    //レンダーターゲットのハンドルを設定
-    this->setTemporaryRTVHandle();
+    //OffScreenレンダーターゲットのハンドルを設定
+    this->setOffScreenRTVHandle();
     //深度ステンシルビューのハンドルを設定
     this->setDSVHandle();
 
     //レンダーターゲットをセット
-    //this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
     this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
-    this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
-
     //レンダーターゲットのクリア
+    this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
     //深度ステンシルのクリア
     this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
 }
@@ -68,20 +63,27 @@ void DX12Resources::beginRender()
 /// </summary>
 void DX12Resources::endRender()
 {
+    //OffScreenレンダーターゲットの描画完了を待つ
     this->renderContext->TransitionTemporaryRenderTargetAwait(this->offScreenRenderTarget->getResource());
 
-    //
+    //Mainレンダーターゲットの描画開始
     this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
 
     //ビューポートとシザリング矩形の設定
     this->renderContext->setViewport(this->viewport);
     this->renderContext->setScissorRect(this->viewport);
+
+    //レンダーターゲットの設定
     this->setMainRTVHandle();
-    this->setDSVHandle();
     this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
+
+    //深度ステンシルのクリア
+    this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
+
+    //offscreenをテクスチャとしたフルスクリーン四角形を描画
     fullScreenQuad->draw(this->renderContext.get(), offScreenRenderTarget.get());
 
-    //レンダーターゲットの描画完了を待つ
+    //Mainレンダーターゲットの描画完了を待つ
     this->renderContext->TransitionMainRenderTargetAwait(this->renderTarget->getResource(this->frameIndex));
 
     //コマンドのクローズ
@@ -385,18 +387,36 @@ std::shared_ptr<RenderTarget> DX12Resources::createRenderTarget(const int width,
     return renderTarget;
 }
 
+/// <summary>
+/// オフスクリーンレンダーターゲット生成
+/// </summary>
+/// <returns>
+/// 生成&初期化したオフスクリーンレンダーターゲット
+/// </returns>
 std::shared_ptr<OffScreenRenderTarget> DX12Resources::createOffScreenRenderTarget()
 {
     OffScreenRenderTarget::OffScreenRenderTargetConf conf = {};
     conf.backBufferDesc = this->renderTarget->getResource(0)->GetDesc();
     conf.descriptorHeapDesc = this->renderTarget->getDescriptorHeap()->GetDesc();
-
+    conf.clearColor[0] = this->backGroundColor[0];
+    conf.clearColor[1] = this->backGroundColor[1];
+    conf.clearColor[2] = this->backGroundColor[2];
+    conf.clearColor[3] = this->backGroundColor[3];
     std::shared_ptr<OffScreenRenderTarget> osrt = {};
     osrt = std::make_shared<OffScreenRenderTarget>(conf);
     osrt->init(this->device.Get());
     return osrt;
 }
 
+/// <summary>
+/// 深度ステンシル生成
+/// </summary>
+/// <param name="width">幅</param>
+/// <param name="height">高さ</param>
+/// <param name="frameBufferCount">バッファ番号</param>
+/// <returns>
+/// 生成&初期化した深度ステンシル
+/// </returns>
 std::shared_ptr<DepthStencil> DX12Resources::createDepthStencil(const int width, const int height, const UINT frameBufferCount)
 {
     std::shared_ptr<DepthStencil> depthStencil = std::make_shared<DepthStencil>();
@@ -484,7 +504,7 @@ void DX12Resources::setMainRTVHandle()
     this->currentFrameBufferRTVHandle.ptr += static_cast<unsigned long long>(this->renderTarget->getDescriptorHeapSize()) * this->frameIndex;
 }
 
-void DX12Resources::setTemporaryRTVHandle()
+void DX12Resources::setOffScreenRTVHandle()
 {
     this->currentFrameBufferRTVHandle = this->offScreenRenderTarget->getRTVHeap()->GetCPUDescriptorHandleForHeapStart();
     //this->currentFrameBufferRTVHandle.ptr += static_cast<unsigned long long>(this->offScreenRenderTarget->getDescriptorHeapSize()) * this->frameIndex;
@@ -498,7 +518,3 @@ void DX12Resources::setDSVHandle()
     this->currentFrameBufferDSVHandle = this->depthStencil->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
 }
 
-void DX12Resources::drawMainRenderTarget()
-{
-
-}

@@ -9,6 +9,7 @@ public:
     struct OffScreenRenderTargetConf {
         D3D12_RESOURCE_DESC backBufferDesc;
         D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc;
+        float clearColor[4];
     };
 
 public:
@@ -19,10 +20,6 @@ public:
 private:
     //リソースを作成
     void createResource(ID3D12Device* device);
-    //ディスクリプタヒープを作成
-    //void createDescriptorHeap(ID3D12Device* device);
-    //レンダーターゲットビューを作成
-    void createView(ID3D12Device* device);
     //ディスクリプタヒープのサイズを作成
     void createDescriptorHeapSize(ID3D12Device* device);
     //シェーダーリソースビューを作成

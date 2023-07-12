@@ -13,8 +13,8 @@ void Sprite::init()
     initIndexBuffer();
     initTexture();
 
-    //this->rotationEffect = std::make_shared<RotationEffect>();
-    //this->rotationEffect->init(conf.device, conf.camera);
+    this->rotationEffect = std::make_shared<RotationEffect>();
+    this->rotationEffect->init(conf.device, conf.camera);
 }
 
 /// <summary>
@@ -41,9 +41,9 @@ void Sprite::draw(RenderContext* rc)
     rc->drawIndexed(this->numIndices);
 
 
-    //this->rotationEffect->update(rc, conf.camera, this->vertexBuffer.get(), this->indexBuffer.get(), this->numIndices);
-    //rc->setIndexBuffer(this->indexBuffer.get());
-    //rc->setVertexBuffer(this->vertexBuffer.get());
+    this->rotationEffect->update(rc, conf.camera, this->vertexBuffer.get(), this->indexBuffer.get(), this->numIndices);
+    rc->setIndexBuffer(this->indexBuffer.get());
+    rc->setVertexBuffer(this->vertexBuffer.get());
 }
 
 /// <summary>

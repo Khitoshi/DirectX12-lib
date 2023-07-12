@@ -68,9 +68,11 @@ private://生成系
     ComPtr<ID3D12CommandAllocator> createCommandAllocator();
     //コマンドリスト生成
     ComPtr<ID3D12GraphicsCommandList4> createCommandList();
-    //レンダーターゲット生成
+    //Mainレンダーターゲット生成
     std::shared_ptr<RenderTarget> createRenderTarget(const int width, const int height, const UINT frameBufferCount);
+    //オフスクリーンレンダーターゲット生成
     std::shared_ptr<OffScreenRenderTarget> createOffScreenRenderTarget();
+    //深度ステンシル生成
     std::shared_ptr<DepthStencil> createDepthStencil(const int width, const int height, const UINT frameBufferCount);
     //フェンス生成
     std::shared_ptr<Fence> createFence();
@@ -84,19 +86,18 @@ private://生成系
 
     //レンダーターゲットビューのハンドルを設定
     void setMainRTVHandle();
-    void setTemporaryRTVHandle();
+    void setOffScreenRTVHandle();
 
     //深度ステンシルビューのハンドルを設定
     void setDSVHandle();
 
-    void drawMainRenderTarget();
 public://設定系
-    void setBackGroundColor(const float color[4]) 
-    { 
-        this->backGroundColor[0] = color[0]; 
-        this->backGroundColor[1] = color[1]; 
-        this->backGroundColor[2] = color[2]; 
-        this->backGroundColor[3] = color[3]; 
+    void setBackGroundColor(const float color[4])
+    {
+        this->backGroundColor[0] = color[0];
+        this->backGroundColor[1] = color[1];
+        this->backGroundColor[2] = color[2];
+        this->backGroundColor[3] = color[3];
     };
 public://取得系
     //デバイス取得

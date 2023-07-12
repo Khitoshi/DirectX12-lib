@@ -43,7 +43,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         ResourceManager::getInstance()->registerResource("window", window);
 
         //DX12初期化処理
+        float color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
         std::shared_ptr <DX12Resources> dx12Resources = std::make_shared<DX12Resources>();
+        dx12Resources->setBackGroundColor(color);
         dx12Resources->init(ResourceManager::getInstance()->getResource<Window>("window")->getHWND(), winConf.width, winConf.height, FRAMEBUFFERCOUNT);
         ResourceManager::getInstance()->registerResource("dx12Resources", dx12Resources);
 
@@ -71,7 +73,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
         //メッセージループ処理
         //float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        //float color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
 #ifdef _DEBUG
         //FPS計測用
         const int FRAMERATE_BUFFER_SIZE = 1000;
