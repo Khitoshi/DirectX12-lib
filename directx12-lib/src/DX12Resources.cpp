@@ -56,9 +56,9 @@ void DX12Resources::beginRender()
     //レンダーターゲットをセット
     //this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
     this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
+    this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
 
     //レンダーターゲットのクリア
-    this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
     //深度ステンシルのクリア
     this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
 }
@@ -79,11 +79,7 @@ void DX12Resources::endRender()
     this->setMainRTVHandle();
     this->setDSVHandle();
     this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
-    //レンダーターゲットのクリアa
-    //this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
-    //深度ステンシルのクリア
-    //this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
-    fullScreenQuad->draw(this->renderContext.get());
+    fullScreenQuad->draw(this->renderContext.get(), offScreenRenderTarget.get());
 
     //レンダーターゲットの描画完了を待つ
     this->renderContext->TransitionMainRenderTargetAwait(this->renderTarget->getResource(this->frameIndex));

@@ -4,7 +4,7 @@
 struct VSInput
 {
     float4 pos : POSITION; //XYZW
-    float2 uv : TEXCOORD; //RGBA
+    float2 uv : TEXCOORD;
 };
 
 VSOutput VSMain(VSInput input)

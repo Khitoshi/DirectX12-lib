@@ -84,8 +84,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->setBackGroundColor(color);
             ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->beginRender();
 
-            //SceneManager::getInstance().update();
-            //SceneManager::getInstance().render(sceneConf);
+            SceneManager::getInstance().update();
+            SceneManager::getInstance().render(sceneConf);
 
 #ifdef _DEBUG
             //imguiFrame開始処理
@@ -111,9 +111,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             }
 
             //imguiメニュー更新処理
-            //SceneManager::getInstance().updateImguiMenu();
+            SceneManager::getInstance().updateImguiMenu();
             //シーン選択
-            //SceneManager::getInstance().sceneSelect();
+            SceneManager::getInstance().sceneSelect();
 
             //Frame終了処理
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->endFrame();

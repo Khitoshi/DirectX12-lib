@@ -9,7 +9,7 @@ void FullScreenQuad::init(ID3D12Device* device)
     createPipelineState(device);
 }
 
-void FullScreenQuad::draw(RenderContext* rc)
+void FullScreenQuad::draw(RenderContext* rc, OffScreenRenderTarget* osrt)
 {
     //ルートシグネチャを設定。
     rc->setRootSignature(this->rootSignature.get());
@@ -21,6 +21,8 @@ void FullScreenQuad::draw(RenderContext* rc)
     rc->setVertexBuffer(this->vertexBuffer.get());
     //インデックスバッファを設定。
     //rc->setIndexBuffer(this->indexBuffer.get());
+    //rc->setGraphicsRootDescriptorTable(0, osrt->getSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+    rc->setTexture(osrt->getSRVHeap(),1);
     //ドローコール
     rc->drawInstanced(4);
 }
@@ -95,8 +97,16 @@ void FullScreenQuad::createRootSignature(ID3D12Device* device)
     //ルートシグニチャの設定(レジスタを使用しないので空にする)
     RootSignatureConf conf = {};
     conf.rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-    rootSignature = std::make_shared<RootSignature>();
-    rootSignature->init(device, conf);
+    conf.samplerFilter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+    conf.textureAddressModeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    conf.textureAddressModeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    conf.textureAddressModeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    conf.numSampler = 1;
+    conf.maxSrvDescriptor = 1;
+    conf.offsetInDescriptorsFromTableStartSRV = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+    conf.rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+    this->rootSignature = RootSignatureCacheManager::getInstance().getOrCreate(device, conf);
 }
 
 void FullScreenQuad::createPipelineState(ID3D12Device* device)
@@ -130,4 +140,8 @@ void FullScreenQuad::createPipelineState(ID3D12Device* device)
     conf.desc = desc;
 
     this->pso = PSOCacheManager::getInstance().getPSO(device, conf);
+}
+
+void FullScreenQuad::createTexture(ID3D12Device* device)
+{
 }

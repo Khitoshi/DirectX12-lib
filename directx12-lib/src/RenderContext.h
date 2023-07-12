@@ -118,6 +118,16 @@ public:
     }
 
     /// <summary>
+    /// ルートパラメータに対応するディスクリプタテーブルを設定
+    /// </summary>
+    /// <param name="rootParamIndex"></param>
+    /// <param name="handle"></param>
+    void setGraphicsRootDescriptorTable(int rootParamIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle)
+    {
+        this->commandList->SetGraphicsRootDescriptorTable(rootParamIndex, handle);
+    }
+
+    /// <summary>
     /// レンダーターゲット(フロントバッファ)の状態遷移を待つ
     /// TARGET -> PRESENT
     /// </summary>
@@ -237,7 +247,8 @@ public:
         auto ds = cbv->getDescriptorHeap();
         this->commandList->SetDescriptorHeaps(1, &ds);
         //this->commandList->SetGraphicsRootConstantBufferView(0, cbv->getConstantBufferViewGPUVirtualAddress());
-        this->commandList->SetGraphicsRootDescriptorTable(0, cbv->getGPUDescriptorHandleForHeapStart());
+        //this->commandList->SetGraphicsRootDescriptorTable(0, cbv->getGPUDescriptorHandleForHeapStart());
+        this->setGraphicsRootDescriptorTable(0, cbv->getGPUDescriptorHandleForHeapStart());
     }
 
     /// <summary>
@@ -265,7 +276,13 @@ public:
     void setTexture(Texture* texture) {
         auto ds = texture->GetDescriptorHeap();
         this->commandList->SetDescriptorHeaps(1, &ds);
-        this->commandList->SetGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
+        //this->commandList->SetGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
+        this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
+    }
+
+    void setTexture(ID3D12DescriptorHeap* ds,int size) {
+        this->commandList->SetDescriptorHeaps(size, &ds);
+        this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
     }
 
 public:
