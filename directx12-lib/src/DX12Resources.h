@@ -104,6 +104,12 @@ public://取得系
     ID3D12Device5* getDevice() const { return device.Get(); }
     //レンダーコンテキスト取得
     RenderContext* getRenderContext() const { return renderContext.get(); }
+    //オフスクリーンレンダーターゲット取得
+    OffScreenRenderTarget* getOffScreenRenderTarget() const { return offScreenRenderTarget.get(); }
+    //ビューポート取得
+    D3D12_VIEWPORT getViewport() const { return viewport; }
+    //現在書き込み中のフレームバッファの深度ステンシルビューのハンドル取得
+    D3D12_CPU_DESCRIPTOR_HANDLE getCurrentFrameBufferDSVHandle() const { return currentFrameBufferDSVHandle; }
 private:
     ComPtr<ID3D12Device5>device;                                    //デバイス
     ComPtr<ID3D12CommandQueue>commandQueue;                         //コマンドキュー

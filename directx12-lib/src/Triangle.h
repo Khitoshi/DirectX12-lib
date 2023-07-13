@@ -9,7 +9,7 @@
 #include<DirectXMath.h>
 #include "RenderMode.h"
 #include <stdexcept>
-
+#include "OffScreenRenderTarget.h"
 /// <summary>
 /// シンプルな三角形を描画するクラスの初期化情報
 /// </summary>

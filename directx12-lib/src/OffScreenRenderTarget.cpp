@@ -15,6 +15,41 @@ void OffScreenRenderTarget::init(ID3D12Device* device)
 }
 
 /// <summary>
+/// offscreenに描画をする為の初期処理
+/// </summary>
+/// <param name="rc">レンダーコンテキスト</param>
+void OffScreenRenderTarget::beginRender(RenderContext* rc)
+{
+    //ビューポートとシザリング矩形の設定
+    rc->setViewport(this->viewport);
+    rc->setScissorRect(this->viewport);
+
+    //レンダーターゲットのRESOURCE_BARRIER設定
+    rc->TransitionTemporaryRenderTargetBegin(this->resource.Get());
+
+    //レンダーターゲットを設定
+    rc->setRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), this->depthStencilViewHandle);
+    //レンダーターゲットのクリア
+    rc->clearRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), conf.clearColor);
+    //深度ステンシルのクリア
+    rc->clearDepthStencil(depthStencilViewHandle, 1.0f);
+
+
+}
+
+/// <summary>
+/// offscreenに描画をする為の終了処理
+/// </summary>
+/// <param name="rc">レンダーコンテキスト</param>
+void OffScreenRenderTarget::endRender(RenderContext* rc)
+{
+    //レンダーターゲットのRESOURCE_BARRIER設定
+    //this->renderContext->TransitionTemporaryRenderTargetAwait(this->offScreenRenderTarget->getResource());
+    //this->offScreenRenderTarget->endRender(this->renderContext.get());
+    rc->TransitionTemporaryRenderTargetAwait(this->resource.Get());
+}
+
+/// <summary>
 /// リソースを作成する
 /// </summary>
 /// <param name="device">初期化&生成済みのGPUデバイス</param>

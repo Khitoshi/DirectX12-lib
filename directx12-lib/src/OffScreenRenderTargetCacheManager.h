@@ -24,17 +24,13 @@ public:
             hash_combine(seed, k.resourceDesc.SampleDesc.Quality);
             hash_combine(seed, k.resourceDesc.Layout);
             hash_combine(seed, k.resourceDesc.Flags);
-            //hash_combine(seed, k.clearDepth);
-            //hash_combine(seed, k.clearStencil);
 
-
- 
             return seed;
         }
     };
 private:
     OffScreenRenderTargetCacheManager() {};
-	~OffScreenRenderTargetCacheManager() {};
+    ~OffScreenRenderTargetCacheManager() {};
 public:
     /// <summary>
     /// シングルトンなインスタンスを取得
@@ -42,9 +38,9 @@ public:
     /// <returns></returns>
     static OffScreenRenderTargetCacheManager& getInstance()
     {
-		static OffScreenRenderTargetCacheManager instance;
-		return instance;
-	}
+        static OffScreenRenderTargetCacheManager instance;
+        return instance;
+    }
 
     /// <summary>
     /// 取得or生成
@@ -53,21 +49,21 @@ public:
     /// <param name="conf"></param>
     /// <returns></returns>
     std::shared_ptr<OffScreenRenderTarget> getOrCreate(ID3D12Device* device, const OffScreenRenderTarget::OffScreenRenderTargetConf& conf) {
-		auto it = this->offScreenRenderTargetMapCache.find(conf);
-		//キャッシュにあるならそれを返す
+        auto it = this->offScreenRenderTargetMapCache.find(conf);
+        //キャッシュにあるならそれを返す
         if (it != this->offScreenRenderTargetMapCache.end()) {
-			return it->second;
-		}
+            return it->second;
+        }
 
         //生成
-        create(device,conf);
+        create(device, conf);
         it = this->offScreenRenderTargetMapCache.find(conf);
         if (it == this->offScreenRenderTargetMapCache.end()) {
             throw std::runtime_error("OffScreenRenderTargetCacheManager::getOrCreate() OffScreenRenderTarget not found");
-		}
+        }
 
-		return it->second;
-	}
+        return it->second;
+    }
 
 private:
     //オフスクリーンレンダーターゲット生成
@@ -79,6 +75,6 @@ private:
         this->offScreenRenderTargetMapCache[conf] = offScreenRenderTarget;
     }
 private:
-    
-	std::unordered_map<OffScreenRenderTarget::OffScreenRenderTargetConf, std::shared_ptr<OffScreenRenderTarget>,OffScreenRenderTargetCacheKeyHasher, std::equal_to<OffScreenRenderTarget::OffScreenRenderTargetConf>> offScreenRenderTargetMapCache;
+
+    std::unordered_map<OffScreenRenderTarget::OffScreenRenderTargetConf, std::shared_ptr<OffScreenRenderTarget>, OffScreenRenderTargetCacheKeyHasher, std::equal_to<OffScreenRenderTarget::OffScreenRenderTargetConf>> offScreenRenderTargetMapCache;
 };

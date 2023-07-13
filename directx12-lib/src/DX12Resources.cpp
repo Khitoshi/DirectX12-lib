@@ -39,23 +39,26 @@ void DX12Resources::beginRender()
     this->renderContext->reset(this->commandAllocator.Get(), nullptr);
 
     //ビューポートとシザリング矩形の設定
-    this->renderContext->setViewport(this->viewport);
-    this->renderContext->setScissorRect(this->viewport);
+    //this->renderContext->setViewport(this->viewport);
+    //this->renderContext->setScissorRect(this->viewport);
 
     //レンダーターゲットの設定
-    this->renderContext->TransitionTemporaryRenderTargetBegin(this->offScreenRenderTarget->getResource());
+    //this->renderContext->TransitionTemporaryRenderTargetBegin(this->offScreenRenderTarget->getResource());
 
     //OffScreenレンダーターゲットのハンドルを設定
-    this->setOffScreenRTVHandle();
+    //this->setOffScreenRTVHandle();
     //深度ステンシルビューのハンドルを設定
     this->setDSVHandle();
 
     //レンダーターゲットをセット
-    this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
+    //this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
     //レンダーターゲットのクリア
-    this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
+    //this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
     //深度ステンシルのクリア
-    this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
+    //this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
+    //this->offScreenRenderTarget->setDepthStencil(this->currentFrameBufferDSVHandle);
+    //this->offScreenRenderTarget->setViewport(&this->viewport);
+    //this->offScreenRenderTarget->beginRender(this->renderContext.get());
 }
 
 /// <summary>
@@ -64,7 +67,8 @@ void DX12Resources::beginRender()
 void DX12Resources::endRender()
 {
     //OffScreenレンダーターゲットの描画完了を待つ
-    this->renderContext->TransitionTemporaryRenderTargetAwait(this->offScreenRenderTarget->getResource());
+    //this->renderContext->TransitionTemporaryRenderTargetAwait(this->offScreenRenderTarget->getResource());
+    //this->offScreenRenderTarget->endRender(this->renderContext.get());
 
     //Mainレンダーターゲットの描画開始
     this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));

@@ -2,13 +2,14 @@
 
 #include "d3dx12.h"
 #include "RenderContext.h"
-
+#include "OffScreenRenderTarget.h"
 /// <summary>
 /// ÉVÅ[Éì
 /// </summary>
 struct SceneConf {
     ID3D12Device* device;
     RenderContext* renderContext;
+    OffScreenRenderTarget* offScreenRenderTarget;
 };
 
 /// <summary>
