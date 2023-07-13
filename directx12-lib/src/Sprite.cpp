@@ -29,7 +29,6 @@ void Sprite::draw(RenderContext* rc)
     rc->setPipelineState(this->defaultPipelineStateObject.get());
     //プリミティブのトポロジーを設定。
     rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
     //頂点バッファを設定。
     rc->setVertexBuffer(this->vertexBuffer.get());
     //インデックスバッファを設定。

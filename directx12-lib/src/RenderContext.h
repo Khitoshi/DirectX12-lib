@@ -259,7 +259,10 @@ public:
         this->commandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
         //this->commandList->DrawInstanced(indexCount, 1, 0, 0);
     }
-
+    /// <summary>
+    /// インデックスなしの描画コールを実行
+    /// </summary>
+    /// <param name="indexCount"></param>
     void drawInstanced(UINT indexCount)
     {
         this->commandList->DrawInstanced(indexCount, 1, 0, 0);
@@ -273,15 +276,18 @@ public:
         this->commandList->SetGraphicsRootSignature(rootSignature->getRootSignature());
     }
 
+    /// <summary>
+    /// テスクチャを設定
+    /// </summary>
+    /// <param name="texture"></param>
     void setTexture(Texture* texture) {
         auto ds = texture->GetDescriptorHeap();
         this->commandList->SetDescriptorHeaps(1, &ds);
         //this->commandList->SetGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
         this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
     }
-
-    void setTexture(ID3D12DescriptorHeap* ds,int size) {
-        this->commandList->SetDescriptorHeaps(size, &ds);
+    void setTexture(ID3D12DescriptorHeap* ds,int dsNum) {
+        this->commandList->SetDescriptorHeaps(dsNum, &ds);
         this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
     }
 
@@ -295,6 +301,5 @@ private:
 
     ID3D12GraphicsCommandList4* commandList;                        //コマンドリスト
     D3D12_VIEWPORT viewport;                                        //現在のビューポート
-    //std::vector< ComPtr<ID3D12Resource> > m_scratchResourceList;	//スクラッチリソースのリスト。
     D3D12_VIEWPORT currentViewport;				                    //現在のビューポート
 };

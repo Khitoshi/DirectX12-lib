@@ -1,14 +1,23 @@
 #include "FullScreenQuad.h"
 
+/// <summary>
+/// 初期化処理
+/// </summary>
+/// <param name="device">初期化&生成済みのGPUデバイス</param>
 void FullScreenQuad::init(ID3D12Device* device)
 {
     createShader(device);
     createVertexBuffer(device);
-    //createIndexBuffer(device);
     createRootSignature(device);
     createPipelineState(device);
+    this->numIndices = 4;
 }
 
+/// <summary>
+/// 描画処理
+/// </summary>
+/// <param name="rc">レンダーコンテキスト</param>
+/// <param name="osrt">オフスクリーンレンダーターゲット</param>
 void FullScreenQuad::draw(RenderContext* rc, OffScreenRenderTarget* osrt)
 {
     //ルートシグネチャを設定。
@@ -20,13 +29,15 @@ void FullScreenQuad::draw(RenderContext* rc, OffScreenRenderTarget* osrt)
     //頂点バッファを設定。
     rc->setVertexBuffer(this->vertexBuffer.get());
     //インデックスバッファを設定。
-    //rc->setIndexBuffer(this->indexBuffer.get());
-    //rc->setGraphicsRootDescriptorTable(0, osrt->getSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     rc->setTexture(osrt->getSRVHeap(),1);
     //ドローコール
-    rc->drawInstanced(4);
+    rc->drawInstanced(this->numIndices);
 }
 
+/// <summary>
+/// Basicシェーダーのペア生成
+/// </summary>
+/// <param name="device">初期化&生成済みのGPUデバイス</param>
 void FullScreenQuad::createShader(ID3D12Device* device)
 {
     {
@@ -48,7 +59,7 @@ void FullScreenQuad::createShader(ID3D12Device* device)
 /// <summary>
 /// 頂点バッファの作成
 /// </summary>
-/// <param name="device"></param>
+/// <param name="device">初期化&生成済みのGPUデバイス</param>
 void FullScreenQuad::createVertexBuffer(ID3D12Device* device)
 {
     //頂点バッファの作成
@@ -59,7 +70,6 @@ void FullScreenQuad::createVertexBuffer(ID3D12Device* device)
         {{  1.0f,  1.0f, 0.0f }, {1,0}}, // 右上
     };
 
-
     VertexBufferConf conf = {};
     conf.device = device;
     conf.size = sizeof(vertices);
@@ -69,29 +79,10 @@ void FullScreenQuad::createVertexBuffer(ID3D12Device* device)
     vertexBuffer->copy(vertices);
 }
 
-void FullScreenQuad::createIndexBuffer(ID3D12Device* device)
-{
-    //インデックスバッファの作成
-    uint16_t indices[] = {
-        0,1,2,
-        2,1,3
-    };
-    //インデックスバッファの設定
-    this->numIndices = sizeof(indices) / sizeof(unsigned short);
-    IndexBufferConf conf = {};
-    conf.device = device;
-    conf.size = sizeof(indices) * numIndices;
-    conf.stride = sizeof(uint16_t);
-    conf.count = numIndices;
-    indexBuffer = std::make_shared<IndexBuffer>();
-    indexBuffer->init(conf);
-    indexBuffer->copy(indices);
-}
-
 /// <summary>
 /// ルートシグニチャの作成
 /// </summary>
-/// <param name="device"></param>
+/// <param name="device">初期化&生成済みのGPUデバイス</param>
 void FullScreenQuad::createRootSignature(ID3D12Device* device)
 {
     //ルートシグニチャの設定(レジスタを使用しないので空にする)
@@ -109,13 +100,17 @@ void FullScreenQuad::createRootSignature(ID3D12Device* device)
     this->rootSignature = RootSignatureCacheManager::getInstance().getOrCreate(device, conf);
 }
 
+/// <summary>
+/// パイプラインステートオブジェクト作成
+/// </summary>
+/// <param name="device">初期化&生成済みのGPUデバイス</param>
 void FullScreenQuad::createPipelineState(ID3D12Device* device)
 {
     PipelineStateObject::PipelineStateObjectConf conf;
     // インプットレイアウト
     D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
-      { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,  0, 0,   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
-      { "TEXCOORD",		0, DXGI_FORMAT_R32G32_FLOAT, 0, 12,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
+      { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,     0, 0,   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
+      { "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,        0, 12,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
     };
 
     //パイプラインステートオブジェクトの設定
@@ -142,6 +137,3 @@ void FullScreenQuad::createPipelineState(ID3D12Device* device)
     this->pso = PSOCacheManager::getInstance().getPSO(device, conf);
 }
 
-void FullScreenQuad::createTexture(ID3D12Device* device)
-{
-}

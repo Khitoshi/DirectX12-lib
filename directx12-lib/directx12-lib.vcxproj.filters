@@ -281,6 +281,12 @@
     <ClInclude Include="src\FullScreenQuad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\OffScreenRenderTargetCacheManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OffScreenRenderTargetHashes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">

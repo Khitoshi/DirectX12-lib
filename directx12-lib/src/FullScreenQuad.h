@@ -10,33 +10,42 @@
 #include "OffScreenRenderTarget.h"
 #include <DirectXMath.h>
 
+/// <summary>
+/// オフスクリーンレンダーターゲットをフルスクリーンに描画するクラス
+/// </summary>
 class FullScreenQuad
 {
 public:
 	struct Vertex
 	{
-		DirectX::XMFLOAT3 position;
-		DirectX::XMFLOAT2 uv;
+		DirectX::XMFLOAT3 position;	//頂点座標
+		DirectX::XMFLOAT2 uv;		//テクスチャ座標
 	};
 public:
-	FullScreenQuad() {};
+	FullScreenQuad():
+		vertexBuffer(),
+		indexBuffer(),
+		rootSignature(),
+		pso(),
+		basicShaderPair(),
+		texture(),
+		numIndices(0)
+	{};
 	~FullScreenQuad() {};
 
+	//初期化処理
 	void init(ID3D12Device* device);
+	//描画処理
 	void draw(RenderContext* rc, OffScreenRenderTarget* osrt);
 private:
 	//シェーダーのペア
 	void createShader(ID3D12Device* device);
 	//頂点バッファの作成
 	void createVertexBuffer(ID3D12Device* device);
-	//インデックスバッファの作成
-	void createIndexBuffer(ID3D12Device* device);
 	//ルートシグネチャの作成
 	void createRootSignature(ID3D12Device* device);
 	//パイプラインステートの作成
 	void createPipelineState(ID3D12Device* device);
-	//テクスチャの作成
-	void createTexture(ID3D12Device* device);
 private:
 	std::shared_ptr<VertexBuffer> vertexBuffer;				//頂点バッファ
 	std::shared_ptr<IndexBuffer> indexBuffer;				//インデックスバッファ

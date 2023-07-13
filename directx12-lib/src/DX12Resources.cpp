@@ -396,7 +396,7 @@ std::shared_ptr<RenderTarget> DX12Resources::createRenderTarget(const int width,
 std::shared_ptr<OffScreenRenderTarget> DX12Resources::createOffScreenRenderTarget()
 {
     OffScreenRenderTarget::OffScreenRenderTargetConf conf = {};
-    conf.backBufferDesc = this->renderTarget->getResource(0)->GetDesc();
+    conf.resourceDesc = this->renderTarget->getResource(0)->GetDesc();
     conf.descriptorHeapDesc = this->renderTarget->getDescriptorHeap()->GetDesc();
     conf.clearColor[0] = this->backGroundColor[0];
     conf.clearColor[1] = this->backGroundColor[1];
