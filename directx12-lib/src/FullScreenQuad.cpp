@@ -18,7 +18,7 @@ void FullScreenQuad::init(ID3D12Device* device)
 /// </summary>
 /// <param name="rc">レンダーコンテキスト</param>
 /// <param name="osrt">オフスクリーンレンダーターゲット</param>
-void FullScreenQuad::draw(RenderContext* rc, OffScreenRenderTarget* osrt)
+void FullScreenQuad::draw(RenderContext* rc, CompositeRenderTarget* crt)
 {
     //ルートシグネチャを設定。
     rc->setRootSignature(this->rootSignature.get());
@@ -29,7 +29,7 @@ void FullScreenQuad::draw(RenderContext* rc, OffScreenRenderTarget* osrt)
     //頂点バッファを設定。
     rc->setVertexBuffer(this->vertexBuffer.get());
     //インデックスバッファを設定。
-    rc->setTexture(osrt->getSRVHeap(),1);
+    rc->setTexture(crt->getSRVHeap(),1);
     //ドローコール
     rc->drawInstanced(this->numIndices);
 }

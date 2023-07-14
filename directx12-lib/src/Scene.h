@@ -9,7 +9,6 @@
 struct SceneConf {
     ID3D12Device* device;
     RenderContext* renderContext;
-    OffScreenRenderTarget* offScreenRenderTarget;
 };
 
 /// <summary>

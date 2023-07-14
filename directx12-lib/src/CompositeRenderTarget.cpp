@@ -1,11 +1,12 @@
+#include "CompositeRenderTarget.h"
 #include <stdexcept>
-#include "OffScreenRenderTarget.h"
+
 
 /// <summary>
 /// 初期化
 /// </summary>
 /// <param name="device">初期化&生成済みのGPUデバイス</param>
-void OffScreenRenderTarget::init(ID3D12Device* device)
+void CompositeRenderTarget::init(ID3D12Device* device)
 {
     createResource(device);
     createSRVHeap(device);
@@ -18,17 +19,17 @@ void OffScreenRenderTarget::init(ID3D12Device* device)
 /// offscreenに描画をする為の初期処理
 /// </summary>
 /// <param name="rc">レンダーコンテキスト</param>
-void OffScreenRenderTarget::beginRender(RenderContext* rc)
+void CompositeRenderTarget::beginRender(RenderContext* rc, D3D12_VIEWPORT viewport, D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle)
 {
     //ビューポートとシザリング矩形の設定
-    rc->setViewport(this->viewport);
-    rc->setScissorRect(this->viewport);
+    rc->setViewport(viewport);
+    rc->setScissorRect(viewport);
 
     //レンダーターゲットのRESOURCE_BARRIER設定
     rc->TransitionTemporaryRenderTargetBegin(this->resource.Get());
 
     //レンダーターゲットを設定
-    rc->setRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), this->depthStencilViewHandle);
+    rc->setRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), depthStencilViewHandle);
     //レンダーターゲットのクリア
     rc->clearRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), conf.clearColor);
     //深度ステンシルのクリア
@@ -40,11 +41,9 @@ void OffScreenRenderTarget::beginRender(RenderContext* rc)
 /// offscreenに描画をする為の終了処理
 /// </summary>
 /// <param name="rc">レンダーコンテキスト</param>
-void OffScreenRenderTarget::endRender(RenderContext* rc)
+void CompositeRenderTarget::endRender(RenderContext* rc)
 {
     //レンダーターゲットのRESOURCE_BARRIER設定
-    //this->renderContext->TransitionTemporaryRenderTargetAwait(this->offScreenRenderTarget->getResource());
-    //this->offScreenRenderTarget->endRender(this->renderContext.get());
     rc->TransitionTemporaryRenderTargetAwait(this->resource.Get());
 }
 
@@ -52,7 +51,7 @@ void OffScreenRenderTarget::endRender(RenderContext* rc)
 /// リソースを作成する
 /// </summary>
 /// <param name="device">初期化&生成済みのGPUデバイス</param>
-void OffScreenRenderTarget::createResource(ID3D12Device* device)
+void CompositeRenderTarget::createResource(ID3D12Device* device)
 {
     D3D12_RESOURCE_DESC desc = {};
     desc = this->conf.resourceDesc;
@@ -76,7 +75,7 @@ void OffScreenRenderTarget::createResource(ID3D12Device* device)
 /// シェーダーリソースビュー用のディスクリプタヒープを作成する
 /// </summary>
 /// <param name="device">初期化&生成済みのGPUデバイス</param>
-void OffScreenRenderTarget::createSRVHeap(ID3D12Device* device)
+void CompositeRenderTarget::createSRVHeap(ID3D12Device* device)
 {
     //SRVディスクリプタヒープ作成
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
@@ -93,7 +92,7 @@ void OffScreenRenderTarget::createSRVHeap(ID3D12Device* device)
 /// シェーダーリソースビューを作成する
 /// </summary>
 /// <param name="device">初期化&生成済みのGPUデバイス</param>
-void OffScreenRenderTarget::createShaderResourceView(ID3D12Device* device)
+void CompositeRenderTarget::createShaderResourceView(ID3D12Device* device)
 {
     //シェーダーリソースビューを作成
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -108,7 +107,7 @@ void OffScreenRenderTarget::createShaderResourceView(ID3D12Device* device)
 /// レンダーターゲットビュー用のディスクリプタヒープを作成する
 /// </summary>
 /// <param name="device">初期化&生成済みのGPUデバイス</param>
-void OffScreenRenderTarget::createRTVHeap(ID3D12Device* device)
+void CompositeRenderTarget::createRTVHeap(ID3D12Device* device)
 {
     //RTVディスクリプタヒープ作成
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
@@ -123,7 +122,7 @@ void OffScreenRenderTarget::createRTVHeap(ID3D12Device* device)
 /// レンダーターゲットビューを作成する
 /// </summary>
 /// <param name="device">初期化&生成済みのGPUデバイス</param>
-void OffScreenRenderTarget::createRenderTargetView(ID3D12Device* device)
+void CompositeRenderTarget::createRenderTargetView(ID3D12Device* device)
 {
     //レンダーターゲットビューを作成
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
@@ -131,3 +130,4 @@ void OffScreenRenderTarget::createRenderTargetView(ID3D12Device* device)
     rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     device->CreateRenderTargetView(this->resource.Get(), &rtvDesc, this->RTVHeap->GetCPUDescriptorHandleForHeapStart());
 }
+

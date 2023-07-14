@@ -8,7 +8,8 @@
 
 #include "SwapChain.h"
 #include "RenderTarget.h"
-#include "OffScreenRenderTarget.h"
+//#include "OffScreenRenderTarget.h"
+#include "CompositeRenderTarget.h"
 #include "DepthStencil.h"
 #include "RenderContext.h"
 #include "Fence.h"
@@ -29,7 +30,7 @@ public:
         commandAllocator(),
         commandList(),
         renderTarget(),
-        offScreenRenderTarget(),
+        compositeRenderTarget(),
         depthStencil(),
         fence(),
         renderContext(),
@@ -71,7 +72,7 @@ private://生成系
     //Mainレンダーターゲット生成
     std::shared_ptr<RenderTarget> createRenderTarget(const int width, const int height, const UINT frameBufferCount);
     //オフスクリーンレンダーターゲット生成
-    std::shared_ptr<OffScreenRenderTarget> createOffScreenRenderTarget();
+    std::shared_ptr<CompositeRenderTarget> createCompositeRenderTarget();
     //深度ステンシル生成
     std::shared_ptr<DepthStencil> createDepthStencil(const int width, const int height, const UINT frameBufferCount);
     //フェンス生成
@@ -104,8 +105,6 @@ public://取得系
     ID3D12Device5* getDevice() const { return device.Get(); }
     //レンダーコンテキスト取得
     RenderContext* getRenderContext() const { return renderContext.get(); }
-    //オフスクリーンレンダーターゲット取得
-    OffScreenRenderTarget* getOffScreenRenderTarget() const { return offScreenRenderTarget.get(); }
     //ビューポート取得
     D3D12_VIEWPORT getViewport() const { return viewport; }
     //現在書き込み中のフレームバッファの深度ステンシルビューのハンドル取得
@@ -117,7 +116,7 @@ private:
     ComPtr<ID3D12CommandAllocator>commandAllocator;                 //コマンドアロケータ
     ComPtr<ID3D12GraphicsCommandList4>commandList;                  //コマンドリスト
     std::shared_ptr<RenderTarget>renderTarget;                      //レンダーターゲット
-    std::shared_ptr<OffScreenRenderTarget>offScreenRenderTarget;    //オフスクリーンレンダーターゲット
+    std::shared_ptr<CompositeRenderTarget>compositeRenderTarget;    //オフスクリーンレンダーターゲット
     std::shared_ptr<DepthStencil>depthStencil;                      //深度ステンシル
 
     std::shared_ptr<Fence> fence;                                   //フェンス

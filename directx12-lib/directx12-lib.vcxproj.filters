@@ -138,6 +138,9 @@
     <ClCompile Include="src\SceneSprite.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="src\CompositeRenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -285,6 +288,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\OffScreenRenderTargetHashes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CompositeRenderTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

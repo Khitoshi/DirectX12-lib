@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\CompositeRenderTarget.cpp" />
     <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\DepthStencil.cpp" />
     <ClCompile Include="src\DX12Resources.cpp" />
@@ -54,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\CompositeRenderTarget.h" />
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\d3dx12.h" />
     <ClInclude Include="src\DepthStencil.h" />

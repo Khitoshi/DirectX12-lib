@@ -7,7 +7,7 @@
 #include "VertexBuffer.h"
 #include "RenderContext.h"
 #include "Texture.h"
-#include "OffScreenRenderTarget.h"
+#include "CompositeRenderTarget.h"
 #include <DirectXMath.h>
 
 /// <summary>
@@ -36,7 +36,7 @@ public:
 	//初期化処理
 	void init(ID3D12Device* device);
 	//描画処理
-	void draw(RenderContext* rc, OffScreenRenderTarget* osrt);
+	void draw(RenderContext* rc, CompositeRenderTarget* osrt);
 private:
 	//シェーダーのペア
 	void createShader(ID3D12Device* device);

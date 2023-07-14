@@ -66,7 +66,11 @@ public:
     }
 
 private:
-    //オフスクリーンレンダーターゲット生成
+    /// <summary>
+    /// オフスクリーンレンダーターゲット生成
+    /// </summary>
+    /// <param name="device"></param>
+    /// <param name="conf"></param>
     void create(ID3D12Device* device, const OffScreenRenderTarget::OffScreenRenderTargetConf& conf)
     {
         //キャッシュにないなら作成して返す
@@ -74,7 +78,26 @@ private:
         offScreenRenderTarget->init(device);
         this->offScreenRenderTargetMapCache[conf] = offScreenRenderTarget;
     }
-private:
 
+public:
+    /// <summary>
+    /// 深度ステンシルに使用するディスクリプターハンドル設定
+    /// </summary>
+    /// <param name="depthStencilViewHandle"></param>
+    void setDepthStencilViewHandle(const D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle) {
+		this->depthStencilViewHandle = depthStencilViewHandle;
+	}
+
+    /// <summary>
+    /// ビューポート設定
+    /// </summary>
+    /// <param name="viewport"></param>
+    void setViewport(const D3D12_VIEWPORT viewport) {
+        this->viewport = viewport;
+    }
+
+private:
+    D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle; //深度ステンシルビューハンドル
+    D3D12_VIEWPORT viewport;                            //ビューポート
     std::unordered_map<OffScreenRenderTarget::OffScreenRenderTargetConf, std::shared_ptr<OffScreenRenderTarget>, OffScreenRenderTargetCacheKeyHasher, std::equal_to<OffScreenRenderTarget::OffScreenRenderTargetConf>> offScreenRenderTargetMapCache;
 };

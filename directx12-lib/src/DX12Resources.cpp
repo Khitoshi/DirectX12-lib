@@ -1,6 +1,6 @@
 #include "DX12Resources.h"
+#include "OffScreenRenderTargetCacheManager.h"
 #include <stdexcept>
-
 void DX12Resources::init(const HWND hWnd, const int width, const int height, const int frameBufferCount)
 {
     //所有権が変わるので解放は合計で1回になる
@@ -11,7 +11,7 @@ void DX12Resources::init(const HWND hWnd, const int width, const int height, con
     this->commandAllocator = createCommandAllocator();
     this->commandList = createCommandList();
     this->renderTarget = createRenderTarget(width, height, frameBufferCount);
-    this->offScreenRenderTarget = createOffScreenRenderTarget();
+    this->compositeRenderTarget = createCompositeRenderTarget();
     this->depthStencil = createDepthStencil(width, height, frameBufferCount);
     this->fence = createFence();
     this->renderContext = createRenderContext();
@@ -50,15 +50,9 @@ void DX12Resources::beginRender()
     //深度ステンシルビューのハンドルを設定
     this->setDSVHandle();
 
-    //レンダーターゲットをセット
-    //this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
-    //レンダーターゲットのクリア
-    //this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
-    //深度ステンシルのクリア
-    //this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
-    //this->offScreenRenderTarget->setDepthStencil(this->currentFrameBufferDSVHandle);
-    //this->offScreenRenderTarget->setViewport(&this->viewport);
-    //this->offScreenRenderTarget->beginRender(this->renderContext.get());
+    OffScreenRenderTargetCacheManager::getInstance().setDepthStencilViewHandle(this->currentFrameBufferRTVHandle);
+    OffScreenRenderTargetCacheManager::getInstance().setViewport(this->viewport);
+
 }
 
 /// <summary>
@@ -66,10 +60,10 @@ void DX12Resources::beginRender()
 /// </summary>
 void DX12Resources::endRender()
 {
-    //OffScreenレンダーターゲットの描画完了を待つ
-    //this->renderContext->TransitionTemporaryRenderTargetAwait(this->offScreenRenderTarget->getResource());
-    //this->offScreenRenderTarget->endRender(this->renderContext.get());
-
+    //compositeRenderTargetの描画開始処理
+    this->compositeRenderTarget->beginRender(this->renderContext.get(), this->viewport, this->currentFrameBufferDSVHandle);
+    //compositeRenderTargetの描画終了処理
+    this->compositeRenderTarget->endRender(this->renderContext.get());
     //Mainレンダーターゲットの描画開始
     this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
 
@@ -85,7 +79,7 @@ void DX12Resources::endRender()
     this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
 
     //offscreenをテクスチャとしたフルスクリーン四角形を描画
-    fullScreenQuad->draw(this->renderContext.get(), offScreenRenderTarget.get());
+    fullScreenQuad->draw(this->renderContext.get(), compositeRenderTarget.get());
 
     //Mainレンダーターゲットの描画完了を待つ
     this->renderContext->TransitionMainRenderTargetAwait(this->renderTarget->getResource(this->frameIndex));
@@ -397,19 +391,19 @@ std::shared_ptr<RenderTarget> DX12Resources::createRenderTarget(const int width,
 /// <returns>
 /// 生成&初期化したオフスクリーンレンダーターゲット
 /// </returns>
-std::shared_ptr<OffScreenRenderTarget> DX12Resources::createOffScreenRenderTarget()
+std::shared_ptr<CompositeRenderTarget> DX12Resources::createCompositeRenderTarget()
 {
-    OffScreenRenderTarget::OffScreenRenderTargetConf conf = {};
+    CompositeRenderTarget::CompositeRenderTargetConf conf = {};
     conf.resourceDesc = this->renderTarget->getResource(0)->GetDesc();
     conf.descriptorHeapDesc = this->renderTarget->getDescriptorHeap()->GetDesc();
     conf.clearColor[0] = this->backGroundColor[0];
     conf.clearColor[1] = this->backGroundColor[1];
     conf.clearColor[2] = this->backGroundColor[2];
     conf.clearColor[3] = this->backGroundColor[3];
-    std::shared_ptr<OffScreenRenderTarget> osrt = {};
-    osrt = std::make_shared<OffScreenRenderTarget>(conf);
-    osrt->init(this->device.Get());
-    return osrt;
+    std::shared_ptr<CompositeRenderTarget> crt = {};
+    crt = std::make_shared<CompositeRenderTarget>(conf);
+    crt->init(this->device.Get());
+    return crt;
 }
 
 /// <summary>
@@ -510,7 +504,7 @@ void DX12Resources::setMainRTVHandle()
 
 void DX12Resources::setOffScreenRTVHandle()
 {
-    this->currentFrameBufferRTVHandle = this->offScreenRenderTarget->getRTVHeap()->GetCPUDescriptorHandleForHeapStart();
+    this->currentFrameBufferRTVHandle = this->compositeRenderTarget->getRTVHeap()->GetCPUDescriptorHandleForHeapStart();
     //this->currentFrameBufferRTVHandle.ptr += static_cast<unsigned long long>(this->offScreenRenderTarget->getDescriptorHeapSize()) * this->frameIndex;
 }
 

@@ -63,12 +63,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         auto device = dx12Resources->getDevice();
         //レンダーコンテキスト取得
         auto rc = dx12Resources->getRenderContext();
-        auto osrt = dx12Resources->getOffScreenRenderTarget();
         //シーン共通の描画設定
         SceneConf sceneConf = {};
         sceneConf.device = device;
         sceneConf.renderContext = rc;
-        sceneConf.offScreenRenderTarget = osrt;//dx12Resources->getOffScreenRenderTarget();
         //シーン登録処理
         SceneManager::getInstance().registerScene();
 
@@ -91,9 +89,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             //TODO:そのlistを使ってパスの合体を行う
             //TODO:するとオフスクリーンを持ってこなくてもできる!
             //TODO:しかもimgui関連のエラーも解消できる!
-            osrt->setDepthStencil(dx12Resources->getCurrentFrameBufferDSVHandle());
-            osrt->setViewport(dx12Resources->getViewport());
-            osrt->beginRender(rc);
+            //osrt->setDepthStencil(dx12Resources->getCurrentFrameBufferDSVHandle());
+            //osrt->setViewport(dx12Resources->getViewport());
+            //osrt->beginRender(rc);
 
             //シーン更新処理
             SceneManager::getInstance().update();
@@ -136,7 +134,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif // _DEBUG
 
             //描画終了処理
-            osrt->endRender(rc);
             dx12Resources->endRender();
 
             //描画終了処理後にシーン変更を行う
