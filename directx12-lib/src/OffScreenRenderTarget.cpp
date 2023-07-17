@@ -33,7 +33,6 @@ void OffScreenRenderTarget::beginRender(RenderContext* rc)
     rc->clearRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), conf.clearColor);
     //深度ステンシルのクリア
     rc->clearDepthStencil(depthStencilViewHandle, 1.0f);
-
 }
 
 /// <summary>
@@ -43,8 +42,6 @@ void OffScreenRenderTarget::beginRender(RenderContext* rc)
 void OffScreenRenderTarget::endRender(RenderContext* rc)
 {
     //レンダーターゲットのRESOURCE_BARRIER設定
-    //this->renderContext->TransitionTemporaryRenderTargetAwait(this->offScreenRenderTarget->getResource());
-    //this->offScreenRenderTarget->endRender(this->renderContext.get());
     rc->TransitionTemporaryRenderTargetAwait(this->resource.Get());
 }
 

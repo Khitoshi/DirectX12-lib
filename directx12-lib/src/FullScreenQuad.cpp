@@ -29,7 +29,7 @@ void FullScreenQuad::draw(RenderContext* rc, CompositeRenderTarget* crt)
     //頂点バッファを設定。
     rc->setVertexBuffer(this->vertexBuffer.get());
     //インデックスバッファを設定。
-    rc->setTexture(crt->getSRVHeap(),1);
+    rc->setTexture(crt->getSRVHeap(), 1);
     //ドローコール
     rc->drawInstanced(this->numIndices);
 }
@@ -95,7 +95,6 @@ void FullScreenQuad::createRootSignature(ID3D12Device* device)
     conf.numSampler = 1;
     conf.maxSrvDescriptor = 1;
     conf.offsetInDescriptorsFromTableStartSRV = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-    conf.rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     this->rootSignature = RootSignatureCacheManager::getInstance().getOrCreate(device, conf);
 }

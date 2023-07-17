@@ -38,20 +38,23 @@ void DX12Resources::beginRender()
     //コマンドリストのリセット
     this->renderContext->reset(this->commandAllocator.Get(), nullptr);
 
-    //ビューポートとシザリング矩形の設定
-    //this->renderContext->setViewport(this->viewport);
-    //this->renderContext->setScissorRect(this->viewport);
-
-    //レンダーターゲットの設定
-    //this->renderContext->TransitionTemporaryRenderTargetBegin(this->offScreenRenderTarget->getResource());
-
-    //OffScreenレンダーターゲットのハンドルを設定
-    //this->setOffScreenRTVHandle();
     //深度ステンシルビューのハンドルを設定
     this->setDSVHandle();
 
-    OffScreenRenderTargetCacheManager::getInstance().setDepthStencilViewHandle(this->currentFrameBufferRTVHandle);
+    //オフスクリーンで使用する深度ステンシルビューのハンドルを設定
+    //OffScreenRenderTargetCacheManager::getInstance().setDepthStencilViewHandle(this->currentFrameBufferRTVHandle);
+    OffScreenRenderTargetCacheManager::getInstance().setDepthStencilViewHandle(this->currentFrameBufferDSVHandle);
+    //オフスクリーンで使用するビューポートを設定
     OffScreenRenderTargetCacheManager::getInstance().setViewport(this->viewport);
+
+    OffScreenRenderTarget::OffScreenRenderTargetConf conf = {};
+    conf.clearColor[0] = this->backGroundColor[0];
+    conf.clearColor[1] = this->backGroundColor[1];
+    conf.clearColor[2] = this->backGroundColor[2];
+    conf.clearColor[3] = this->backGroundColor[3];
+    conf.descriptorHeapDesc = this->renderTarget->getDescriptorHeap()->GetDesc();
+    conf.resourceDesc = this->renderTarget->getResource(this->frameIndex)->GetDesc();
+    OffScreenRenderTargetCacheManager::getInstance().setConf(conf);
 
 }
 
@@ -60,10 +63,13 @@ void DX12Resources::beginRender()
 /// </summary>
 void DX12Resources::endRender()
 {
-    //compositeRenderTargetの描画開始処理
+    //offscreenを1枚のテクスチャにまとめる描画開始処理
     this->compositeRenderTarget->beginRender(this->renderContext.get(), this->viewport, this->currentFrameBufferDSVHandle);
-    //compositeRenderTargetの描画終了処理
+    //offscreenを1枚のテクスチャにまとめる描画処理
+    this->compositeRenderTarget->render(this->renderContext.get(), this->device.Get());
+    //offscreenを1枚のテクスチャにまとめる描画終了処理
     this->compositeRenderTarget->endRender(this->renderContext.get());
+
     //Mainレンダーターゲットの描画開始
     this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
 

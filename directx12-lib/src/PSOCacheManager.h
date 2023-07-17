@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PipelineStateObject.h"
-#include "PSOHashes.h"
+#include "Hashes.h"
 #include <stdexcept>
 #include <map>
 #include <unordered_map>
@@ -56,7 +56,7 @@ public:
     }
 
     std::shared_ptr<PipelineStateObject> getPSO(ID3D12Device* device, const PipelineStateObject::PipelineStateObjectConf conf) {
-        
+
         auto it = this->psoCache.find(conf);
         // キャッシュにあるか確認
         if (it != this->psoCache.end()) {
@@ -70,7 +70,7 @@ public:
         if (pso == nullptr) {
             throw std::runtime_error("PSOの作成に失敗しました。");
         }
-        
+
 
         //return psoCache[params];
         return pso;
@@ -79,7 +79,7 @@ public:
 private:
     std::shared_ptr<PipelineStateObject> createPSO(ID3D12Device* device, const PipelineStateObject::PipelineStateObjectConf conf)
     {
-       
+
         std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>(conf);
         pso->init(device);
 

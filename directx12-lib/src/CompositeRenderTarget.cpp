@@ -1,6 +1,9 @@
 #include "CompositeRenderTarget.h"
 #include <stdexcept>
-
+#include "OffScreenRenderTargetCacheManager.h"
+#include "RootSignatureCacheManager.h"
+#include "PSOCacheManager.h"
+#include "ShaderCacheManager.h"
 
 /// <summary>
 /// 初期化
@@ -13,6 +16,11 @@ void CompositeRenderTarget::init(ID3D12Device* device)
     createShaderResourceView(device);
     createRTVHeap(device);
     createRenderTargetView(device);
+
+    initRootSignature(device);
+    initShader(device);
+    initVertexBuffer(device);
+    initPipelineStateObject(device);
 }
 
 /// <summary>
@@ -22,6 +30,7 @@ void CompositeRenderTarget::init(ID3D12Device* device)
 void CompositeRenderTarget::beginRender(RenderContext* rc, D3D12_VIEWPORT viewport, D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle)
 {
     //ビューポートとシザリング矩形の設定
+    rc->setRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), depthStencilViewHandle);
     rc->setViewport(viewport);
     rc->setScissorRect(viewport);
 
@@ -29,12 +38,50 @@ void CompositeRenderTarget::beginRender(RenderContext* rc, D3D12_VIEWPORT viewpo
     rc->TransitionTemporaryRenderTargetBegin(this->resource.Get());
 
     //レンダーターゲットを設定
-    rc->setRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), depthStencilViewHandle);
     //レンダーターゲットのクリア
     rc->clearRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), conf.clearColor);
     //深度ステンシルのクリア
     rc->clearDepthStencil(depthStencilViewHandle, 1.0f);
 
+}
+
+void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
+{
+    for (auto& rt : OffScreenRenderTargetCacheManager::getInstance().getRenderTargetList())
+    {
+        //ルートシグネチャを設定。
+        rc->setRootSignature(this->rootSignature.get());
+        //パイプラインステートを設定。
+        rc->setPipelineState(this->pso.get());
+        //プリミティブのトポロジーを設定。
+        rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+        //頂点バッファを設定。
+        rc->setVertexBuffer(this->vb.get());
+        //テクスチャを設定。
+        //rc->setDescriptorHeap(this->SRVHeap.Get());
+
+        //TODO:テクスチャの設定を綺麗にする
+        //ID3D12DescriptorHeap* descriptorHeaps[] = { this->SRVHeap.Get(), rt->getSRVHeap() };
+        {
+            //シェーダーリソースビューを作成
+            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+            srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            srvDesc.Texture2D.MipLevels = 1;
+            srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+            D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = this->SRVHeap->GetCPUDescriptorHandleForHeapStart();
+            cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+            device->CreateShaderResourceView(rt->getResource(), &srvDesc, cpuHandle);
+        }
+        rc->setDescriptorHeap(this->SRVHeap.Get());
+
+        D3D12_GPU_DESCRIPTOR_HANDLE handle = this->SRVHeap->GetGPUDescriptorHandleForHeapStart();
+        rc->setGraphicsRootDescriptorTable(0, handle);
+
+        //ドローコール
+        rc->drawInstanced(4);
+    };
+    OffScreenRenderTargetCacheManager::getInstance().clearRenderTargetList();
 }
 
 /// <summary>
@@ -131,3 +178,86 @@ void CompositeRenderTarget::createRenderTargetView(ID3D12Device* device)
     device->CreateRenderTargetView(this->resource.Get(), &rtvDesc, this->RTVHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
+void CompositeRenderTarget::initRootSignature(ID3D12Device* device)
+{
+    RootSignatureConf rootSignatureConf = {};
+
+    rootSignatureConf.samplerFilter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+    rootSignatureConf.textureAddressModeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    rootSignatureConf.textureAddressModeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    rootSignatureConf.textureAddressModeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    rootSignatureConf.numSampler = 1;
+    rootSignatureConf.maxSrvDescriptor = 2;
+    rootSignatureConf.offsetInDescriptorsFromTableStartSRV = 0;
+    rootSignatureConf.rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+    this->rootSignature = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
+}
+
+void CompositeRenderTarget::initShader(ID3D12Device* device)
+{
+    {
+        ShaderConf conf = {};
+        conf.filePath = "./src/shaders/MultiPathCompositingVS.hlsl";
+        conf.entryFuncName = "VSMain";
+        conf.currentShaderModelType = ShaderConf::ShaderModelType::Vertex;
+        this->shaderPair.vertexShader = ShaderCacheManager::getInstance().getOrCreate(conf);
+    }
+
+    {
+        ShaderConf conf = {};
+        conf.filePath = "./src/shaders/MultiPathCompositingPS.hlsl";
+        conf.entryFuncName = "PSMain";
+        conf.currentShaderModelType = ShaderConf::ShaderModelType::Pixel;
+        this->shaderPair.pixelShader = ShaderCacheManager::getInstance().getOrCreate(conf);
+    }
+}
+
+void CompositeRenderTarget::initPipelineStateObject(ID3D12Device* device)
+{
+    D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA }
+    };
+
+    // インプットレイアウト
+    PipelineStateObject::PipelineStateObjectConf PSOConf = {};
+    PSOConf.desc.pRootSignature = this->rootSignature->getRootSignature();
+    PSOConf.desc.VS = CD3DX12_SHADER_BYTECODE(this->shaderPair.vertexShader->getShaderBlob());
+    PSOConf.desc.PS = CD3DX12_SHADER_BYTECODE(this->shaderPair.pixelShader->getShaderBlob());
+    PSOConf.desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    PSOConf.desc.SampleMask = UINT_MAX;
+    PSOConf.desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    PSOConf.desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+    PSOConf.desc.InputLayout = { inputElementDesc, _countof(inputElementDesc) };
+    PSOConf.desc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
+    PSOConf.desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    PSOConf.desc.NumRenderTargets = 1;
+    PSOConf.desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    PSOConf.desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+    PSOConf.desc.SampleDesc.Count = 1;
+    PSOConf.desc.SampleDesc.Quality = 0;
+    PSOConf.desc.NodeMask = 1;
+    PSOConf.desc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+
+    this->pso = PSOCacheManager::getInstance().getPSO(device, PSOConf);
+}
+
+void CompositeRenderTarget::initVertexBuffer(ID3D12Device* device)
+{
+    //頂点バッファの作成
+    Vertex vertices[] = {
+        {{ -1.0f, -1.0f, 0.0f }, {0,1}}, // 左下
+        {{ -1.0f,  1.0f, 0.0f }, {0,0}}, // 左上
+        {{  1.0f, -1.0f, 0.0f }, {1,1}}, // 右下
+        {{  1.0f,  1.0f, 0.0f }, {1,0}}, // 右上
+    };
+
+    VertexBufferConf conf = {};
+    conf.device = device;
+    conf.size = sizeof(vertices);
+    conf.stride = sizeof(Vertex);
+    vb = std::make_shared<VertexBuffer>();
+    vb->init(conf);
+    vb->copy(vertices);
+}

@@ -31,11 +31,11 @@ public:
     //初期化処理
     void init(const ImGuiManagerConf conf);
     //フレーム開始処理
-    void beginFrame();
+    void beginFrame(RenderContext* rc, ID3D12Device* device);
     //フレーム終了処理
     void endFrame();
     //描画処理
-    void render(RenderContext* rc);
+    void render(RenderContext* rc, ID3D12Device* device);
     //解放処理
     void deinit();
 private:

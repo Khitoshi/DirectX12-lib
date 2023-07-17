@@ -40,6 +40,9 @@
     <Filter Include="Shaders\FullScreenQuad">
       <UniqueIdentifier>{72651c45-2c72-4f2b-aedd-15039fbccc05}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\MultiPathCompositing">
+      <UniqueIdentifier>{dca62733-f061-4116-80bd-85b795761a5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -266,9 +269,6 @@
     <ClInclude Include="src\ShaderCacheManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PSOHashes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\SpriteModifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -287,10 +287,10 @@
     <ClInclude Include="src\OffScreenRenderTargetCacheManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OffScreenRenderTargetHashes.h">
+    <ClInclude Include="src\CompositeRenderTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\CompositeRenderTarget.h">
+    <ClInclude Include="src\Hashes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -319,6 +319,12 @@
     <FxCompile Include="src\shaders\FullScreenQuadVS.hlsl">
       <Filter>Shaders\FullScreenQuad</Filter>
     </FxCompile>
+    <FxCompile Include="src\shaders\MultiPathCompositingPS.hlsl">
+      <Filter>Shaders\MultiPathCompositing</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\MultiPathCompositingVS.hlsl">
+      <Filter>Shaders\MultiPathCompositing</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\Triangle.hlsli">
@@ -333,6 +339,9 @@
     <None Include="packages.config" />
     <None Include="src\shaders\FullScreenQuad.hlsli">
       <Filter>Shaders\FullScreenQuad</Filter>
+    </None>
+    <None Include="src\shaders\MultiPathCompositing.hlsli">
+      <Filter>Shaders\MultiPathCompositing</Filter>
     </None>
   </ItemGroup>
 </Project>

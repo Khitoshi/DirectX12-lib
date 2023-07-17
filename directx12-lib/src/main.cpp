@@ -101,8 +101,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 #ifdef _DEBUG
             //imguiFrame開始処理
-            ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->beginFrame();
-
+            ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->beginFrame(rc, device);
             {
                 ImGui::Begin("System");
 
@@ -130,7 +129,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             //Frame終了処理
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->endFrame();
             //imgui描画処理
-            ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->render(ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getRenderContext());
+            ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->render(rc, device);
 #endif // _DEBUG
 
             //描画終了処理

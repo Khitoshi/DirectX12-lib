@@ -63,6 +63,7 @@
     <ClInclude Include="src\Fence.h" />
     <ClInclude Include="src\FullScreenQuad.h" />
     <ClInclude Include="src\HashCombine.h" />
+    <ClInclude Include="src\Hashes.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imgui.h" />
     <ClInclude Include="src\imgui\ImGuiManager.h" />
@@ -75,10 +76,8 @@
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\OffScreenRenderTargetCacheManager.h" />
-    <ClInclude Include="src\OffScreenRenderTargetHashes.h" />
     <ClInclude Include="src\PipelineStateObject.h" />
     <ClInclude Include="src\PSOCacheManager.h" />
-    <ClInclude Include="src\PSOHashes.h" />
     <ClInclude Include="src\RenderContext.h" />
     <ClInclude Include="src\RenderMode.h" />
     <ClInclude Include="src\RenderTarget.h" />
@@ -117,6 +116,26 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PSMain</EntryPointName>
     </FxCompile>
     <FxCompile Include="src\shaders\FullScreenQuadVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="src\shaders\MultiPathCompositingPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\MultiPathCompositingVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
@@ -186,6 +205,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="src\shaders\FullScreenQuad.hlsli" />
+    <None Include="src\shaders\MultiPathCompositing.hlsli" />
     <None Include="src\shaders\Rotation.hlsli" />
     <None Include="src\shaders\Sprite.hlsli" />
     <None Include="src\shaders\Triangle.hlsli" />

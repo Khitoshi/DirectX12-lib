@@ -283,12 +283,20 @@ public:
     void setTexture(Texture* texture) {
         auto ds = texture->GetDescriptorHeap();
         this->commandList->SetDescriptorHeaps(1, &ds);
-        //this->commandList->SetGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
         this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
     }
-    void setTexture(ID3D12DescriptorHeap* ds,int dsNum) {
+    void setTexture(ID3D12DescriptorHeap* ds, int dsNum) {
         this->commandList->SetDescriptorHeaps(dsNum, &ds);
         this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
+    }
+
+    /// <summary>
+    /// ディスクリプタヒープの登録
+    /// </summary>
+    /// <param name="descriptorHeap"></param>
+    void setMultiTestDescriptorHeap(ID3D12DescriptorHeap** dh)
+    {
+        this->commandList->SetDescriptorHeaps(2, dh);
     }
 
 public:

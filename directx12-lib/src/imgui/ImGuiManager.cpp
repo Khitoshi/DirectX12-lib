@@ -1,5 +1,6 @@
 #include "ImGuiManager.h"
 #include <stdexcept>
+#include "..\OffScreenRenderTargetCacheManager.h"
 
 /// <summary>
 /// imguiの初期化
@@ -33,8 +34,26 @@ void ImGuiManager::init(const ImGuiManagerConf conf)
 /// <summary>
 /// Frame開始処理
 /// </summary>
-void ImGuiManager::beginFrame()
+void ImGuiManager::beginFrame(RenderContext* rc, ID3D12Device* device)
 {
+    auto renderTarget = OffScreenRenderTargetCacheManager::getInstance().getOrCreate(device);
+    auto depthStencil = OffScreenRenderTargetCacheManager::getInstance().getDepthStencilViewHandle();
+    auto viewport = OffScreenRenderTargetCacheManager::getInstance().getViewport();
+    //ビューポートとシザリング矩形の設定
+    {
+        float color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+        rc->setRenderTarget(renderTarget.get()->getRTVHeap()->GetCPUDescriptorHandleForHeapStart(), depthStencil);
+        rc->setViewport(viewport);
+        rc->setScissorRect(viewport);
+        //レンダーターゲットのRESOURCE_BARRIER設定
+        rc->TransitionTemporaryRenderTargetBegin((renderTarget->getResource()));
+        //レンダーターゲットを設定
+        //レンダーターゲットのクリア
+        rc->clearRenderTarget(renderTarget.get()->getRTVHeap()->GetCPUDescriptorHandleForHeapStart(), color);
+        //深度ステンシルのクリア
+        rc->clearDepthStencil(depthStencil, 1.0f);
+    }
+
     // Start the Dear ImGui frame
     ImGui_ImplDX12_NewFrame();
     ImGui_ImplWin32_NewFrame();
@@ -53,11 +72,15 @@ void ImGuiManager::endFrame()
 /// imguiの描画
 /// </summary>
 /// <param name="rc">レンダーコンテキスト</param>
-void ImGuiManager::render(RenderContext* rc)
+void ImGuiManager::render(RenderContext* rc, ID3D12Device* device)
 {
     ImGui::Render();
     rc->setDescriptorHeap(this->descriptorHeap.Get());
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), rc->getCommandList());
+
+    auto renderTarget = OffScreenRenderTargetCacheManager::getInstance().getOrCreate(device);
+    rc->TransitionTemporaryRenderTargetAwait(renderTarget->getResource());
+    OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(renderTarget.get());
 }
 
 /// <summary>

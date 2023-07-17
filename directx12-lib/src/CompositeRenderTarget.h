@@ -1,6 +1,10 @@
 #pragma once
 #include "d3dx12.h"
+#include "PipelineStateObject.h"
+#include "VertexBuffer.h"
 #include "RenderContext.h"
+#include "RootSignature.h"
+#include "Shader.h"
 //#include "OffScreenRenderTarget.h"
 
 class CompositeRenderTarget
@@ -24,6 +28,7 @@ public:
     //初期化
     void init(ID3D12Device* device);
     void beginRender(RenderContext* rc, D3D12_VIEWPORT viewport, D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle);
+    void render(RenderContext* rc, ID3D12Device* device);
     void endRender(RenderContext* rc);
 
 private:
@@ -37,6 +42,17 @@ private:
     void createRTVHeap(ID3D12Device* device);
     //レンダーターゲットビューを作成
     void createRenderTargetView(ID3D12Device* device);
+
+    //ルートシグネチャの作成
+    void initRootSignature(ID3D12Device* device);
+    //シェーダーのロード
+    void initShader(ID3D12Device* device);
+    //パイプラインステートオブジェクトの作成
+    void initPipelineStateObject(ID3D12Device* device);
+
+    //頂点バッファの作成
+    void initVertexBuffer(ID3D12Device* device);
+
 public://設定系
     //void setDepthStencil(const D3D12_CPU_DESCRIPTOR_HANDLE cdh) { this->depthStencilViewHandle = cdh; }       //深度ステンシルの設定
     //void setViewport(D3D12_VIEWPORT vp) { viewport = vp; }             //ビューポートの設定
@@ -45,12 +61,20 @@ public://取得系
     ID3D12DescriptorHeap* getSRVHeap() const { return SRVHeap.Get(); }  //シェーダーリソースビューディスクリプタヒープの取得
     ID3D12DescriptorHeap* getRTVHeap() const { return RTVHeap.Get(); }  //レンダーターゲットビューディスクリプタヒープの取得
 private:
+    //頂点データ
+    struct Vertex
+    {
+        DirectX::XMFLOAT3 position;	//座標
+        DirectX::XMFLOAT2 uv;		//テクスチャ座標
+    };
+
     CompositeRenderTargetConf conf;			            //設定
     ComPtr<ID3D12Resource> resource;		            //リソース
     ComPtr<ID3D12DescriptorHeap> SRVHeap;               //シェーダーリソースビューディスクリプタヒープ
     ComPtr<ID3D12DescriptorHeap> RTVHeap;               //レンダーターゲットビューディスクリプタヒープ
 
-    //D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle; //深度ステンシルビューハンドル
-    //D3D12_VIEWPORT viewport;                            //ビューポート
-
+    std::shared_ptr<PipelineStateObject> pso;           //パイプラインステートオブジェクト
+    std::shared_ptr<VertexBuffer> vb;                   //頂点バッファ
+    std::shared_ptr<RootSignature> rootSignature;       //ルートシグニチャ
+    BasicShaderPair shaderPair;                         //シェーダーペア
 };
