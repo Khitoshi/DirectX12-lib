@@ -21,6 +21,8 @@ void CompositeRenderTarget::init(ID3D12Device* device)
     initShader(device);
     initVertexBuffer(device);
     initPipelineStateObject(device);
+
+    descriptorHeapCache = std::make_unique<DescriptorHeapCache>();
 }
 
 /// <summary>
@@ -29,20 +31,7 @@ void CompositeRenderTarget::init(ID3D12Device* device)
 /// <param name="rc">レンダーコンテキスト</param>
 void CompositeRenderTarget::beginRender(RenderContext* rc, D3D12_VIEWPORT viewport, D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle)
 {
-    //ビューポートとシザリング矩形の設定
-    rc->setRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), depthStencilViewHandle);
-    rc->setViewport(viewport);
-    rc->setScissorRect(viewport);
-
-    //レンダーターゲットのRESOURCE_BARRIER設定
-    rc->TransitionTemporaryRenderTargetBegin(this->resource.Get());
-
-    //レンダーターゲットを設定
-    //レンダーターゲットのクリア
-    rc->clearRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), conf.clearColor);
-    //深度ステンシルのクリア
-    rc->clearDepthStencil(depthStencilViewHandle, 1.0f);
-
+    rc->simpleStart(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), depthStencilViewHandle, this->resource.Get());
 }
 
 void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
@@ -57,22 +46,9 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
         rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         //頂点バッファを設定。
         rc->setVertexBuffer(this->vb.get());
-        //テクスチャを設定。
-        //rc->setDescriptorHeap(this->SRVHeap.Get());
 
         //TODO:テクスチャの設定を綺麗にする
-        //ID3D12DescriptorHeap* descriptorHeaps[] = { this->SRVHeap.Get(), rt->getSRVHeap() };
-        {
-            //シェーダーリソースビューを作成
-            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-            srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            srvDesc.Texture2D.MipLevels = 1;
-            srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-            D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = this->SRVHeap->GetCPUDescriptorHandleForHeapStart();
-            cpuHandle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-            device->CreateShaderResourceView(rt->getResource(), &srvDesc, cpuHandle);
-        }
+        descriptorHeapCache->getOrCreate(device, rt->getResource(), this->SRVHeap.Get(), srvDesc);
         rc->setDescriptorHeap(this->SRVHeap.Get());
 
         D3D12_GPU_DESCRIPTOR_HANDLE handle = this->SRVHeap->GetGPUDescriptorHandleForHeapStart();
@@ -142,7 +118,7 @@ void CompositeRenderTarget::createSRVHeap(ID3D12Device* device)
 void CompositeRenderTarget::createShaderResourceView(ID3D12Device* device)
 {
     //シェーダーリソースビューを作成
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc = {};
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srvDesc.Texture2D.MipLevels = 1;

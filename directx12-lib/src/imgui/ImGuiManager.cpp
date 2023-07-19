@@ -40,19 +40,7 @@ void ImGuiManager::beginFrame(RenderContext* rc, ID3D12Device* device)
     auto depthStencil = OffScreenRenderTargetCacheManager::getInstance().getDepthStencilViewHandle();
     auto viewport = OffScreenRenderTargetCacheManager::getInstance().getViewport();
     //ビューポートとシザリング矩形の設定
-    {
-        float color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
-        rc->setRenderTarget(renderTarget.get()->getRTVHeap()->GetCPUDescriptorHandleForHeapStart(), depthStencil);
-        rc->setViewport(viewport);
-        rc->setScissorRect(viewport);
-        //レンダーターゲットのRESOURCE_BARRIER設定
-        rc->TransitionTemporaryRenderTargetBegin((renderTarget->getResource()));
-        //レンダーターゲットを設定
-        //レンダーターゲットのクリア
-        rc->clearRenderTarget(renderTarget.get()->getRTVHeap()->GetCPUDescriptorHandleForHeapStart(), color);
-        //深度ステンシルのクリア
-        rc->clearDepthStencil(depthStencil, 1.0f);
-    }
+    rc->simpleStart(renderTarget.get()->getRTVHeap()->GetCPUDescriptorHandleForHeapStart(), depthStencil, renderTarget->getResource());
 
     // Start the Dear ImGui frame
     ImGui_ImplDX12_NewFrame();

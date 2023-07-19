@@ -59,6 +59,7 @@
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\d3dx12.h" />
     <ClInclude Include="src\DepthStencil.h" />
+    <ClInclude Include="src\DescriptorHeapCache.h" />
     <ClInclude Include="src\DX12Resources.h" />
     <ClInclude Include="src\Fence.h" />
     <ClInclude Include="src\FullScreenQuad.h" />

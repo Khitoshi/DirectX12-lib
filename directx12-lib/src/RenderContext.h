@@ -18,7 +18,6 @@ class RenderContext
 public:
     RenderContext() :
         commandList(),
-        viewport(),
         currentViewport()
     {};
     ~RenderContext() {};
@@ -299,6 +298,22 @@ public:
         this->commandList->SetDescriptorHeaps(2, dh);
     }
 
+    void simpleStart(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, ID3D12Resource* rtvResource)
+    {
+        float color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+        //レンダーターゲットを設定
+        this->setRenderTarget(rtvHandle, dsvHandle);
+        //ビューポートとシザー矩形を設定
+        this->setViewport(currentViewport);
+        this->setScissorRect(currentViewport);
+        //レンダーターゲットのRESOURCE_BARRIER設定
+        this->TransitionTemporaryRenderTargetBegin(rtvResource);
+        //レンダーターゲットのクリア
+        this->clearRenderTarget(rtvHandle, color);
+        //深度ステンシルのクリア
+        this->clearDepthStencil(dsvHandle, 1.0f);
+    }
+
 public:
     ID3D12GraphicsCommandList4* getCommandList() { return this->commandList; }//コマンドリストの取得
 
@@ -308,6 +323,6 @@ private:
     enum { MAX_SHADER_RESOURCE = 16 };	//シェーダーリソースの最大数
 
     ID3D12GraphicsCommandList4* commandList;                        //コマンドリスト
-    D3D12_VIEWPORT viewport;                                        //現在のビューポート
     D3D12_VIEWPORT currentViewport;				                    //現在のビューポート
+    //float currentBackGroundColor[4];                                                 //クリアカラー
 };

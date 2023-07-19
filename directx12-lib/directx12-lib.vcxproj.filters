@@ -293,6 +293,9 @@
     <ClInclude Include="src\Hashes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DescriptorHeapCache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">

@@ -74,11 +74,12 @@ void DX12Resources::endRender()
     this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
 
     //ビューポートとシザリング矩形の設定
+    this->setMainRTVHandle();
+
     this->renderContext->setViewport(this->viewport);
     this->renderContext->setScissorRect(this->viewport);
 
     //レンダーターゲットの設定
-    this->setMainRTVHandle();
     this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
 
     //深度ステンシルのクリア

@@ -5,7 +5,7 @@
 #include "RenderContext.h"
 #include "RootSignature.h"
 #include "Shader.h"
-//#include "OffScreenRenderTarget.h"
+#include "DescriptorHeapCache.h"
 
 class CompositeRenderTarget
 {
@@ -21,7 +21,9 @@ public:
         conf(c),
         resource(),
         SRVHeap(),
-        RTVHeap()
+        RTVHeap(),
+        srvDesc(),
+        descriptorHeapCache()
     {};
     ~CompositeRenderTarget() {};
 
@@ -77,4 +79,6 @@ private:
     std::shared_ptr<VertexBuffer> vb;                   //頂点バッファ
     std::shared_ptr<RootSignature> rootSignature;       //ルートシグニチャ
     BasicShaderPair shaderPair;                         //シェーダーペア
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    std::shared_ptr<DescriptorHeapCache> descriptorHeapCache;       //ディスクリプタヒープキャッシュマネージャー
 };
