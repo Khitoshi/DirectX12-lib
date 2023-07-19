@@ -71,18 +71,18 @@ void DX12Resources::endRender()
     this->compositeRenderTarget->endRender(this->renderContext.get());
 
     //Mainレンダーターゲットの描画開始
-    this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
-
-    //ビューポートとシザリング矩形の設定
-    this->setMainRTVHandle();
-
-    this->renderContext->setViewport(this->viewport);
-    this->renderContext->setScissorRect(this->viewport);
 
     //レンダーターゲットの設定
+    this->setMainRTVHandle();
     this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
+    
+    //ビューポートとシザリング矩形の設定
+    this->renderContext->setViewport(this->viewport);
+    this->renderContext->setScissorRect(this->viewport);
+    this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
 
     //深度ステンシルのクリア
+    this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
     this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
 
     //offscreenをテクスチャとしたフルスクリーン四角形を描画

@@ -2,6 +2,7 @@
 #include "OffScreenRenderTarget.h"
 #include "Hashes.h"
 #include <vector>
+#include <stdexcept>
 
 /// <summary>
 /// オフスクリーンレンダーターゲットのキャッシュ管理システム
@@ -15,24 +16,24 @@ public:
         std::size_t operator()(const OffScreenRenderTarget::OffScreenRenderTargetConf& k) const
         {
             std::size_t seed = 0;
-            //hash_combine(seed, k.resourceDesc.Dimension);
-            //hash_combine(seed, k.resourceDesc.Alignment);
-            //hash_combine(seed, k.resourceDesc.Width);
-            //hash_combine(seed, k.resourceDesc.Height);
-            //hash_combine(seed, k.resourceDesc.DepthOrArraySize);
-            //hash_combine(seed, k.resourceDesc.MipLevels);
-            //hash_combine(seed, k.resourceDesc.Format);
-            //hash_combine(seed, k.resourceDesc.SampleDesc);
-            //hash_combine(seed, k.resourceDesc.Layout);
-            //hash_combine(seed, k.resourceDesc.Flags);
-            //
-            //hash_combine(seed, k.descriptorHeapDesc.NumDescriptors);
-            //hash_combine(seed, k.descriptorHeapDesc.Type);
-            //
-            //hash_combine(seed, k.clearColor[0]);
-            //hash_combine(seed, k.clearColor[1]);
-            //hash_combine(seed, k.clearColor[2]);
-            //hash_combine(seed, k.clearColor[3]);
+            hash_combine(seed, k.resourceDesc.Dimension);
+            hash_combine(seed, k.resourceDesc.Alignment);
+            hash_combine(seed, k.resourceDesc.Width);
+            hash_combine(seed, k.resourceDesc.Height);
+            hash_combine(seed, k.resourceDesc.DepthOrArraySize);
+            hash_combine(seed, k.resourceDesc.MipLevels);
+            hash_combine(seed, k.resourceDesc.Format);
+            hash_combine(seed, k.resourceDesc.SampleDesc);
+            hash_combine(seed, k.resourceDesc.Layout);
+            hash_combine(seed, k.resourceDesc.Flags);
+            
+            hash_combine(seed, k.descriptorHeapDesc.NumDescriptors);
+            hash_combine(seed, k.descriptorHeapDesc.Type);
+            
+            hash_combine(seed, k.clearColor[0]);
+            hash_combine(seed, k.clearColor[1]);
+            hash_combine(seed, k.clearColor[2]);
+            hash_combine(seed, k.clearColor[3]);
             return seed;
         }
     };

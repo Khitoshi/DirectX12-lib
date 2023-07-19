@@ -3,34 +3,6 @@
 #include "d3dx12.h"
 
 namespace std {
-
-    template <>
-    struct hash<D3D12_RESOURCE_DIMENSION> {
-        std::size_t operator()(const D3D12_RESOURCE_DIMENSION& resouce_dimension) const {
-            std::size_t seed = 0;
-            hash_combine(seed, resouce_dimension);
-            return seed;
-        }
-    };
-
-    template <>
-    struct hash<D3D12_TEXTURE_LAYOUT> {
-        std::size_t operator()(const D3D12_TEXTURE_LAYOUT& d3d12_texture_layout) const {
-            std::size_t seed = 0;
-            hash_combine(seed, d3d12_texture_layout);
-            return seed;
-        }
-    };
-
-    template <>
-    struct hash<D3D12_RESOURCE_FLAGS> {
-        std::size_t operator()(const D3D12_RESOURCE_FLAGS& d3d12_resource_flags) const {
-            std::size_t seed = 0;
-            hash_combine(seed, d3d12_resource_flags);
-            return seed;
-        }
-    };
-
     template <>
     struct hash<D3D12_BLEND_DESC> {
         std::size_t operator()(const D3D12_BLEND_DESC& blendDesc) const {

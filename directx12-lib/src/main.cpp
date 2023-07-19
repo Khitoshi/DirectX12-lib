@@ -100,6 +100,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 
 #ifdef _DEBUG
+           
+            
             //imguiFrame開始処理
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->beginFrame(rc, device);
             {
@@ -125,11 +127,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             SceneManager::getInstance().updateImguiMenu();
             //シーン選択
             SceneManager::getInstance().sceneSelect();
-
             //Frame終了処理
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->endFrame();
             //imgui描画処理
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->render(rc, device);
+            
 #endif // _DEBUG
 
             //描画終了処理

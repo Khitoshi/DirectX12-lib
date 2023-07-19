@@ -47,7 +47,6 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
         //頂点バッファを設定。
         rc->setVertexBuffer(this->vb.get());
 
-        //TODO:テクスチャの設定を綺麗にする
         descriptorHeapCache->getOrCreate(device, rt->getResource(), this->SRVHeap.Get(), srvDesc);
         rc->setDescriptorHeap(this->SRVHeap.Get());
 
