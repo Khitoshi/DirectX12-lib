@@ -30,7 +30,7 @@ public:
     //èâä˙âª
     void init(ID3D12Device* device);
     void beginRender(RenderContext* rc, D3D12_VIEWPORT viewport, D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle);
-    void render(RenderContext* rc, ID3D12Device* device);
+    void render(RenderContext* rc, ID3D12Device* device, D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle);
     void endRender(RenderContext* rc);
 
 private:

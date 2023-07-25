@@ -16,42 +16,47 @@
 class FullScreenQuad
 {
 public:
-	struct Vertex
-	{
-		DirectX::XMFLOAT3 position;	//頂点座標
-		DirectX::XMFLOAT2 uv;		//テクスチャ座標
-	};
+    struct Vertex
+    {
+        DirectX::XMFLOAT3 position;	//頂点座標
+        DirectX::XMFLOAT2 uv;		//テクスチャ座標
+    };
 public:
-	FullScreenQuad():
-		vertexBuffer(),
-		indexBuffer(),
-		rootSignature(),
-		pso(),
-		basicShaderPair(),
-		texture(),
-		numIndices(0)
-	{};
-	~FullScreenQuad() {};
+    FullScreenQuad() :
+        vertexBuffer(),
+        indexBuffer(),
+        rootSignature(),
+        pso(),
+        basicShaderPair(),
+        texture(),
+        numIndices(0),
+        SRVHeap()
+    {};
+    ~FullScreenQuad() {};
 
-	//初期化処理
-	void init(ID3D12Device* device);
-	//描画処理
-	void draw(RenderContext* rc, CompositeRenderTarget* osrt);
+    //初期化処理
+    void init(ID3D12Device* device);
+    //描画処理
+    void draw(RenderContext* rc, ID3D12Device* device, CompositeRenderTarget* osrt);
 private:
-	//シェーダーのペア
-	void createShader(ID3D12Device* device);
-	//頂点バッファの作成
-	void createVertexBuffer(ID3D12Device* device);
-	//ルートシグネチャの作成
-	void createRootSignature(ID3D12Device* device);
-	//パイプラインステートの作成
-	void createPipelineState(ID3D12Device* device);
+    //シェーダーのペア
+    void createShader(ID3D12Device* device);
+    //頂点バッファの作成
+    void createVertexBuffer(ID3D12Device* device);
+    //ルートシグネチャの作成
+    void createRootSignature(ID3D12Device* device);
+    //パイプラインステートの作成
+    void createPipelineState(ID3D12Device* device);
+
+    void createSRVHeap(ID3D12Device* device);
+    void createSRV(ID3D12Device* device, CompositeRenderTarget* osrt);
 private:
-	std::shared_ptr<VertexBuffer> vertexBuffer;				//頂点バッファ
-	std::shared_ptr<IndexBuffer> indexBuffer;				//インデックスバッファ
-	std::shared_ptr<RootSignature> rootSignature;			//ルートシグネチャ
-	std::shared_ptr<PipelineStateObject> pso;				//パイプラインステートオブジェクト
-	BasicShaderPair basicShaderPair;						//シェーダーのペア
-	std::shared_ptr<Texture> texture;						//テクスチャ
-	int numIndices;											//インデックスの数
+    std::shared_ptr<VertexBuffer> vertexBuffer;				//頂点バッファ
+    std::shared_ptr<IndexBuffer> indexBuffer;				//インデックスバッファ
+    std::shared_ptr<RootSignature> rootSignature;			//ルートシグネチャ
+    std::shared_ptr<PipelineStateObject> pso;				//パイプラインステートオブジェクト
+    BasicShaderPair basicShaderPair;						//シェーダーのペア
+    std::shared_ptr<Texture> texture;						//テクスチャ
+    int numIndices;											//インデックスの数
+    ComPtr<ID3D12DescriptorHeap> SRVHeap;               //シェーダーリソースビューディスクリプタヒープ
 };

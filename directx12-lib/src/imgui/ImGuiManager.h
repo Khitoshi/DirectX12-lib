@@ -6,6 +6,7 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
 #include "../RenderContext.h"
+#include "../OffScreenRenderTarget.h"
 using namespace Microsoft::WRL;
 
 /// <summary>
@@ -41,6 +42,10 @@ public:
 private:
     //ディスクリプタヒープ生成
     ComPtr<ID3D12DescriptorHeap> createDescriptorHeap(const ImGuiManagerConf conf);
+
 private:
     ComPtr<ID3D12DescriptorHeap> descriptorHeap;    //ディスクリプタヒープ
+
+    std::shared_ptr<OffScreenRenderTarget> offScreenRenderTarget;  //オフスクリーンレンダーターゲット
+
 };

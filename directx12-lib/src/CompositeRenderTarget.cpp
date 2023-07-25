@@ -34,28 +34,30 @@ void CompositeRenderTarget::beginRender(RenderContext* rc, D3D12_VIEWPORT viewpo
     rc->simpleStart(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), depthStencilViewHandle, this->resource.Get());
 }
 
-void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
+void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device, D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle)
 {
+    //ルートシグネチャを設定。
+    rc->setRootSignature(this->rootSignature.get());
+    //パイプラインステートを設定。
+    rc->setPipelineState(this->pso.get());
+    //プリミティブのトポロジーを設定。
+    rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    //頂点バッファを設定。
+    rc->setVertexBuffer(this->vb.get());
+
+    // SRVHeapの始点を取得
     for (auto& rt : OffScreenRenderTargetCacheManager::getInstance().getRenderTargetList())
     {
-        //ルートシグネチャを設定。
-        rc->setRootSignature(this->rootSignature.get());
-        //パイプラインステートを設定。
-        rc->setPipelineState(this->pso.get());
-        //プリミティブのトポロジーを設定。
-        rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-        //頂点バッファを設定。
-        rc->setVertexBuffer(this->vb.get());
-
+        //ディスクリプタヒープを設定
         descriptorHeapCache->getOrCreate(device, rt->getResource(), this->SRVHeap.Get(), srvDesc);
-        rc->setDescriptorHeap(this->SRVHeap.Get());
+    }
+    rc->setDescriptorHeap(this->SRVHeap.Get());
+    //GPUハンドルをcommandlistに設定
+    D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = this->SRVHeap->GetGPUDescriptorHandleForHeapStart();
+    rc->setGraphicsRootDescriptorTable(0, gpuHandle);
 
-        D3D12_GPU_DESCRIPTOR_HANDLE handle = this->SRVHeap->GetGPUDescriptorHandleForHeapStart();
-        rc->setGraphicsRootDescriptorTable(0, handle);
-
-        //ドローコール
-        rc->drawInstanced(4);
-    };
+    //ドローコール
+    rc->drawInstanced(4);
     OffScreenRenderTargetCacheManager::getInstance().clearRenderTargetList();
 }
 
@@ -67,6 +69,7 @@ void CompositeRenderTarget::endRender(RenderContext* rc)
 {
     //レンダーターゲットのRESOURCE_BARRIER設定
     rc->TransitionTemporaryRenderTargetAwait(this->resource.Get());
+
 }
 
 /// <summary>
@@ -116,13 +119,13 @@ void CompositeRenderTarget::createSRVHeap(ID3D12Device* device)
 /// <param name="device">初期化&生成済みのGPUデバイス</param>
 void CompositeRenderTarget::createShaderResourceView(ID3D12Device* device)
 {
-    //シェーダーリソースビューを作成
+    ////シェーダーリソースビューを作成
     srvDesc = {};
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srvDesc.Texture2D.MipLevels = 1;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    device->CreateShaderResourceView(this->resource.Get(), &srvDesc, this->SRVHeap->GetCPUDescriptorHandleForHeapStart());
+    //device->CreateShaderResourceView(this->resource.Get(), &srvDesc, this->SRVHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 /// <summary>
@@ -195,6 +198,21 @@ void CompositeRenderTarget::initPipelineStateObject(ID3D12Device* device)
         {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA }
     };
 
+    //深度ステンシルステート
+    D3D12_DEPTH_STENCIL_DESC dsDesc = {};
+    dsDesc.DepthEnable = FALSE; // 深度テストを無効にする
+    dsDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO; // 深度値の書き込みを無効にする
+    dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS; // 深度比較関数を常に真にする
+    // ステンシル設定も無効にするなら以下も設定
+    dsDesc.StencilEnable = FALSE;
+    dsDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+    dsDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+    const D3D12_DEPTH_STENCILOP_DESC defaultStencilOp =
+    { D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_COMPARISON_FUNC_ALWAYS };
+    dsDesc.FrontFace = defaultStencilOp;
+    dsDesc.BackFace = defaultStencilOp;
+
+
     // インプットレイアウト
     PipelineStateObject::PipelineStateObjectConf PSOConf = {};
     PSOConf.desc.pRootSignature = this->rootSignature->getRootSignature();
@@ -203,6 +221,7 @@ void CompositeRenderTarget::initPipelineStateObject(ID3D12Device* device)
     PSOConf.desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     PSOConf.desc.SampleMask = UINT_MAX;
     PSOConf.desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    //PSOConf.desc.DepthStencilState = dsDesc;
     PSOConf.desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     PSOConf.desc.InputLayout = { inputElementDesc, _countof(inputElementDesc) };
     PSOConf.desc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;

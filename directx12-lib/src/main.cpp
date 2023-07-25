@@ -43,7 +43,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         ResourceManager::getInstance()->registerResource("window", window);
 
         //DX12初期化処理
-        float color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+        float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
         std::shared_ptr <DX12Resources> dx12Resources = std::make_shared<DX12Resources>();
         dx12Resources->setBackGroundColor(color);
         dx12Resources->init(ResourceManager::getInstance()->getResource<Window>("window")->getHWND(), winConf.width, winConf.height, FRAMEBUFFERCOUNT);
@@ -83,25 +83,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             dx12Resources->setBackGroundColor(color);
             dx12Resources->beginRender();
 
-            //TODO:ここをTriangleやSprite内に入れる
-            //TODO:普通にendRenderの中でパスの合体を行えばいいのでは？
-            //TODO:EndRenderの中ではキャッシュではなくそれとは別にlistを作ってそこにパスを追加していく
-            //TODO:そのlistを使ってパスの合体を行う
-            //TODO:するとオフスクリーンを持ってこなくてもできる!
-            //TODO:しかもimgui関連のエラーも解消できる!
-            //osrt->setDepthStencil(dx12Resources->getCurrentFrameBufferDSVHandle());
-            //osrt->setViewport(dx12Resources->getViewport());
-            //osrt->beginRender(rc);
-
             //シーン更新処理
             SceneManager::getInstance().update();
             //シーン描画処理
             SceneManager::getInstance().render(sceneConf);
 
-
 #ifdef _DEBUG
-           
-            
+
             //imguiFrame開始処理
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->beginFrame(rc, device);
             {
@@ -131,7 +119,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->endFrame();
             //imgui描画処理
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->render(rc, device);
-            
+
 #endif // _DEBUG
 
             //描画終了処理

@@ -1,5 +1,5 @@
 #include "Triangle.h"
-
+#include "OffScreenRenderTargetCacheManager.h"
 /// <summary>
 /// 三角形に必要なリソースの初期化
 /// </summary>
@@ -11,6 +11,7 @@ void Triangle::init(TriangleConf conf)
     initPipelineStateObject(conf);
     initVertexBuffer(conf);
     initIndexBuffer(conf);
+    initOffScreenRenderTarget(conf);
 }
 
 /// <summary>
@@ -19,6 +20,17 @@ void Triangle::init(TriangleConf conf)
 /// <param name="rc">レンダーコンテキスト</param>
 void Triangle::draw(RenderContext* rc)
 {
+    //オフスクリーンレンダーターゲットで書き込みできる状態にする
+    auto renderTarget = offScreenRenderTarget->getRTVHeap();
+    auto resource = offScreenRenderTarget->getResource();
+    auto depthStencil = OffScreenRenderTargetCacheManager::getInstance().getDepthStencilViewHandle();
+    auto viewport = OffScreenRenderTargetCacheManager::getInstance().getViewport();
+
+    //ビューポートとシザリング矩形の設定
+    rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depthStencil, resource);
+
+
+
     //ルートシグネチャを設定。
     rc->setRootSignature(this->rootSignature.get());
     //パイプラインステートを設定。
@@ -32,6 +44,10 @@ void Triangle::draw(RenderContext* rc)
     rc->setIndexBuffer(this->indexBuffer.get());
     //ドローコール
     rc->drawIndexed(3);
+
+    //オフスクリーンレンダーターゲットの書き込みを終了する。
+    offScreenRenderTarget->endRender(rc);
+    OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(offScreenRenderTarget.get());
 }
 
 /// <summary>
@@ -52,21 +68,25 @@ void Triangle::initRootSignature(TriangleConf conf)
 /// </summary>
 void Triangle::loadShader()
 {
-    //頂点シェーダーのロード
-    vertexShader = std::make_shared<Shader>();
-    ShaderConf vsConf = {};
-    vsConf.filePath = "./src/shaders/TriangleVS.hlsl";
-    vsConf.entryFuncName = "VSMain";
-    vsConf.currentShaderModelType = ShaderConf::ShaderModelType::Vertex;
-    vertexShader->load(vsConf);
+    {
+        //頂点シェーダーのロード
+        vertexShader = std::make_shared<Shader>();
+        ShaderConf conf = {};
+        conf.filePath = "./src/shaders/TriangleVS.hlsl";
+        conf.entryFuncName = "VSMain";
+        conf.currentShaderModelType = ShaderConf::ShaderModelType::Vertex;
+        vertexShader->load(conf);
+    }
 
-    //ピクセルシェーダーのロード
-    pixelShader = std::make_shared<Shader>();
-    ShaderConf psConf = {};
-    psConf.filePath = "./src/shaders/TrianglePS.hlsl";
-    psConf.entryFuncName = "PSMain";
-    psConf.currentShaderModelType = ShaderConf::ShaderModelType::Pixel;
-    pixelShader->load(psConf);
+    {
+        //ピクセルシェーダーのロード
+        pixelShader = std::make_shared<Shader>();
+        ShaderConf conf = {};
+        conf.filePath = "./src/shaders/TrianglePS.hlsl";
+        conf.entryFuncName = "PSMain";
+        conf.currentShaderModelType = ShaderConf::ShaderModelType::Pixel;
+        pixelShader->load(conf);
+    }
 }
 
 /// <summary>
@@ -175,4 +195,12 @@ void Triangle::initIndexBuffer(TriangleConf conf)
     indexBuffer->init(indexBufferConf);
     //コピー
     indexBuffer->copy(static_cast<uint16_t*>(indices));
+}
+
+void Triangle::initOffScreenRenderTarget(TriangleConf conf)
+{
+    OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
+    osrtConf = OffScreenRenderTargetCacheManager::getInstance().getConf();
+    offScreenRenderTarget = std::make_shared<OffScreenRenderTarget>(osrtConf);
+    offScreenRenderTarget->init(conf.device);
 }

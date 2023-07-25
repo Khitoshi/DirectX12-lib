@@ -35,7 +35,8 @@ public:
         vertexBuffer(),
         indexBuffer(),
         vertices(),
-        renderMode(RenderMode::Default)
+        renderMode(RenderMode::Default),
+        offScreenRenderTarget()
     {};
     ~Triangle() {};
 
@@ -60,6 +61,8 @@ private:
     //インデックスバッファの作成
     void initIndexBuffer(TriangleConf conf);
 
+    //オフスクリーンレンダーターゲットの作成
+    void initOffScreenRenderTarget(TriangleConf conf);
 public:
 
     /// <summary>
@@ -112,4 +115,6 @@ private:
     std::shared_ptr<IndexBuffer> indexBuffer;                                       //インデックスバッファ
     Vertex vertices[3];										                        //頂点データ
     RenderMode renderMode;														    //描画モード
+
+    std::shared_ptr<OffScreenRenderTarget> offScreenRenderTarget;                   //オフスクリーンレンダーターゲット
 };

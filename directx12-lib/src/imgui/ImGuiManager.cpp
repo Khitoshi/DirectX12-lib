@@ -29,6 +29,12 @@ void ImGuiManager::init(const ImGuiManagerConf conf)
         this->descriptorHeap.Get(),
         this->descriptorHeap->GetCPUDescriptorHandleForHeapStart(),
         this->descriptorHeap->GetGPUDescriptorHandleForHeapStart());
+
+    //TODO:リファクタリング対象
+    OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
+    osrtConf = OffScreenRenderTargetCacheManager::getInstance().getConf();
+    this->offScreenRenderTarget = std::make_shared<OffScreenRenderTarget>(osrtConf);
+    this->offScreenRenderTarget->init(conf.device);
 }
 
 /// <summary>
@@ -36,11 +42,14 @@ void ImGuiManager::init(const ImGuiManagerConf conf)
 /// </summary>
 void ImGuiManager::beginFrame(RenderContext* rc, ID3D12Device* device)
 {
-    auto renderTarget = OffScreenRenderTargetCacheManager::getInstance().getOrCreate(device);
+    //オフスクリーンレンダーターゲットで書き込みできる状態にする
+    auto renderTarget = offScreenRenderTarget->getRTVHeap();
+    auto resource = offScreenRenderTarget->getResource();
     auto depthStencil = OffScreenRenderTargetCacheManager::getInstance().getDepthStencilViewHandle();
     auto viewport = OffScreenRenderTargetCacheManager::getInstance().getViewport();
+
     //ビューポートとシザリング矩形の設定
-    rc->simpleStart(renderTarget.get()->getRTVHeap()->GetCPUDescriptorHandleForHeapStart(), depthStencil, renderTarget->getResource());
+    rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depthStencil, resource);
 
     // Start the Dear ImGui frame
     ImGui_ImplDX12_NewFrame();
@@ -66,9 +75,10 @@ void ImGuiManager::render(RenderContext* rc, ID3D12Device* device)
     rc->setDescriptorHeap(this->descriptorHeap.Get());
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), rc->getCommandList());
 
-    auto renderTarget = OffScreenRenderTargetCacheManager::getInstance().getOrCreate(device);
-    rc->TransitionTemporaryRenderTargetAwait(renderTarget->getResource());
-    OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(renderTarget.get());
+    //TODO:リファクタリング対象
+    //オフスクリーンレンダーターゲットの書き込みを終了する。
+    offScreenRenderTarget->endRender(rc);
+    OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(offScreenRenderTarget.get());
 }
 
 /// <summary>

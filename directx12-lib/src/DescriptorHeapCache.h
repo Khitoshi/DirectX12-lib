@@ -10,10 +10,12 @@ public:
 
     D3D12_CPU_DESCRIPTOR_HANDLE getOrCreate(ID3D12Device* device, ID3D12Resource* resource, ID3D12DescriptorHeap* descriptorHeap, D3D12_SHADER_RESOURCE_VIEW_DESC desc)
     {
+
         auto it = handleMapCache.find(resource);
         if (it != handleMapCache.end()) {
             return it->second;
         }
+
 
         D3D12_CPU_DESCRIPTOR_HANDLE handle = create(device, resource, descriptorHeap, desc);
         return handle;

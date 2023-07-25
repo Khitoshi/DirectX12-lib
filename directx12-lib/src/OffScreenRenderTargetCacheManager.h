@@ -26,10 +26,10 @@ public:
             hash_combine(seed, k.resourceDesc.SampleDesc);
             hash_combine(seed, k.resourceDesc.Layout);
             hash_combine(seed, k.resourceDesc.Flags);
-            
+
             hash_combine(seed, k.descriptorHeapDesc.NumDescriptors);
             hash_combine(seed, k.descriptorHeapDesc.Type);
-            
+
             hash_combine(seed, k.clearColor[0]);
             hash_combine(seed, k.clearColor[1]);
             hash_combine(seed, k.clearColor[2]);
@@ -97,7 +97,10 @@ public:
     {
         return this->offScreenRenderTargetList;
     }
-
+    OffScreenRenderTarget* getRenderTarget()
+    {
+        return this->offScreenRenderTargetList.back();
+    }
 
     /// <summary>
     /// レンダーターゲットリストの追加

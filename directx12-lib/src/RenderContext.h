@@ -140,6 +140,7 @@ public:
             D3D12_RESOURCE_STATE_PRESENT);
         //バリアをコマンドリストに追加
         this->commandList->ResourceBarrier(1, &barrier);
+        //this->barriers.push_back(barrier);
     }
 
     /// <summary>
@@ -156,6 +157,7 @@ public:
             D3D12_RESOURCE_STATE_RENDER_TARGET);
         //バリアをコマンドリストに追加
         this->commandList->ResourceBarrier(1, &barrier);
+        //this->barriers.push_back(barrier);
     }
 
 
@@ -172,6 +174,7 @@ public:
             D3D12_RESOURCE_STATE_RENDER_TARGET);
         //バリアをコマンドリストに追加
         this->commandList->ResourceBarrier(1, &barrier);
+        //this->barriers.push_back(barrier);
     }
 
     /// <summary>
@@ -187,7 +190,20 @@ public:
             D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
         //バリアをコマンドリストに追加
         this->commandList->ResourceBarrier(1, &barrier);
+        //this->barriers.push_back(barrier);
     }
+
+    /// <summary>
+    /// リソースバリアの実行
+    /// </summary>
+    void ExecuteResourceBarriers()
+    {
+        if (!this->barriers.empty()) {
+            this->commandList->ResourceBarrier(static_cast<UINT>(this->barriers.size()), barriers.data());
+            this->barriers.clear();
+        }
+    }
+
 
     /// <summary>
     /// ディスクリプタヒープの登録
@@ -289,18 +305,9 @@ public:
         this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
     }
 
-    /// <summary>
-    /// ディスクリプタヒープの登録
-    /// </summary>
-    /// <param name="descriptorHeap"></param>
-    void setMultiTestDescriptorHeap(ID3D12DescriptorHeap** dh)
-    {
-        this->commandList->SetDescriptorHeaps(2, dh);
-    }
-
     void simpleStart(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, ID3D12Resource* rtvResource)
     {
-        float color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+        float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
         //レンダーターゲットを設定
         this->setRenderTarget(rtvHandle, dsvHandle);
         //ビューポートとシザー矩形を設定
@@ -325,4 +332,5 @@ private:
     ID3D12GraphicsCommandList4* commandList;                        //コマンドリスト
     D3D12_VIEWPORT currentViewport;				                    //現在のビューポート
     //float currentBackGroundColor[4];                                                 //クリアカラー
+    std::vector<CD3DX12_RESOURCE_BARRIER> barriers;
 };

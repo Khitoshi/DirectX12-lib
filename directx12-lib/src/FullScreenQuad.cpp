@@ -10,6 +10,7 @@ void FullScreenQuad::init(ID3D12Device* device)
     createVertexBuffer(device);
     createRootSignature(device);
     createPipelineState(device);
+    createSRVHeap(device);
     this->numIndices = 4;
 }
 
@@ -18,7 +19,7 @@ void FullScreenQuad::init(ID3D12Device* device)
 /// </summary>
 /// <param name="rc">レンダーコンテキスト</param>
 /// <param name="osrt">オフスクリーンレンダーターゲット</param>
-void FullScreenQuad::draw(RenderContext* rc, CompositeRenderTarget* crt)
+void FullScreenQuad::draw(RenderContext* rc, ID3D12Device* device, CompositeRenderTarget* crt)
 {
     //ルートシグネチャを設定。
     rc->setRootSignature(this->rootSignature.get());
@@ -29,7 +30,13 @@ void FullScreenQuad::draw(RenderContext* rc, CompositeRenderTarget* crt)
     //頂点バッファを設定。
     rc->setVertexBuffer(this->vertexBuffer.get());
     //インデックスバッファを設定。
-    rc->setTexture(crt->getSRVHeap(), 1);
+    //rc->setTexture(crt->getSRVHeap(), 1);
+    this->createSRV(device, crt);
+    rc->setDescriptorHeap(this->SRVHeap.Get());
+    //GPUハンドルをcommandlistに設定
+    D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = this->SRVHeap->GetGPUDescriptorHandleForHeapStart();
+    rc->setGraphicsRootDescriptorTable(0, gpuHandle);
+
     //ドローコール
     rc->drawInstanced(this->numIndices);
 }
@@ -134,5 +141,29 @@ void FullScreenQuad::createPipelineState(ID3D12Device* device)
     conf.desc = desc;
 
     this->pso = PSOCacheManager::getInstance().getPSO(device, conf);
+}
+
+void FullScreenQuad::createSRVHeap(ID3D12Device* device)
+{
+    //SRV用のディスクリプタヒープを作成
+    D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+    srvHeapDesc.NumDescriptors = 1;
+    srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    if (FAILED(device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&this->SRVHeap)))) {
+        throw new std::exception("failed to create SRV heap");
+    }
+}
+
+void FullScreenQuad::createSRV(ID3D12Device* device, CompositeRenderTarget* osrt)
+{
+    //SRVの作成
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Texture2D.MipLevels = 1;
+
+    device->CreateShaderResourceView(osrt->getResource(), &srvDesc, this->SRVHeap->GetCPUDescriptorHandleForHeapStart());
 }
 

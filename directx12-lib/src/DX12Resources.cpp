@@ -21,6 +21,23 @@ void DX12Resources::init(const HWND hWnd, const int width, const int height, con
     fullScreenQuad = std::make_unique<FullScreenQuad>();
     fullScreenQuad->init(this->device.Get());
 
+
+
+    //オフスクリーンで使用する深度ステンシルビューのハンドルを設定
+    //OffScreenRenderTargetCacheManager::getInstance().setDepthStencilViewHandle(this->currentFrameBufferRTVHandle);
+    OffScreenRenderTargetCacheManager::getInstance().setDepthStencilViewHandle(this->currentFrameBufferDSVHandle);
+    //オフスクリーンで使用するビューポートを設定
+    OffScreenRenderTargetCacheManager::getInstance().setViewport(this->viewport);
+
+    //TODO:リファクタリング対象
+    OffScreenRenderTarget::OffScreenRenderTargetConf conf = {};
+    conf.clearColor[0] = this->backGroundColor[0];
+    conf.clearColor[1] = this->backGroundColor[1];
+    conf.clearColor[2] = this->backGroundColor[2];
+    conf.clearColor[3] = this->backGroundColor[3];
+    conf.descriptorHeapDesc = this->renderTarget->getDescriptorHeap()->GetDesc();
+    conf.resourceDesc = this->renderTarget->getResource(this->frameIndex)->GetDesc();
+    OffScreenRenderTargetCacheManager::getInstance().setConf(conf);
 }
 
 /// <summary>
@@ -47,6 +64,7 @@ void DX12Resources::beginRender()
     //オフスクリーンで使用するビューポートを設定
     OffScreenRenderTargetCacheManager::getInstance().setViewport(this->viewport);
 
+    //TODO:リファクタリング対象
     OffScreenRenderTarget::OffScreenRenderTargetConf conf = {};
     conf.clearColor[0] = this->backGroundColor[0];
     conf.clearColor[1] = this->backGroundColor[1];
@@ -55,7 +73,6 @@ void DX12Resources::beginRender()
     conf.descriptorHeapDesc = this->renderTarget->getDescriptorHeap()->GetDesc();
     conf.resourceDesc = this->renderTarget->getResource(this->frameIndex)->GetDesc();
     OffScreenRenderTargetCacheManager::getInstance().setConf(conf);
-
 }
 
 /// <summary>
@@ -66,7 +83,7 @@ void DX12Resources::endRender()
     //offscreenを1枚のテクスチャにまとめる描画開始処理
     this->compositeRenderTarget->beginRender(this->renderContext.get(), this->viewport, this->currentFrameBufferDSVHandle);
     //offscreenを1枚のテクスチャにまとめる描画処理
-    this->compositeRenderTarget->render(this->renderContext.get(), this->device.Get());
+    this->compositeRenderTarget->render(this->renderContext.get(), this->device.Get(), this->currentFrameBufferDSVHandle);
     //offscreenを1枚のテクスチャにまとめる描画終了処理
     this->compositeRenderTarget->endRender(this->renderContext.get());
 
@@ -74,22 +91,25 @@ void DX12Resources::endRender()
 
     //レンダーターゲットの設定
     this->setMainRTVHandle();
-    this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
-    
+
     //ビューポートとシザリング矩形の設定
+    this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
+    this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
     this->renderContext->setViewport(this->viewport);
     this->renderContext->setScissorRect(this->viewport);
-    this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
 
     //深度ステンシルのクリア
     this->renderContext->clearRenderTarget(this->currentFrameBufferRTVHandle, this->backGroundColor);
     this->renderContext->clearDepthStencil(this->currentFrameBufferDSVHandle, 1.0f);
 
     //offscreenをテクスチャとしたフルスクリーン四角形を描画
-    fullScreenQuad->draw(this->renderContext.get(), compositeRenderTarget.get());
+    fullScreenQuad->draw(this->renderContext.get(), this->device.Get(), compositeRenderTarget.get());
 
     //Mainレンダーターゲットの描画完了を待つ
     this->renderContext->TransitionMainRenderTargetAwait(this->renderTarget->getResource(this->frameIndex));
+
+    //リソースバリアの実行
+    //this->renderContext->ExecuteResourceBarriers();
 
     //コマンドのクローズ
     this->renderContext->close();
