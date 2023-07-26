@@ -46,10 +46,15 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device, D3D1
     rc->setVertexBuffer(this->vb.get());
 
     // SRVHeapの始点を取得
+    UINT slot = 0;
     for (auto& rt : OffScreenRenderTargetCacheManager::getInstance().getRenderTargetList())
     {
         //ディスクリプタヒープを設定
-        descriptorHeapCache->getOrCreate(device, rt->getResource(), this->SRVHeap.Get(), srvDesc);
+        DescriptorHeapCache::DescriptorHeapCacheConf dhcConf = {};
+        dhcConf.resource = rt->getResource();
+        dhcConf.slot = slot;
+        descriptorHeapCache->getOrCreate(device, dhcConf, this->SRVHeap.Get(), srvDesc);
+        slot++;
     }
     rc->setDescriptorHeap(this->SRVHeap.Get());
     //GPUハンドルをcommandlistに設定
@@ -125,7 +130,6 @@ void CompositeRenderTarget::createShaderResourceView(ID3D12Device* device)
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srvDesc.Texture2D.MipLevels = 1;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    //device->CreateShaderResourceView(this->resource.Get(), &srvDesc, this->SRVHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 /// <summary>
@@ -221,8 +225,8 @@ void CompositeRenderTarget::initPipelineStateObject(ID3D12Device* device)
     PSOConf.desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     PSOConf.desc.SampleMask = UINT_MAX;
     PSOConf.desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    //PSOConf.desc.DepthStencilState = dsDesc;
-    PSOConf.desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+    PSOConf.desc.DepthStencilState = dsDesc;
+    //PSOConf.desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     PSOConf.desc.InputLayout = { inputElementDesc, _countof(inputElementDesc) };
     PSOConf.desc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
     PSOConf.desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;

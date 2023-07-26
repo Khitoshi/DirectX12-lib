@@ -83,10 +83,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             dx12Resources->setBackGroundColor(color);
             dx12Resources->beginRender();
 
-            //シーン更新処理
-            SceneManager::getInstance().update();
-            //シーン描画処理
-            SceneManager::getInstance().render(sceneConf);
+
 
 #ifdef _DEBUG
 
@@ -121,6 +118,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->render(rc, device);
 
 #endif // _DEBUG
+
+            //シーン更新処理
+            SceneManager::getInstance().update();
+            //シーン描画処理
+            SceneManager::getInstance().render(sceneConf);
 
             //描画終了処理
             dx12Resources->endRender();
