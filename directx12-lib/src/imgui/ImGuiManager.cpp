@@ -49,6 +49,7 @@ void ImGuiManager::beginFrame(RenderContext* rc, ID3D12Device* device)
     auto viewport = OffScreenRenderTargetCacheManager::getInstance().getViewport();
 
     //ビューポートとシザリング矩形の設定
+    rc->transitionOffScreenRenderTargetBegin(resource);
     rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depthStencil, resource);
 
     // Start the Dear ImGui frame

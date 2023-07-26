@@ -22,9 +22,9 @@ class CompositeRenderTarget
 {
 public:
     struct CompositeRenderTargetConf {
-        D3D12_RESOURCE_DESC resourceDesc; 		    //バックバッファの設定
-        D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc;  //バックバッファで使用しているディスクリプタヒープの設定
-        float clearColor[4];                            //生成時のクリアカラー
+        D3D12_RESOURCE_DESC resource_desc; 		            //バックバッファの設定
+        D3D12_DESCRIPTOR_HEAP_DESC descriptor_heap_desc;    //バックバッファで使用しているディスクリプタヒープの設定
+        float clear_color[4];                               //生成時のクリアカラー
     };
 
 public:
@@ -46,9 +46,9 @@ public:
     //初期化
     void init(ID3D12Device* device);
     //描画初期処理
-    void beginRender(RenderContext* rc, D3D12_VIEWPORT viewport, D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle);
+    void beginRender(RenderContext* rc, D3D12_CPU_DESCRIPTOR_HANDLE depthStencil_view_handle);
     //描画処理
-    void render(RenderContext* rc, ID3D12Device* device, D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle);
+    void render(RenderContext* rc, ID3D12Device* device);
     //描画終了処理
     void endRender(RenderContext* rc);
 
@@ -58,11 +58,11 @@ private:
     //シェーダーリソースビューのディスクリプタヒープを作成
     void createSRVHeap(ID3D12Device* device);
     //シェーダーリソースビューを作成
-    void createShaderResourceView(ID3D12Device* device);
+    void createSRVDesc(ID3D12Device* device);
     //レンダーターゲットビューのディスクリプタヒープを作成
     void createRTVHeap(ID3D12Device* device);
     //レンダーターゲットビューを作成
-    void createRenderTargetView(ID3D12Device* device);
+    void createRTV(ID3D12Device* device);
 
     //ルートシグネチャの作成
     void initRootSignature(ID3D12Device* device);
@@ -74,6 +74,7 @@ private:
     void initVertexBuffer(ID3D12Device* device);
     //ディスクリプタヒープキャッシュマネージャーの作成
     void initDescriptorHeapCache();
+
 public://取得系
     //リソースの取得
     ID3D12Resource* getResource() const { return resource_.Get(); }
@@ -91,17 +92,17 @@ private:
         DirectX::XMFLOAT2 uv;		//テクスチャ座標
     };
 
-    CompositeRenderTargetConf conf_;			                    //設定
+    CompositeRenderTargetConf conf_;			                    //クラスの設定
 
     ComPtr<ID3D12Resource> resource_;		                        //リソース
     ComPtr<ID3D12DescriptorHeap> srv_heap_;                         //シェーダーリソースビューディスクリプタヒープ
     ComPtr<ID3D12DescriptorHeap> rtv_heap_;                         //レンダーターゲットビューディスクリプタヒープ
 
     std::shared_ptr<PipelineStateObject> pso_;                      //パイプラインステートオブジェクト
-    std::shared_ptr<VertexBuffer> vertex_buffer_;                              //頂点バッファ
+    std::shared_ptr<VertexBuffer> vertex_buffer_;                   //頂点バッファ
     std::shared_ptr<RootSignature> root_signature_;                 //ルートシグニチャ
-    std::shared_ptr<Shader> pixel_shader_;                                     //ピクセルシェーダー
-    std::shared_ptr<Shader> vertex_shader_;                                     //頂点シェーダー
+    std::shared_ptr<Shader> pixel_shader_;                          //ピクセルシェーダー
+    std::shared_ptr<Shader> vertex_shader_;                         //頂点シェーダー
     D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc_;                      //シェーダーリソースビューの設定
 
     std::shared_ptr<DescriptorHeapCache> descriptor_heap_cache_;    //ディスクリプタヒープキャッシュマネージャー

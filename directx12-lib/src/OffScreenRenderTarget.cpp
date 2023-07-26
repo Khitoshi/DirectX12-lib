@@ -25,7 +25,7 @@ void OffScreenRenderTarget::beginRender(RenderContext* rc)
     rc->setScissorRect(this->viewport);
 
     //レンダーターゲットのRESOURCE_BARRIER設定
-    rc->TransitionTemporaryRenderTargetBegin(this->resource.Get());
+    rc->transitionOffScreenRenderTargetBegin(this->resource.Get());
 
     //レンダーターゲットを設定
     rc->setRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), this->depthStencilViewHandle);
@@ -42,7 +42,7 @@ void OffScreenRenderTarget::beginRender(RenderContext* rc)
 void OffScreenRenderTarget::endRender(RenderContext* rc)
 {
     //レンダーターゲットのRESOURCE_BARRIER設定
-    rc->TransitionTemporaryRenderTargetAwait(this->resource.Get());
+    rc->transitionOffScreenRenderTargetEnd(this->resource.Get());
 }
 
 /// <summary>

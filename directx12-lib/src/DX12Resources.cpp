@@ -81,9 +81,9 @@ void DX12Resources::beginRender()
 void DX12Resources::endRender()
 {
     //offscreenを1枚のテクスチャにまとめる描画開始処理
-    this->compositeRenderTarget->beginRender(this->renderContext.get(), this->viewport, this->currentFrameBufferDSVHandle);
+    this->compositeRenderTarget->beginRender(this->renderContext.get(), this->currentFrameBufferDSVHandle);
     //offscreenを1枚のテクスチャにまとめる描画処理
-    this->compositeRenderTarget->render(this->renderContext.get(), this->device.Get(), this->currentFrameBufferDSVHandle);
+    this->compositeRenderTarget->render(this->renderContext.get(), this->device.Get());
     //offscreenを1枚のテクスチャにまとめる描画終了処理
     this->compositeRenderTarget->endRender(this->renderContext.get());
 
@@ -93,7 +93,8 @@ void DX12Resources::endRender()
     this->setMainRTVHandle();
 
     //ビューポートとシザリング矩形の設定
-    this->renderContext->TransitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
+    this->renderContext->transitionMainRenderTargetBegin(this->renderTarget->getResource(this->frameIndex));
+    this->renderContext->executeResourceBarriers();
     this->renderContext->setRenderTarget(this->currentFrameBufferRTVHandle, this->currentFrameBufferDSVHandle);
     this->renderContext->setViewport(this->viewport);
     this->renderContext->setScissorRect(this->viewport);
@@ -106,10 +107,10 @@ void DX12Resources::endRender()
     fullScreenQuad->draw(this->renderContext.get(), this->device.Get(), compositeRenderTarget.get());
 
     //Mainレンダーターゲットの描画完了を待つ
-    this->renderContext->TransitionMainRenderTargetAwait(this->renderTarget->getResource(this->frameIndex));
+    this->renderContext->transitionMainRenderTargetEnd(this->renderTarget->getResource(this->frameIndex));
 
     //リソースバリアの実行
-    //this->renderContext->ExecuteResourceBarriers();
+    this->renderContext->executeResourceBarriers();
 
     //コマンドのクローズ
     this->renderContext->close();
@@ -421,12 +422,12 @@ std::shared_ptr<RenderTarget> DX12Resources::createRenderTarget(const int width,
 std::shared_ptr<CompositeRenderTarget> DX12Resources::createCompositeRenderTarget()
 {
     CompositeRenderTarget::CompositeRenderTargetConf conf = {};
-    conf.resourceDesc = this->renderTarget->getResource(0)->GetDesc();
-    conf.descriptorHeapDesc = this->renderTarget->getDescriptorHeap()->GetDesc();
-    conf.clearColor[0] = this->backGroundColor[0];
-    conf.clearColor[1] = this->backGroundColor[1];
-    conf.clearColor[2] = this->backGroundColor[2];
-    conf.clearColor[3] = this->backGroundColor[3];
+    conf.resource_desc = this->renderTarget->getResource(0)->GetDesc();
+    conf.descriptor_heap_desc = this->renderTarget->getDescriptorHeap()->GetDesc();
+    conf.clear_color[0] = this->backGroundColor[0];
+    conf.clear_color[1] = this->backGroundColor[1];
+    conf.clear_color[2] = this->backGroundColor[2];
+    conf.clear_color[3] = this->backGroundColor[3];
     std::shared_ptr<CompositeRenderTarget> crt = {};
     crt = std::make_shared<CompositeRenderTarget>(conf);
     crt->init(this->device.Get());

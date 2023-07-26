@@ -131,7 +131,7 @@ public:
     /// TARGET -> PRESENT
     /// </summary>
     /// <param name="renderTarget">状態遷移させるリソース</param>
-    void TransitionMainRenderTargetAwait(ID3D12Resource* renderTarget)
+    void transitionMainRenderTargetEnd(ID3D12Resource* renderTarget)
     {
         //リソースバリアで、グラフィックスパイプラインでリソースの使用方法が変更されるタイミングを制御
         CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -139,8 +139,7 @@ public:
             D3D12_RESOURCE_STATE_RENDER_TARGET,
             D3D12_RESOURCE_STATE_PRESENT);
         //バリアをコマンドリストに追加
-        this->commandList->ResourceBarrier(1, &barrier);
-        //this->barriers.push_back(barrier);
+        this->barriers.push_back(barrier);
     }
 
     /// <summary>
@@ -149,15 +148,14 @@ public:
     /// に遷移
     /// </summary>
     /// <param name="renderTarget">状態遷移させるリソース</param>
-    void TransitionMainRenderTargetBegin(ID3D12Resource* renderTarget) {
+    void transitionMainRenderTargetBegin(ID3D12Resource* renderTarget) {
         //リソースバリアで、グラフィックスパイプラインでリソースの使用方法が変更されるタイミングを制御
         CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
             renderTarget,
             D3D12_RESOURCE_STATE_PRESENT,
             D3D12_RESOURCE_STATE_RENDER_TARGET);
         //バリアをコマンドリストに追加
-        this->commandList->ResourceBarrier(1, &barrier);
-        //this->barriers.push_back(barrier);
+        this->barriers.push_back(barrier);
     }
 
 
@@ -165,7 +163,7 @@ public:
     /// OffScreenRenderTargetへの描き込み開始
     /// </summary>
     /// <param name="renderTarget">レンダーターゲット</param>
-    void TransitionTemporaryRenderTargetBegin(ID3D12Resource* renderTarget)
+    void transitionOffScreenRenderTargetBegin(ID3D12Resource* renderTarget)
     {
         //リソースバリアで、グラフィックスパイプラインでリソースの使用方法が変更されるタイミングを制御
         CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -173,15 +171,14 @@ public:
             D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
             D3D12_RESOURCE_STATE_RENDER_TARGET);
         //バリアをコマンドリストに追加
-        this->commandList->ResourceBarrier(1, &barrier);
-        //this->barriers.push_back(barrier);
+        this->barriers.push_back(barrier);
     }
 
     /// <summary>
     /// OffScreenRenderTargetへの描き込み待ち
     /// </summary>
     /// <param name="renderTarget">レンダーターゲット</param>
-    void TransitionTemporaryRenderTargetAwait(ID3D12Resource* renderTarget)
+    void transitionOffScreenRenderTargetEnd(ID3D12Resource* renderTarget)
     {
         //リソースバリアで、グラフィックスパイプラインでリソースの使用方法が変更されるタイミングを制御
         CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -189,14 +186,13 @@ public:
             D3D12_RESOURCE_STATE_RENDER_TARGET,
             D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
         //バリアをコマンドリストに追加
-        this->commandList->ResourceBarrier(1, &barrier);
-        //this->barriers.push_back(barrier);
+        this->barriers.push_back(barrier);
     }
 
     /// <summary>
     /// リソースバリアの実行
     /// </summary>
-    void ExecuteResourceBarriers()
+    void executeResourceBarriers()
     {
         if (!this->barriers.empty()) {
             this->commandList->ResourceBarrier(static_cast<UINT>(this->barriers.size()), barriers.data());
@@ -261,8 +257,6 @@ public:
     {
         auto ds = cbv->getDescriptorHeap();
         this->commandList->SetDescriptorHeaps(1, &ds);
-        //this->commandList->SetGraphicsRootConstantBufferView(0, cbv->getConstantBufferViewGPUVirtualAddress());
-        //this->commandList->SetGraphicsRootDescriptorTable(0, cbv->getGPUDescriptorHandleForHeapStart());
         this->setGraphicsRootDescriptorTable(0, cbv->getGPUDescriptorHandleForHeapStart());
     }
 
@@ -272,7 +266,6 @@ public:
     /// <param name="indexCount">インデックスの要素数</param>
     void drawIndexed(UINT indexCount) {
         this->commandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
-        //this->commandList->DrawInstanced(indexCount, 1, 0, 0);
     }
     /// <summary>
     /// インデックスなしの描画コールを実行
@@ -305,16 +298,26 @@ public:
         this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
     }
 
+    /// <summary>
+    /// 単純な描画開始処理
+    /// </summary>
+    /// <param name="rtvHandle">レンダーターゲットビューハンドル</param>
+    /// <param name="dsvHandle">深度ステンシルビューハンドル</param>
+    /// <param name="rtvResource">レンダーターゲットのリソース</param>
     void simpleStart(D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle, ID3D12Resource* rtvResource)
     {
+        //リソースバリアの実行
+        this->executeResourceBarriers();
+
         float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
         //レンダーターゲットを設定
         this->setRenderTarget(rtvHandle, dsvHandle);
+
         //ビューポートとシザー矩形を設定
         this->setViewport(currentViewport);
         this->setScissorRect(currentViewport);
-        //レンダーターゲットのRESOURCE_BARRIER設定
-        this->TransitionTemporaryRenderTargetBegin(rtvResource);
+
         //レンダーターゲットのクリア
         this->clearRenderTarget(rtvHandle, color);
         //深度ステンシルのクリア
@@ -329,8 +332,8 @@ private:
     enum { MAX_CONSTANT_BUFFER = 8 };	//定数バッファの最大数
     enum { MAX_SHADER_RESOURCE = 16 };	//シェーダーリソースの最大数
 
-    ID3D12GraphicsCommandList4* commandList;                        //コマンドリスト
-    D3D12_VIEWPORT currentViewport;				                    //現在のビューポート
-    //float currentBackGroundColor[4];                                                 //クリアカラー
-    std::vector<CD3DX12_RESOURCE_BARRIER> barriers;
+    ID3D12GraphicsCommandList4* commandList;        //コマンドリスト
+    D3D12_VIEWPORT currentViewport;				    //現在のビューポート
+
+    std::vector<CD3DX12_RESOURCE_BARRIER> barriers; //RESOURCE_BARRIERのリスト
 };

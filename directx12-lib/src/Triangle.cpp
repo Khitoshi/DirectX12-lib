@@ -27,6 +27,7 @@ void Triangle::draw(RenderContext* rc)
     auto viewport = OffScreenRenderTargetCacheManager::getInstance().getViewport();
 
     //ビューポートとシザリング矩形の設定
+    rc->transitionOffScreenRenderTargetBegin(resource);
     rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depthStencil, resource);
 
 
