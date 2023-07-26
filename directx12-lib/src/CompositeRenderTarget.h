@@ -1,12 +1,23 @@
 #pragma once
-#include "d3dx12.h"
-#include "PipelineStateObject.h"
-#include "VertexBuffer.h"
-#include "RenderContext.h"
-#include "RootSignature.h"
-#include "Shader.h"
-#include "DescriptorHeapCache.h"
+#include <d3d12.h>
+#include <DirectXMath.h>
+#include <wrl.h>
 
+#include "d3dx12.h"
+
+class   RootSignature;
+class   RenderContext;
+class   VertexBuffer;
+class   PipelineStateObject;
+class   DescriptorHeapCache;
+class   Shader;
+
+
+using Microsoft::WRL::ComPtr;
+
+/// <summary>
+/// オフスクリーンを1枚のテクスチャに合成するクラス
+/// </summary>
 class CompositeRenderTarget
 {
 public:
@@ -18,19 +29,27 @@ public:
 
 public:
     CompositeRenderTarget(CompositeRenderTargetConf c) :
-        conf(c),
-        resource(),
-        SRVHeap(),
-        RTVHeap(),
-        srvDesc(),
-        descriptorHeapCache()
+        conf_(c),
+        resource_(),
+        srv_heap_(),
+        rtv_heap_(),
+        pso_(),
+        vertex_buffer_(),
+        root_signature_(),
+        pixel_shader_(),
+        vertex_shader_(),
+        srv_desc_(),
+        descriptor_heap_cache_()
     {};
     ~CompositeRenderTarget() {};
 
     //初期化
     void init(ID3D12Device* device);
+    //描画初期処理
     void beginRender(RenderContext* rc, D3D12_VIEWPORT viewport, D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle);
+    //描画処理
     void render(RenderContext* rc, ID3D12Device* device, D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle);
+    //描画終了処理
     void endRender(RenderContext* rc);
 
 private:
@@ -51,17 +70,19 @@ private:
     void initShader(ID3D12Device* device);
     //パイプラインステートオブジェクトの作成
     void initPipelineStateObject(ID3D12Device* device);
-
     //頂点バッファの作成
     void initVertexBuffer(ID3D12Device* device);
-
-public://設定系
-    //void setDepthStencil(const D3D12_CPU_DESCRIPTOR_HANDLE cdh) { this->depthStencilViewHandle = cdh; }       //深度ステンシルの設定
-    //void setViewport(D3D12_VIEWPORT vp) { viewport = vp; }             //ビューポートの設定
+    //ディスクリプタヒープキャッシュマネージャーの作成
+    void initDescriptorHeapCache();
 public://取得系
-    ID3D12Resource* getResource() const { return resource.Get(); }      //リソースの取得
-    ID3D12DescriptorHeap* getSRVHeap() const { return SRVHeap.Get(); }  //シェーダーリソースビューディスクリプタヒープの取得
-    ID3D12DescriptorHeap* getRTVHeap() const { return RTVHeap.Get(); }  //レンダーターゲットビューディスクリプタヒープの取得
+    //リソースの取得
+    ID3D12Resource* getResource() const { return resource_.Get(); }
+
+    //シェーダーリソースビューディスクリプタヒープの取得
+    ID3D12DescriptorHeap* getSRVHeap() const { return srv_heap_.Get(); }
+
+    //レンダーターゲットビューディスクリプタヒープの取得
+    ID3D12DescriptorHeap* getRTVHeap() const { return rtv_heap_.Get(); }
 private:
     //頂点データ
     struct Vertex
@@ -70,15 +91,18 @@ private:
         DirectX::XMFLOAT2 uv;		//テクスチャ座標
     };
 
-    CompositeRenderTargetConf conf;			            //設定
-    ComPtr<ID3D12Resource> resource;		            //リソース
-    ComPtr<ID3D12DescriptorHeap> SRVHeap;               //シェーダーリソースビューディスクリプタヒープ
-    ComPtr<ID3D12DescriptorHeap> RTVHeap;               //レンダーターゲットビューディスクリプタヒープ
+    CompositeRenderTargetConf conf_;			                    //設定
 
-    std::shared_ptr<PipelineStateObject> pso;           //パイプラインステートオブジェクト
-    std::shared_ptr<VertexBuffer> vb;                   //頂点バッファ
-    std::shared_ptr<RootSignature> rootSignature;       //ルートシグニチャ
-    BasicShaderPair shaderPair;                         //シェーダーペア
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
-    std::shared_ptr<DescriptorHeapCache> descriptorHeapCache;       //ディスクリプタヒープキャッシュマネージャー
+    ComPtr<ID3D12Resource> resource_;		                        //リソース
+    ComPtr<ID3D12DescriptorHeap> srv_heap_;                         //シェーダーリソースビューディスクリプタヒープ
+    ComPtr<ID3D12DescriptorHeap> rtv_heap_;                         //レンダーターゲットビューディスクリプタヒープ
+
+    std::shared_ptr<PipelineStateObject> pso_;                      //パイプラインステートオブジェクト
+    std::shared_ptr<VertexBuffer> vertex_buffer_;                              //頂点バッファ
+    std::shared_ptr<RootSignature> root_signature_;                 //ルートシグニチャ
+    std::shared_ptr<Shader> pixel_shader_;                                     //ピクセルシェーダー
+    std::shared_ptr<Shader> vertex_shader_;                                     //頂点シェーダー
+    D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc_;                      //シェーダーリソースビューの設定
+
+    std::shared_ptr<DescriptorHeapCache> descriptor_heap_cache_;    //ディスクリプタヒープキャッシュマネージャー
 };
