@@ -1,5 +1,6 @@
 #include "Sprite.h"
 //#include "ShaderCacheManager.h"
+#include "OffScreenRenderTargetCacheManager.h"
 /// <summary>
 /// 初期化処理
 /// </summary>
@@ -12,9 +13,13 @@ void Sprite::init()
     initVertexBuffer();
     initIndexBuffer();
     initTexture();
-
+    /*
     this->rotationEffect = std::make_shared<RotationEffect>();
     this->rotationEffect->init(conf.device, conf.camera);
+    */
+
+
+    initOffScreenRenderTarget();
 }
 
 /// <summary>
@@ -23,6 +28,18 @@ void Sprite::init()
 /// <param name="rc"></param>
 void Sprite::draw(RenderContext* rc)
 {
+    {
+        //オフスクリーンレンダーターゲットで書き込みできる状態にする
+        auto renderTarget = offScreenRenderTarget->getRTVHeap();
+        auto resource = offScreenRenderTarget->getResource();
+        auto depthStencil = OffScreenRenderTargetCacheManager::getInstance().getDepthStencilViewHandle();
+        auto viewport = OffScreenRenderTargetCacheManager::getInstance().getViewport();
+
+        //ビューポートとシザリング矩形の設定
+        rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depthStencil, resource);
+    }
+
+
     //ルートシグネチャを設定。
     rc->setRootSignature(this->rootSignature.get());
     //パイプラインステートを設定。
@@ -39,10 +56,15 @@ void Sprite::draw(RenderContext* rc)
     //ドローコール
     rc->drawIndexed(this->numIndices);
 
-
+    /*
     this->rotationEffect->update(rc, conf.camera, this->vertexBuffer.get(), this->indexBuffer.get(), this->numIndices);
     rc->setIndexBuffer(this->indexBuffer.get());
     rc->setVertexBuffer(this->vertexBuffer.get());
+    */
+
+    //オフスクリーンレンダーターゲットの書き込みを終了する。
+    offScreenRenderTarget->endRender(rc);
+    OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(offScreenRenderTarget.get());
 }
 
 /// <summary>
@@ -196,4 +218,14 @@ void Sprite::initTexture()
     textureConf.filePath = conf.filePath;
     texture = std::make_shared<Texture>(textureConf);
     texture->Load();
+}
+
+
+
+void Sprite::initOffScreenRenderTarget()
+{
+    OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
+    osrtConf = OffScreenRenderTargetCacheManager::getInstance().getConf();
+    offScreenRenderTarget = std::make_shared<OffScreenRenderTarget>(osrtConf);
+    offScreenRenderTarget->init(conf.device);
 }

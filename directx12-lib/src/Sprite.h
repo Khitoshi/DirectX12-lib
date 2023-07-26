@@ -8,6 +8,7 @@
 #include "RootSignatureCacheManager.h"
 #include "ShaderCacheManager.h"
 #include "PSOCacheManager.h"
+#include "OffScreenRenderTarget.h"
 #include "RotationEffect.h"
 #include <memory>
 #include <DirectXMath.h>
@@ -62,7 +63,8 @@ private:
     void initIndexBuffer();
     //テクスチャの作成
     void initTexture();
-
+    //オフスクリーンレンダーターゲットの作成
+    void initOffScreenRenderTarget();
 public:
     //頂点データ
     struct Vertex
@@ -120,5 +122,5 @@ private:
     std::shared_ptr<Rotation> rotation;												//回転
 
     std::shared_ptr<RotationEffect> rotationEffect;									//回転エフェクト
-
+    std::shared_ptr<OffScreenRenderTarget> offScreenRenderTarget;					//オフスクリーンレンダーターゲット
 };
