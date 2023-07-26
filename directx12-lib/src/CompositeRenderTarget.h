@@ -12,7 +12,6 @@ class   PipelineStateObject;
 class   DescriptorHeapCache;
 class   Shader;
 
-
 using Microsoft::WRL::ComPtr;
 
 /// <summary>
@@ -21,6 +20,7 @@ using Microsoft::WRL::ComPtr;
 class CompositeRenderTarget
 {
 public:
+    //初期化時に必要な情報
     struct CompositeRenderTargetConf {
         D3D12_RESOURCE_DESC resource_desc; 		            //バックバッファの設定
         D3D12_DESCRIPTOR_HEAP_DESC descriptor_heap_desc;    //バックバッファで使用しているディスクリプタヒープの設定

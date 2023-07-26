@@ -445,13 +445,13 @@ std::shared_ptr<CompositeRenderTarget> DX12Resources::createCompositeRenderTarge
 /// </returns>
 std::shared_ptr<DepthStencil> DX12Resources::createDepthStencil(const int width, const int height, const UINT frameBufferCount)
 {
-    std::shared_ptr<DepthStencil> depthStencil = std::make_shared<DepthStencil>();
-    DepthStencilConf conf = {};
-    conf.device = this->device.Get();
-    conf.width = width;
-    conf.height = height;
-    conf.frameBufferCount = frameBufferCount;
-    depthStencil->init(conf);
+    DepthStencil::DepthStencilConf ds_conf = {};
+    ds_conf.width = width;
+    ds_conf.height = height;
+    ds_conf.frame_buffer_count = frameBufferCount;
+
+    std::shared_ptr<DepthStencil> depthStencil = std::make_shared<DepthStencil>(ds_conf);
+    depthStencil->init(this->device.Get());
     return depthStencil;
 }
 

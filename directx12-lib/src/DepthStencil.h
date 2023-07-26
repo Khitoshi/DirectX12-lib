@@ -6,40 +6,47 @@
 using namespace Microsoft::WRL;
 
 /// <summary>
-/// 深度ステンシルバッファ生成時に使用する設定
-/// </summary>
-struct DepthStencilConf
-{
-    ID3D12Device* device;
-    UINT frameBufferCount;
-    UINT width;
-    UINT height;
-};
-
-/// <summary>
 /// 深度ステンシルバッファ生成用クラス
 /// </summary>
 class DepthStencil
 {
 public:
-    DepthStencil() :descriptorHeap(), resource() {};
+    /// <summary>
+    /// 深度ステンシルバッファ生成時に使用する設定
+    /// </summary>
+    struct DepthStencilConf
+    {
+        UINT frame_buffer_count;    //フレームバッファ数
+        UINT width;                 //幅
+        UINT height;                //高さ
+    };
+
+public:
+    DepthStencil(const DepthStencilConf c) :conf_(c), descriptor_heap_(), resource_() {};
     ~DepthStencil() {};
 
     //初期化処理
-    void init(const DepthStencilConf depthStencilConf);
+    void init(ID3D12Device* device);
 
 private:
     //ディスクリプタヒープの生成
-    ComPtr<ID3D12DescriptorHeap> createDescriptorHeap(const DepthStencilConf depthStencilConf);
+    void createDescriptorHeap(ID3D12Device* device);
 
     //リソースの生成
-    void createResource(const DepthStencilConf depthStencilConf);
+    void createResource(ID3D12Device* device);
+
+    //深度ステンシルビュー生成
+    void createDSV(ID3D12Device* device);
 
 public:
-    ID3D12DescriptorHeap* getDescriptorHeap() const { return descriptorHeap.Get(); }    //ディスクリプタヒープの取得
-    ID3D12Resource* getResource() const { return resource.Get(); }                      //リソースの取得
+    //ディスクリプタヒープの取得
+    ID3D12DescriptorHeap* getDescriptorHeap() const { return descriptor_heap_.Get(); }
+
+    //リソースの取得
+    ID3D12Resource* getResource() const { return resource_.Get(); }
 
 private:
-    ComPtr<ID3D12DescriptorHeap>    descriptorHeap;         //ディスクリプタヒープ
-    ComPtr<ID3D12Resource>          resource;               //リソース
+    DepthStencilConf conf_;                             //深度ステンシルバッファ生成時に使用する設定
+    ComPtr<ID3D12DescriptorHeap>    descriptor_heap_;   //ディスクリプタヒープ
+    ComPtr<ID3D12Resource>          resource_;          //リソース
 };
