@@ -10,9 +10,9 @@
 #include "Triangle.h"
 #include "SceneDefault.h"
 #include "SceneManager.h"
-
+#include "DeviceContext.h"
 #ifdef _DEBUG
-#include "imgui\ImGuiManager.h"
+#include "imgui/ImGuiManager.h"
 #endif // !_DEBUG
 
 //デバッグ用出力関数
@@ -27,7 +27,6 @@ void DebugOutputFormatString(const char* format, ...) {
 #endif
 }
 
-#define FRAMEBUFFERCOUNT 2
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
     try {
@@ -43,16 +42,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         ResourceManager::getInstance()->registerResource("window", window);
 
         //DX12初期化処理
-        float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
         std::shared_ptr <DX12Resources> dx12Resources = std::make_shared<DX12Resources>();
-        dx12Resources->setBackGroundColor(color);
-        dx12Resources->init(ResourceManager::getInstance()->getResource<Window>("window")->getHWND(), winConf.width, winConf.height, FRAMEBUFFERCOUNT);
+        dx12Resources->init(ResourceManager::getInstance()->getResource<Window>("window")->getHWND(), winConf.width, winConf.height);
         ResourceManager::getInstance()->registerResource("dx12Resources", dx12Resources);
         dx12Resources = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources");
 #ifdef _DEBUG//imgui初期化処理
         ImGuiManagerConf imguiConf = {};
-        imguiConf.device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDevice();
-        imguiConf.frameBufferCount = FRAMEBUFFERCOUNT;
+        imguiConf.device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDeviceContext()->getDevice();
         imguiConf.hWnd = ResourceManager::getInstance()->getResource<Window>("window")->getHWND();
         std::shared_ptr<ImGuiManager> imguiManager = std::make_shared<ImGuiManager>();
         imguiManager->init(imguiConf);
@@ -60,7 +56,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif // _DEBUG
 
         //デバイス取得
-        auto device = dx12Resources->getDevice();
+        auto device = dx12Resources->getDeviceContext()->getDevice();
         //レンダーコンテキスト取得
         auto rc = dx12Resources->getRenderContext();
         //シーン共通の描画設定
@@ -80,10 +76,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif // _DEBUG
         while (ResourceManager::getInstance()->getResource<Window>("window")->processMessages()) {
             //描画開始処理
-            dx12Resources->setBackGroundColor(color);
             dx12Resources->beginRender();
-
-
 
 #ifdef _DEBUG
 
@@ -91,9 +84,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->beginFrame(rc, device);
             {
                 ImGui::Begin("System");
-
-                //背景色変更
-                //ImGui::ColorEdit4("back color", color);
 
                 //マウス座標表示
                 ImVec2 mousePos = ImGui::GetIO().MousePos;

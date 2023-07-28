@@ -30,10 +30,6 @@ public:
             hash_combine(seed, k.descriptorHeapDesc.NumDescriptors);
             hash_combine(seed, k.descriptorHeapDesc.Type);
 
-            hash_combine(seed, k.clearColor[0]);
-            hash_combine(seed, k.clearColor[1]);
-            hash_combine(seed, k.clearColor[2]);
-            hash_combine(seed, k.clearColor[3]);
             return seed;
         }
     };

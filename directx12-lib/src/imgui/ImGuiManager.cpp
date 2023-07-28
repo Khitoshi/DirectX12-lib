@@ -1,7 +1,7 @@
 #include "ImGuiManager.h"
 #include <stdexcept>
-#include "..\OffScreenRenderTargetCacheManager.h"
-
+#include "../OffScreenRenderTargetCacheManager.h"
+#include "../CommonGraphicsConfig.h"
 /// <summary>
 /// imguiの初期化
 /// </summary>
@@ -24,7 +24,7 @@ void ImGuiManager::init(const ImGuiManagerConf conf)
     ImGui_ImplWin32_Init(conf.hWnd);
     ImGui_ImplDX12_Init(
         conf.device,
-        conf.frameBufferCount,
+        frameBufferCount,
         DXGI_FORMAT_R8G8B8A8_UNORM,
         this->descriptorHeap.Get(),
         this->descriptorHeap->GetCPUDescriptorHandleForHeapStart(),
@@ -50,7 +50,8 @@ void ImGuiManager::beginFrame(RenderContext* rc, ID3D12Device* device)
 
     //ビューポートとシザリング矩形の設定
     rc->transitionOffScreenRenderTargetBegin(resource);
-    rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depthStencil, resource);
+    //rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depthStencil, resource);
+    rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depthStencil);
 
     // Start the Dear ImGui frame
     ImGui_ImplDX12_NewFrame();
@@ -102,7 +103,7 @@ ComPtr<ID3D12DescriptorHeap> ImGuiManager::createDescriptorHeap(const ImGuiManag
 {
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.NumDescriptors = conf.frameBufferCount;
+    desc.NumDescriptors = frameBufferCount;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
     ComPtr<ID3D12DescriptorHeap> heap;

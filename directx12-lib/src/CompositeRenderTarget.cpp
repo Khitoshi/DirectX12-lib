@@ -4,7 +4,7 @@
 #include "RootSignatureCacheManager.h"
 #include "PSOCacheManager.h"
 #include "ShaderCacheManager.h"
-
+#include "CommonGraphicsConfig.h"
 #include <stdexcept>
 
 /// <summary>
@@ -36,7 +36,8 @@ void CompositeRenderTarget::beginRender(RenderContext* rc, D3D12_CPU_DESCRIPTOR_
     //リソースの状態を遷移
     rc->transitionOffScreenRenderTargetBegin(this->resource_.Get());
     //描画開始処理
-    rc->simpleStart(this->rtv_heap_->GetCPUDescriptorHandleForHeapStart(), depthStencil_view_handle, this->resource_.Get());
+    rc->simpleStart(this->rtv_heap_->GetCPUDescriptorHandleForHeapStart(), depthStencil_view_handle);
+    //rc->simpleStart(this->rtv_heap_->GetCPUDescriptorHandleForHeapStart(), depthStencil_view_handle, this->resource_.Get());
 }
 
 /// <summary>
@@ -98,7 +99,7 @@ void CompositeRenderTarget::createResource(ID3D12Device* device)
     desc = this->conf_.resource_desc;
     D3D12_HEAP_PROPERTIES heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     D3D12_CLEAR_VALUE clear_value = {};
-    clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, conf_.clear_color);
+    clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, backGroundColor);
     if (FAILED(device->CreateCommittedResource(
         &heap_prop,
         D3D12_HEAP_FLAG_NONE,

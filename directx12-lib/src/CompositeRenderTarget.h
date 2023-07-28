@@ -19,15 +19,15 @@ using Microsoft::WRL::ComPtr;
 /// </summary>
 class CompositeRenderTarget
 {
+    friend class CompositeRenderTargetFactory;
 public:
     //初期化時に必要な情報
     struct CompositeRenderTargetConf {
         D3D12_RESOURCE_DESC resource_desc; 		            //バックバッファの設定
         D3D12_DESCRIPTOR_HEAP_DESC descriptor_heap_desc;    //バックバッファで使用しているディスクリプタヒープの設定
-        float clear_color[4];                               //生成時のクリアカラー
     };
 
-public:
+private:
     CompositeRenderTarget(CompositeRenderTargetConf c) :
         conf_(c),
         resource_(),
@@ -41,10 +41,9 @@ public:
         srv_desc_(),
         descriptor_heap_cache_()
     {};
+public:
     ~CompositeRenderTarget() {};
 
-    //初期化
-    void init(ID3D12Device* device);
     //描画初期処理
     void beginRender(RenderContext* rc, D3D12_CPU_DESCRIPTOR_HANDLE depthStencil_view_handle);
     //描画処理
@@ -53,6 +52,8 @@ public:
     void endRender(RenderContext* rc);
 
 private:
+    //初期化
+    void init(ID3D12Device* device);
     //リソースを作成
     void createResource(ID3D12Device* device);
     //シェーダーリソースビューのディスクリプタヒープを作成

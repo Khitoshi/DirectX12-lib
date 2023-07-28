@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "OffScreenRenderTarget.h"
+#include "CommonGraphicsConfig.h"
 
 /// <summary>
 /// 初期化
@@ -20,19 +21,8 @@ void OffScreenRenderTarget::init(ID3D12Device* device)
 /// <param name="rc">レンダーコンテキスト</param>
 void OffScreenRenderTarget::beginRender(RenderContext* rc)
 {
-    //ビューポートとシザリング矩形の設定
-    rc->setViewport(this->viewport);
-    rc->setScissorRect(this->viewport);
-
-    //レンダーターゲットのRESOURCE_BARRIER設定
     rc->transitionOffScreenRenderTargetBegin(this->resource.Get());
-
-    //レンダーターゲットを設定
-    rc->setRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), this->depthStencilViewHandle);
-    //レンダーターゲットのクリア
-    rc->clearRenderTarget(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), conf.clearColor);
-    //深度ステンシルのクリア
-    rc->clearDepthStencil(depthStencilViewHandle, 1.0f);
+    rc->simpleStart(this->RTVHeap->GetCPUDescriptorHandleForHeapStart(), this->depthStencilViewHandle);
 }
 
 /// <summary>
@@ -55,7 +45,7 @@ void OffScreenRenderTarget::createResource(ID3D12Device* device)
     desc = this->conf.resourceDesc;
     D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     D3D12_CLEAR_VALUE clearValue = {};
-    clearValue = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, conf.clearColor);
+    clearValue = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, backGroundColor);
 
     if (FAILED(device->CreateCommittedResource(
         &heapProp,

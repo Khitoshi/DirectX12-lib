@@ -15,7 +15,6 @@ using namespace Microsoft::WRL;
 struct ImGuiManagerConf {
     HWND hWnd;
     ID3D12Device* device;
-    UINT frameBufferCount;
 };
 
 /// <summary>

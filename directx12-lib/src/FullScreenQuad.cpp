@@ -11,7 +11,7 @@ void FullScreenQuad::init(ID3D12Device* device)
     createRootSignature(device);
     createPipelineState(device);
     createSRVHeap(device);
-    this->numIndices = 4;
+    this->num_indices_ = 4;
 }
 
 /// <summary>
@@ -21,52 +21,52 @@ void FullScreenQuad::init(ID3D12Device* device)
 /// <param name="osrt">オフスクリーンレンダーターゲット</param>
 void FullScreenQuad::draw(RenderContext* rc, ID3D12Device* device, CompositeRenderTarget* crt)
 {
-    //ルートシグネチャを設定。
-    rc->setRootSignature(this->rootSignature.get());
-    //パイプラインステートを設定。
-    rc->setPipelineState(this->pso.get());
-    //プリミティブのトポロジーを設定。
+    //ルートシグネチャを設定
+    rc->setRootSignature(this->root_signature_.get());
+    //パイプラインステートを設定
+    rc->setPipelineState(this->pso_.get());
+    //プリミティブのトポロジーを設定
     rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    //頂点バッファを設定。
-    rc->setVertexBuffer(this->vertexBuffer.get());
-    //インデックスバッファを設定。
-    //rc->setTexture(crt->getSRVHeap(), 1);
+    //頂点バッファを設定
+    rc->setVertexBuffer(this->vertex_buffer_.get());
+    //ディスクリプタ作成
     this->createSRV(device, crt);
-    rc->setDescriptorHeap(this->SRVHeap.Get());
+    //SRVヒープを設定
+    rc->setDescriptorHeap(this->srv_heap_.Get());
     //GPUハンドルをcommandlistに設定
-    D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = this->SRVHeap->GetGPUDescriptorHandleForHeapStart();
+    D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = this->srv_heap_->GetGPUDescriptorHandleForHeapStart();
     rc->setGraphicsRootDescriptorTable(0, gpuHandle);
 
     //ドローコール
-    rc->drawInstanced(this->numIndices);
+    rc->drawInstanced(this->num_indices_);
 }
 
 /// <summary>
 /// Basicシェーダーのペア生成
 /// </summary>
-/// <param name="device">初期化&生成済みのGPUデバイス</param>
+/// <param name="device">GPUデバイス</param>
 void FullScreenQuad::createShader(ID3D12Device* device)
 {
-    {
+    {//頂点シェーダー
         ShaderConf conf = {};
         conf.currentShaderModelType = ShaderConf::ShaderModelType::Vertex;
         conf.entryFuncName = "VSMain";
         conf.filePath = "./src/shaders/FullScreenQuadVS.hlsl";
-        basicShaderPair.vertexShader = ShaderCacheManager::getInstance().getOrCreate(conf);
+        this->vertex_shader_ = ShaderCacheManager::getInstance().getOrCreate(conf);
     }
-    {
+    {//ピクセルシェーダー
         ShaderConf conf = {};
         conf.currentShaderModelType = ShaderConf::ShaderModelType::Pixel;
         conf.entryFuncName = "PSMain";
         conf.filePath = "./src/shaders/FullScreenQuadPS.hlsl";
-        basicShaderPair.pixelShader = ShaderCacheManager::getInstance().getOrCreate(conf);
+        this->pixel_shader_ = ShaderCacheManager::getInstance().getOrCreate(conf);
     }
 }
 
 /// <summary>
 /// 頂点バッファの作成
 /// </summary>
-/// <param name="device">初期化&生成済みのGPUデバイス</param>
+/// <param name="device">GPUデバイス</param>
 void FullScreenQuad::createVertexBuffer(ID3D12Device* device)
 {
     //頂点バッファの作成
@@ -81,9 +81,9 @@ void FullScreenQuad::createVertexBuffer(ID3D12Device* device)
     conf.device = device;
     conf.size = sizeof(vertices);
     conf.stride = sizeof(Vertex);
-    vertexBuffer = std::make_shared<VertexBuffer>();
-    vertexBuffer->init(conf);
-    vertexBuffer->copy(vertices);
+    vertex_buffer_ = std::make_shared<VertexBuffer>();
+    vertex_buffer_->init(conf);
+    vertex_buffer_->copy(vertices);
 }
 
 /// <summary>
@@ -103,7 +103,7 @@ void FullScreenQuad::createRootSignature(ID3D12Device* device)
     conf.maxSrvDescriptor = 1;
     conf.offsetInDescriptorsFromTableStartSRV = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-    this->rootSignature = RootSignatureCacheManager::getInstance().getOrCreate(device, conf);
+    this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, conf);
 }
 
 /// <summary>
@@ -112,7 +112,6 @@ void FullScreenQuad::createRootSignature(ID3D12Device* device)
 /// <param name="device">初期化&生成済みのGPUデバイス</param>
 void FullScreenQuad::createPipelineState(ID3D12Device* device)
 {
-    PipelineStateObject::PipelineStateObjectConf conf;
     // インプットレイアウト
     D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
       { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,     0, 0,   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
@@ -121,9 +120,9 @@ void FullScreenQuad::createPipelineState(ID3D12Device* device)
 
     //パイプラインステートオブジェクトの設定
     D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = { 0 };
-    desc.pRootSignature = this->rootSignature->getRootSignature();
-    desc.VS = CD3DX12_SHADER_BYTECODE(this->basicShaderPair.vertexShader->getShaderBlob());
-    desc.PS = CD3DX12_SHADER_BYTECODE(this->basicShaderPair.pixelShader->getShaderBlob());
+    desc.pRootSignature = this->root_signature_->getRootSignature();
+    desc.VS = CD3DX12_SHADER_BYTECODE(this->vertex_shader_->getShaderBlob());
+    desc.PS = CD3DX12_SHADER_BYTECODE(this->pixel_shader_->getShaderBlob());
     desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     desc.SampleMask = UINT_MAX;
     desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
@@ -138,19 +137,21 @@ void FullScreenQuad::createPipelineState(ID3D12Device* device)
     desc.SampleDesc.Quality = 0;
     desc.NodeMask = 1;
     desc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+
+    PipelineStateObject::PipelineStateObjectConf conf;
     conf.desc = desc;
 
-    this->pso = PSOCacheManager::getInstance().getPSO(device, conf);
+    this->pso_ = PSOCacheManager::getInstance().getPSO(device, conf);
 }
 
 void FullScreenQuad::createSRVHeap(ID3D12Device* device)
 {
     //SRV用のディスクリプタヒープを作成
-    D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-    srvHeapDesc.NumDescriptors = 1;
-    srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    if (FAILED(device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&this->SRVHeap)))) {
+    D3D12_DESCRIPTOR_HEAP_DESC srv_heap_desc = {};
+    srv_heap_desc.NumDescriptors = 1;
+    srv_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    srv_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    if (FAILED(device->CreateDescriptorHeap(&srv_heap_desc, IID_PPV_ARGS(&this->srv_heap_)))) {
         throw new std::exception("failed to create SRV heap");
     }
 }
@@ -158,12 +159,12 @@ void FullScreenQuad::createSRVHeap(ID3D12Device* device)
 void FullScreenQuad::createSRV(ID3D12Device* device, CompositeRenderTarget* osrt)
 {
     //SRVの作成
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Texture2D.MipLevels = 1;
+    D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+    srv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srv_desc.Texture2D.MipLevels = 1;
 
-    device->CreateShaderResourceView(osrt->getResource(), &srvDesc, this->SRVHeap->GetCPUDescriptorHandleForHeapStart());
+    device->CreateShaderResourceView(osrt->getResource(), &srv_desc, this->srv_heap_->GetCPUDescriptorHandleForHeapStart());
 }
 

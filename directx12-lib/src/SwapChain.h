@@ -4,46 +4,53 @@
 #include <dxgi1_4.h>
 using namespace Microsoft::WRL;
 
-//スワップチェインの生成時に使用する設定
-struct SwapChainConf {
-    UINT frameBufferCount;           //バッファ数
-    UINT width;                      //幅
-    UINT height;                     //高さ
-    HWND hWnd;                       //ウィンドウハンドル
-    IDXGIFactory4* factory;      //DXGIファクトリ
-    ID3D12CommandQueue* commandQueue;//コマンドキュー
-};
+
 
 /// <summary>
 /// スワップチェイン
 /// </summary>
 class SwapChain
 {
-public:
+    friend class SwapChainFactory;
 
 public:
-    SwapChain() :
-        swapChain(),
-        currentBackBufferIndex(0)
+    //スワップチェインの生成時に使用する設定
+    struct SwapChainConf {
+        UINT frame_buffer_count;           //バッファ数
+        UINT width;                      //幅
+        UINT height;                     //高さ
+        HWND hWnd;                       //ウィンドウハンドル
+        IDXGIFactory4* factory;      //DXGIファクトリ
+        ID3D12CommandQueue* command_queue;//コマンドキュー
+    };
+
+private:
+    SwapChain(const SwapChainConf& c) :
+        conf_(c),
+        swap_chain_(),
+        current_back_buffer_index_(0)
     {};
+public:
     ~SwapChain() {};
-
-    //スワップチェイン関係の生成
-    void init(const SwapChainConf swapChainConf);
 
     //スワップチェインのプレゼント
     void present();
 
 private:
+    //スワップチェイン関係の生成
+    void init();
+
     //スワップチェインの生成
-    ComPtr<IDXGISwapChain3> createSwapChain(const SwapChainConf swapChainConf);
+    void createSwapChain();
     //バックバッファの生成
-    UINT createCurrentBackBufferIndex();
+    void createCurrentBackBufferIndex();
 
 public:
-    IDXGISwapChain3* getSwapChain() const { return swapChain.Get(); } //スワップチェインの取得
-    UINT getCurrentBackBufferIndex() const { return currentBackBufferIndex; } //現在のバックバッファの番号の取得
+    IDXGISwapChain3* getSwapChain() const { return swap_chain_.Get(); }             //スワップチェインの取得
+    UINT getCurrentBackBufferIndex() const { return current_back_buffer_index_; }   //現在のバックバッファの番号の取得
+
 private:
-    ComPtr<IDXGISwapChain3> swapChain;      //スワップチェイン
-    UINT currentBackBufferIndex;            //現在のバックバッファの番号
+    SwapChainConf conf_;                    //設定
+    ComPtr<IDXGISwapChain3> swap_chain_;    //スワップチェイン
+    UINT current_back_buffer_index_;        //現在のバックバッファの番号
 };

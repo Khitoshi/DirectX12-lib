@@ -2,19 +2,23 @@
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
-//#pragma comment(lib, "d3dcompiler.lib")
+
 #include "d3dx12.h"
 #include <dxgi1_4.h>
 
-#include "SwapChain.h"
-#include "RenderTarget.h"
-//#include "OffScreenRenderTarget.h"
-#include "CompositeRenderTarget.h"
-#include "DepthStencil.h"
-#include "RenderContext.h"
-#include "Fence.h"
-#include "RootSignature.h"
-#include "FullScreenQuad.h"
+class DeviceContext;
+class CommandQueue;
+class SwapChain;
+class CommandAllocator;
+class GraphicsCommandList;
+class RenderTarget;
+
+class CompositeRenderTarget;
+class DepthStencil;
+class RenderContext;
+class Fence;
+class FullScreenQuad;
+
 using namespace Microsoft::WRL;
 
 /// <summary>
@@ -24,28 +28,27 @@ class DX12Resources
 {
 public:
     DX12Resources() :
-        device(nullptr),
-        commandQueue(),
-        swapChain(),
-        commandAllocator(),
-        commandList(),
-        renderTarget(),
-        compositeRenderTarget(),
-        depthStencil(),
-        fence(),
-        renderContext(),
-        viewport(),
-        scissorRect(),
-        currentFrameBufferRTVHandle(),
-        currentFrameBufferDSVHandle(),
-        frameIndex(0),
-        fullScreenQuad(),
-        backGroundColor()
+        device_context_(nullptr),
+        command_queue_(),
+        swap_chain_(),
+        command_allocator_(),
+        command_list_(),
+        render_target_(),
+        composite_render_target_(),
+        depth_stencil_(),
+        fence_(),
+        viewport_(),
+        scissor_rect_(),
+        render_context_(),
+        current_frame_buffer_rtv_handle_(),
+        current_frame_buffer_dsv_handle_(),
+        frame_index_(0),
+        full_screen_quad_()
     {}
     ~DX12Resources() { waitEndOfDrawing(); }
 
     //初期化処理
-    void init(const HWND hWnd, const int width, const int height, const int frameBufferCount);
+    void init(const HWND hWnd, const int width, const int height);
 
     //レンダリング開始処理
     void beginRender();
@@ -59,77 +62,72 @@ public:
 private://生成系
     //IDXGIファクトリ生成
     ComPtr<IDXGIFactory4> createFactory();
-    //デバイス生成
-    ComPtr<ID3D12Device5> createDevice(IDXGIFactory4* dxgiFactory);
-    //コマンドキュー生成
-    ComPtr<ID3D12CommandQueue> createCommandQueue();
+    void initCommandQueue();
     //スワップチェイン生成
-    std::shared_ptr<SwapChain> createSwapChain(const HWND hWnd, const int width, const int height, const int frameBufferCount, IDXGIFactory4* factory);
+    void initSwapChain(const HWND hWnd, const int width, const int height, const int frameBufferCount, IDXGIFactory4* factory);
     //コマンドアロケータ生成
-    ComPtr<ID3D12CommandAllocator> createCommandAllocator();
+    void initCommandAllocator();
     //コマンドリスト生成
-    ComPtr<ID3D12GraphicsCommandList4> createCommandList();
+    void initCommandList();
     //Mainレンダーターゲット生成
-    std::shared_ptr<RenderTarget> createRenderTarget(const int width, const int height, const UINT frameBufferCount);
+    void initRenderTarget();
     //オフスクリーンレンダーターゲット生成
-    std::shared_ptr<CompositeRenderTarget> createCompositeRenderTarget();
+    void initCompositeRenderTarget();
     //深度ステンシル生成
-    std::shared_ptr<DepthStencil> createDepthStencil(const int width, const int height, const UINT frameBufferCount);
+    void initDepthStencil(const int width, const int height);
     //フェンス生成
-    std::shared_ptr<Fence> createFence();
-    //レンダーコンテキスト生成
-    std::shared_ptr<RenderContext> createRenderContext();
-
+    void initFence();
     //ビューポート設定
-    D3D12_VIEWPORT createViewport(const int width, const int height);
+    void initViewport(const int width, const int height);
     //シザリング矩形設定
-    D3D12_RECT createScissorRect(const int width, const int height);
+    void initScissorRect(const int width, const int height);
+    //レンダーコンテキスト生成
+    void initRenderContext();
+    //フルスクリーン四角形生成
+    void initFullScreenQuad();
+
+    //オフスクリーンレンダーターゲットの設定生成
+    void createOffScreenRenderTargetConf();
 
     //レンダーターゲットビューのハンドルを設定
     void setMainRTVHandle();
+    //オフスクリーンレンダーターゲットビューのハンドルを設定
     void setOffScreenRTVHandle();
-
     //深度ステンシルビューのハンドルを設定
-    void setDSVHandle();
+    void updateDSVHandle();
+    //オフスクリーンレンダーターゲットの設定を更新
+    void updateOffScreenRenderTargetConf();
 
-public://設定系
-    void setBackGroundColor(const float color[4])
-    {
-        this->backGroundColor[0] = color[0];
-        this->backGroundColor[1] = color[1];
-        this->backGroundColor[2] = color[2];
-        this->backGroundColor[3] = color[3];
-    };
 public://取得系
     //デバイス取得
-    ID3D12Device5* getDevice() const { return device.Get(); }
+    DeviceContext* getDeviceContext() const { return device_context_.get(); }
     //レンダーコンテキスト取得
-    RenderContext* getRenderContext() const { return renderContext.get(); }
+    RenderContext* getRenderContext() const { return render_context_.get(); }
     //ビューポート取得
-    D3D12_VIEWPORT getViewport() const { return viewport; }
+    D3D12_VIEWPORT getViewport() const { return viewport_; }
     //現在書き込み中のフレームバッファの深度ステンシルビューのハンドル取得
-    D3D12_CPU_DESCRIPTOR_HANDLE getCurrentFrameBufferDSVHandle() const { return currentFrameBufferDSVHandle; }
+    D3D12_CPU_DESCRIPTOR_HANDLE getCurrentFrameBufferDSVHandle() const { return current_frame_buffer_dsv_handle_; }
+
 private:
-    ComPtr<ID3D12Device5>device;                                    //デバイス
-    ComPtr<ID3D12CommandQueue>commandQueue;                         //コマンドキュー
-    std::shared_ptr<SwapChain>swapChain;                            //スワップチェイン
-    ComPtr<ID3D12CommandAllocator>commandAllocator;                 //コマンドアロケータ
-    ComPtr<ID3D12GraphicsCommandList4>commandList;                  //コマンドリスト
-    std::shared_ptr<RenderTarget>renderTarget;                      //レンダーターゲット
-    std::shared_ptr<CompositeRenderTarget>compositeRenderTarget;    //オフスクリーンレンダーターゲット
-    std::shared_ptr<DepthStencil>depthStencil;                      //深度ステンシル
+    std::shared_ptr<DeviceContext>device_context_;                                   //デバイス
+    std::shared_ptr<CommandQueue>command_queue_;                       //コマンドキュー
+    std::shared_ptr<SwapChain>swap_chain_;                          //スワップチェイン
+    std::shared_ptr<CommandAllocator>command_allocator_;               //コマンドアロケータ
+    std::shared_ptr<GraphicsCommandList> command_list_;
+    std::shared_ptr<RenderTarget>render_target_;                    //レンダーターゲット
+    std::shared_ptr<CompositeRenderTarget>composite_render_target_; //オフスクリーンレンダーターゲット
+    std::shared_ptr<DepthStencil>depth_stencil_;                    //深度ステンシル
+    std::shared_ptr<Fence> fence_;                                  //フェンス
+    D3D12_VIEWPORT viewport_;                                       //ビューポート
+    D3D12_RECT scissor_rect_;                                       //シザリング矩形
+    std::shared_ptr<RenderContext> render_context_;                 //レンダーコンテキスト
 
-    std::shared_ptr<Fence> fence;                                   //フェンス
-    std::shared_ptr<RenderContext> renderContext;                   //レンダーコンテキスト
 
-    D3D12_VIEWPORT viewport;                                        //ビューポート
-    D3D12_RECT scissorRect;                                         //シザリング矩形
 
-    D3D12_CPU_DESCRIPTOR_HANDLE currentFrameBufferRTVHandle;		//現在書き込み中のフレームバッファのレンダーターゲットビューのハンドル
-    D3D12_CPU_DESCRIPTOR_HANDLE currentFrameBufferDSVHandle;		//現在書き込み中のフレームバッファの深度ステンシルビューのハンドル
 
-    int frameIndex;                                                 //フレームの番号
-    std::shared_ptr<FullScreenQuad> fullScreenQuad;                 //フルスクリーン四角形
+    D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_rtv_handle_;	//現在書き込み中のフレームバッファのレンダーターゲットビューのハンドル
+    D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_dsv_handle_;	//現在書き込み中のフレームバッファの深度ステンシルビューのハンドル
 
-    float backGroundColor[4];                                       //背景色
+    int frame_index_;                                               //フレームの番号
+    std::shared_ptr<FullScreenQuad> full_screen_quad_;              //フルスクリーン四角形
 };

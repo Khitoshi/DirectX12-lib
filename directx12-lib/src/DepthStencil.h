@@ -10,6 +10,7 @@ using namespace Microsoft::WRL;
 /// </summary>
 class DepthStencil
 {
+    friend class DepthStencilFactory;
 public:
     /// <summary>
     /// 深度ステンシルバッファ生成時に使用する設定
@@ -21,20 +22,19 @@ public:
         UINT height;                //高さ
     };
 
-public:
+private:
     DepthStencil(const DepthStencilConf c) :conf_(c), descriptor_heap_(), resource_() {};
+
+public:
     ~DepthStencil() {};
 
+private:
     //初期化処理
     void init(ID3D12Device* device);
-
-private:
     //ディスクリプタヒープの生成
     void createDescriptorHeap(ID3D12Device* device);
-
     //リソースの生成
     void createResource(ID3D12Device* device);
-
     //深度ステンシルビュー生成
     void createDSV(ID3D12Device* device);
 

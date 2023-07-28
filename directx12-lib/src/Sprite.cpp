@@ -37,7 +37,8 @@ void Sprite::draw(RenderContext* rc)
 
         //ビューポートとシザリング矩形の設定
         rc->transitionOffScreenRenderTargetBegin(resource);
-        rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depthStencil, resource);
+        //rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depthStencil, resource);
+        rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depthStencil);
     }
 
 

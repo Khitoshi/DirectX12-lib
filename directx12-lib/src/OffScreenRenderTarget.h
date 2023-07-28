@@ -14,7 +14,6 @@ public:
     struct OffScreenRenderTargetConf {
         D3D12_RESOURCE_DESC resourceDesc; 		        //バックバッファの設定
         D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc;  //バックバッファで使用しているディスクリプタヒープの設定
-        float clearColor[4];                            //生成時のクリアカラー
 
         bool operator==(const OffScreenRenderTargetConf& conf) const {
             return
@@ -30,12 +29,7 @@ public:
                 resourceDesc.Flags == conf.resourceDesc.Flags &&
 
                 descriptorHeapDesc.NumDescriptors == conf.descriptorHeapDesc.NumDescriptors &&
-                descriptorHeapDesc.Type == conf.descriptorHeapDesc.Type &&
-
-                clearColor[0] == conf.clearColor[0] &&
-                clearColor[1] == conf.clearColor[1] &&
-                clearColor[2] == conf.clearColor[2] &&
-                clearColor[3] == conf.clearColor[3];
+                descriptorHeapDesc.Type == conf.descriptorHeapDesc.Type;
         }
     };
 
