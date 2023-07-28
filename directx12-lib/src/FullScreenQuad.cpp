@@ -1,4 +1,9 @@
 #include "FullScreenQuad.h"
+#include "RenderContext.h"
+#include "ShaderCacheManager.h"
+#include "RootSignatureCacheManager.h"
+#include "PSOCacheManager.h"
+#include "CompositeRenderTarget.h"
 
 /// <summary>
 /// ‰Šú‰»ˆ—

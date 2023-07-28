@@ -1,5 +1,6 @@
 #pragma once
-#include "OffScreenRenderTarget.h"
+#include "OffScreenRenderTargetFactory.h"
+
 #include "Hashes.h"
 #include <vector>
 #include <stdexcept>
@@ -12,23 +13,22 @@ class OffScreenRenderTargetCacheManager
 public:
     struct OffScreenRenderTargetCacheKeyHasher
     {
-        //TODO:クラッシュするので一旦コメントアウト
         std::size_t operator()(const OffScreenRenderTarget::OffScreenRenderTargetConf& k) const
         {
             std::size_t seed = 0;
-            hash_combine(seed, k.resourceDesc.Dimension);
-            hash_combine(seed, k.resourceDesc.Alignment);
-            hash_combine(seed, k.resourceDesc.Width);
-            hash_combine(seed, k.resourceDesc.Height);
-            hash_combine(seed, k.resourceDesc.DepthOrArraySize);
-            hash_combine(seed, k.resourceDesc.MipLevels);
-            hash_combine(seed, k.resourceDesc.Format);
-            hash_combine(seed, k.resourceDesc.SampleDesc);
-            hash_combine(seed, k.resourceDesc.Layout);
-            hash_combine(seed, k.resourceDesc.Flags);
+            hash_combine(seed, k.resource_desc.Dimension);
+            hash_combine(seed, k.resource_desc.Alignment);
+            hash_combine(seed, k.resource_desc.Width);
+            hash_combine(seed, k.resource_desc.Height);
+            hash_combine(seed, k.resource_desc.DepthOrArraySize);
+            hash_combine(seed, k.resource_desc.MipLevels);
+            hash_combine(seed, k.resource_desc.Format);
+            hash_combine(seed, k.resource_desc.SampleDesc);
+            hash_combine(seed, k.resource_desc.Layout);
+            hash_combine(seed, k.resource_desc.Flags);
 
-            hash_combine(seed, k.descriptorHeapDesc.NumDescriptors);
-            hash_combine(seed, k.descriptorHeapDesc.Type);
+            hash_combine(seed, k.descriptor_heap_desc.NumDescriptors);
+            hash_combine(seed, k.descriptor_heap_desc.Type);
 
             return seed;
         }
@@ -36,6 +36,7 @@ public:
 private:
     OffScreenRenderTargetCacheManager() {};
     ~OffScreenRenderTargetCacheManager() {};
+
 public:
     /// <summary>
     /// シングルトンなインスタンスを取得
@@ -124,8 +125,7 @@ private:
     void create(ID3D12Device* device, const OffScreenRenderTarget::OffScreenRenderTargetConf& conf)
     {
         //キャッシュにないなら作成して返す
-        std::shared_ptr<OffScreenRenderTarget> offScreenRenderTarget = std::make_shared<OffScreenRenderTarget>(conf);
-        offScreenRenderTarget->init(device);
+        std::shared_ptr<OffScreenRenderTarget> offScreenRenderTarget = OffScreenRenderTargetFactory::create(conf, device);
         this->offScreenRenderTargetMapCache[conf] = offScreenRenderTarget;
     }
 
@@ -176,10 +176,11 @@ public:
     }
 
 private:
-    D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle; //深度ステンシルビューハンドル
-    D3D12_VIEWPORT viewport;                            //ビューポート
+    OffScreenRenderTarget::OffScreenRenderTargetConf conf_;         //オフスクリーンレンダーターゲットのデフォルトの設定
+    D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle;             //深度ステンシルビューハンドル
+    D3D12_VIEWPORT viewport;                                        //ビューポート
+    //キャッシュ
     std::unordered_map<OffScreenRenderTarget::OffScreenRenderTargetConf, std::shared_ptr<OffScreenRenderTarget>, OffScreenRenderTargetCacheKeyHasher, std::equal_to<OffScreenRenderTarget::OffScreenRenderTargetConf>> offScreenRenderTargetMapCache;
-    std::vector<OffScreenRenderTarget*> offScreenRenderTargetList;
+    std::vector<OffScreenRenderTarget*> offScreenRenderTargetList;  //レンダーターゲットリスト
 
-    OffScreenRenderTarget::OffScreenRenderTargetConf conf;
 };

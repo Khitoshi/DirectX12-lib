@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include "../OffScreenRenderTargetCacheManager.h"
 #include "../CommonGraphicsConfig.h"
+#include "../OffScreenRenderTargetFactory.h"
+
 /// <summary>
 /// imguiの初期化
 /// </summary>
@@ -33,8 +35,7 @@ void ImGuiManager::init(const ImGuiManagerConf conf)
     //TODO:リファクタリング対象
     OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
     osrtConf = OffScreenRenderTargetCacheManager::getInstance().getConf();
-    this->offScreenRenderTarget = std::make_shared<OffScreenRenderTarget>(osrtConf);
-    this->offScreenRenderTarget->init(conf.device);
+    this->offScreenRenderTarget = OffScreenRenderTargetFactory::create(osrtConf, conf.device);
 }
 
 /// <summary>

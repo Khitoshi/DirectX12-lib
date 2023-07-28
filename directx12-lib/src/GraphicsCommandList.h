@@ -16,6 +16,7 @@ private:
 public:
     ~GraphicsCommandList() {};
 
+private:
     //‰Šú‰»
     void init(ID3D12Device* device, ID3D12CommandAllocator* commandAllocator);
 

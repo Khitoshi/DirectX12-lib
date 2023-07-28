@@ -5,6 +5,8 @@
 #include "PSOCacheManager.h"
 #include "ShaderCacheManager.h"
 #include "CommonGraphicsConfig.h"
+#include "VertexBuffer.h"
+#include "RenderContext.h"
 #include <stdexcept>
 
 /// <summary>

@@ -2,6 +2,9 @@
 #include "HashCombine.h"
 #include "d3dx12.h"
 
+/// <summary>
+/// 値計算用のハッシュ関数
+/// </summary>
 namespace std {
     template <>
     struct hash<D3D12_BLEND_DESC> {

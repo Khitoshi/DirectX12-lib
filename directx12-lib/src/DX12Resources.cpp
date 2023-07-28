@@ -311,8 +311,8 @@ void DX12Resources::createOffScreenRenderTargetConf()
     OffScreenRenderTargetCacheManager::getInstance().setViewport(this->viewport_);
 
     OffScreenRenderTarget::OffScreenRenderTargetConf osrt_conf = {};
-    osrt_conf.descriptorHeapDesc = this->render_target_->getDescriptorHeap()->GetDesc();
-    osrt_conf.resourceDesc = this->render_target_->getResource(this->frame_index_)->GetDesc();
+    osrt_conf.descriptor_heap_desc = this->render_target_->getDescriptorHeap()->GetDesc();
+    osrt_conf.resource_desc = this->render_target_->getResource(this->frame_index_)->GetDesc();
     OffScreenRenderTargetCacheManager::getInstance().setConf(osrt_conf);
 }
 
@@ -354,8 +354,8 @@ void DX12Resources::updateOffScreenRenderTargetConf()
     OffScreenRenderTargetCacheManager::getInstance().setViewport(this->viewport_);
 
     OffScreenRenderTarget::OffScreenRenderTargetConf osrt_conf = {};
-    osrt_conf.descriptorHeapDesc = this->render_target_->getDescriptorHeap()->GetDesc();
-    osrt_conf.resourceDesc = this->render_target_->getResource(this->frame_index_)->GetDesc();
+    osrt_conf.descriptor_heap_desc = this->render_target_->getDescriptorHeap()->GetDesc();
+    osrt_conf.resource_desc = this->render_target_->getResource(this->frame_index_)->GetDesc();
     OffScreenRenderTargetCacheManager::getInstance().setConf(osrt_conf);
 }
 

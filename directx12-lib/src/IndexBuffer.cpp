@@ -3,29 +3,29 @@
 /// <summary>
 /// インデクスバッファの初期化
 /// </summary>
-/// <param name="conf">インデックスバッファ生成用設定</param>
-void IndexBuffer::init(IndexBufferConf conf)
+/// <param name="device">GPUデバイス</param>
+void IndexBuffer::init(ID3D12Device* device)
 {
-    this->sizeInBytes = conf.size;
+    this->size_in_bytes_ = this->conf_.size;
     auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    auto rDesc = CD3DX12_RESOURCE_DESC::Buffer(this->sizeInBytes);
+    auto rDesc = CD3DX12_RESOURCE_DESC::Buffer(this->size_in_bytes_);
 
-    auto hr = conf.device->CreateCommittedResource(
+    auto hr = device->CreateCommittedResource(
         &heapProp,
         D3D12_HEAP_FLAG_NONE,
         &rDesc,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS(&this->indexBuffer));
+        IID_PPV_ARGS(&this->index_buffer_));
 
     //インデックスバッファのビューを作成。
-    this->indexBufferView.BufferLocation = indexBuffer->GetGPUVirtualAddress();
+    this->index_buffer_view_.BufferLocation = index_buffer_->GetGPUVirtualAddress();
 
     //ストライドは４バイト固定。
-    this->strideInBytes = 4;
-    this->indexBufferView.Format = DXGI_FORMAT_R32_UINT;
-    this->indexBufferView.SizeInBytes = sizeof(uint32_t) * conf.count;;
-    this->count = conf.count;
+    this->stride_in_bytes_ = 4;
+    this->index_buffer_view_.Format = DXGI_FORMAT_R32_UINT;
+    this->index_buffer_view_.SizeInBytes = sizeof(uint32_t) * this->conf_.count;;
+    this->count_ = this->conf_.count;
 }
 
 /// <summary>
@@ -35,12 +35,12 @@ void IndexBuffer::init(IndexBufferConf conf)
 void IndexBuffer::copy(uint16_t* srcIndices)
 {
     uint32_t* pData = nullptr;
-    if (SUCCEEDED(this->indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
-        for (int i = 0; i < count; i++) {
+    if (SUCCEEDED(this->index_buffer_->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
+        for (int i = 0; i < count_; i++) {
             pData[i] = static_cast<uint32_t>(srcIndices[i]);
         }
     }
-    this->indexBuffer->Unmap(0, nullptr);
+    this->index_buffer_->Unmap(0, nullptr);
 }
 
 /// <summary>
@@ -50,10 +50,10 @@ void IndexBuffer::copy(uint16_t* srcIndices)
 void IndexBuffer::copy(uint32_t* srcIndices)
 {
     uint32_t* pData = nullptr;
-    if (SUCCEEDED(this->indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
-        for (int i = 0; i < count; i++) {
+    if (SUCCEEDED(this->index_buffer_->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
+        for (int i = 0; i < this->count_; i++) {
             pData[i] = srcIndices[i];
         }
     }
-    this->indexBuffer->Unmap(0, nullptr);
+    this->index_buffer_->Unmap(0, nullptr);
 }

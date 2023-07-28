@@ -1,14 +1,18 @@
 #pragma once
-
-#include "PSOCacheManager.h"
-#include "RootSignatureCacheManager.h"
-#include "ShaderCacheManager.h"
-#include "IndexBuffer.h"
-#include "VertexBuffer.h"
-#include "RenderContext.h"
-#include "Texture.h"
-#include "CompositeRenderTarget.h"
+#include "d3dx12.h"
+#include <memory>
 #include <DirectXMath.h>
+
+class VertexBuffer;
+class IndexBuffer;
+class RootSignature;
+class PipelineStateObject;
+class Shader;
+class RenderContext;
+class Texture;
+class CompositeRenderTarget;
+
+using namespace Microsoft::WRL;
 
 /// <summary>
 /// オフスクリーンレンダーターゲットをフルスクリーンに描画するクラス
@@ -17,11 +21,13 @@ class FullScreenQuad
 {
     friend class FullScreenQuadFactory;
 public:
+    //頂点情報構造体
     struct Vertex
     {
         DirectX::XMFLOAT3 position;	//頂点座標
         DirectX::XMFLOAT2 uv;		//テクスチャ座標
     };
+
 private:
     FullScreenQuad() :
         vertex_buffer_(),
@@ -34,10 +40,12 @@ private:
         num_indices_(0),
         srv_heap_()
     {};
+
 public:
     ~FullScreenQuad() {};
     //描画処理
     void draw(RenderContext* rc, ID3D12Device* device, CompositeRenderTarget* osrt);
+
 private:
     //初期化処理
     void init(ID3D12Device* device);
@@ -53,14 +61,15 @@ private:
     void createSRVHeap(ID3D12Device* device);
     //シェーダーリソースビューの作成
     void createSRV(ID3D12Device* device, CompositeRenderTarget* osrt);
+
 private:
-    std::shared_ptr<VertexBuffer> vertex_buffer_;				//頂点バッファ
-    std::shared_ptr<IndexBuffer> index_buffer_;				//インデックスバッファ
-    std::shared_ptr<RootSignature> root_signature_;			//ルートシグネチャ
-    std::shared_ptr<PipelineStateObject> pso_;				//パイプラインステートオブジェクト
-    std::shared_ptr<Shader> pixel_shader_;					//ピクセルシェーダー
-    std::shared_ptr<Shader> vertex_shader_;					//バーテックスシェーダー
-    std::shared_ptr<Texture> texture_;						//テクスチャ
-    UINT num_indices_;											//インデックスの数
-    ComPtr<ID3D12DescriptorHeap> srv_heap_;               //シェーダーリソースビューディスクリプタヒープ
+    std::shared_ptr<VertexBuffer> vertex_buffer_;	//頂点バッファ
+    std::shared_ptr<IndexBuffer> index_buffer_;		//インデックスバッファ
+    std::shared_ptr<RootSignature> root_signature_; //ルートシグネチャ
+    std::shared_ptr<PipelineStateObject> pso_;		//パイプラインステートオブジェクト
+    std::shared_ptr<Shader> pixel_shader_;			//ピクセルシェーダー
+    std::shared_ptr<Shader> vertex_shader_;			//バーテックスシェーダー
+    std::shared_ptr<Texture> texture_;				//テクスチャ
+    UINT num_indices_;								//インデックスの数
+    ComPtr<ID3D12DescriptorHeap> srv_heap_;         //シェーダーリソースビューディスクリプタヒープ
 };

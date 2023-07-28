@@ -1,6 +1,9 @@
 #include "Sprite.h"
 //#include "ShaderCacheManager.h"
 #include "OffScreenRenderTargetCacheManager.h"
+#include "OffScreenRenderTargetFactory.h"
+#include "IndexBufferFactory.h"
+
 /// <summary>
 /// 初期化処理
 /// </summary>
@@ -195,15 +198,13 @@ void Sprite::initIndexBuffer()
 
     //インデックスバッファの設定
     numIndices = sizeof(indices) / sizeof(unsigned short);
-    IndexBufferConf indexBufferConf = {};
-    indexBufferConf.device = conf.device;
+    IndexBuffer::IndexBufferConf indexBufferConf = {};
     indexBufferConf.size = sizeof(indices) * numIndices;// 4 bytes * 要素数 indices
     indexBufferConf.stride = sizeof(unsigned short);
     indexBufferConf.count = numIndices;
 
     //初期化
-    indexBuffer = std::make_shared<IndexBuffer>();
-    indexBuffer->init(indexBufferConf);
+    indexBuffer = IndexBufferFactory::create(indexBufferConf, conf.device);
     //コピー
     indexBuffer->copy(static_cast<uint16_t*>(indices));
 }
@@ -228,6 +229,5 @@ void Sprite::initOffScreenRenderTarget()
 {
     OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
     osrtConf = OffScreenRenderTargetCacheManager::getInstance().getConf();
-    offScreenRenderTarget = std::make_shared<OffScreenRenderTarget>(osrtConf);
-    offScreenRenderTarget->init(conf.device);
+    offScreenRenderTarget = OffScreenRenderTargetFactory::create(osrtConf, conf.device);
 }

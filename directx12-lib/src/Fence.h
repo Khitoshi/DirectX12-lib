@@ -15,6 +15,7 @@ private:
         value_(0),
         event_()
     {};
+
 public:
     ~Fence() {};
 
@@ -28,7 +29,7 @@ private:
     //フェンスのイベントの生成
     void createEvent();
 
-public:
+public://取得系
     //フェンスの取得
     ID3D12Fence* getFence() const { return this->fence_.Get(); }
     //フェンスの値の取得

@@ -263,9 +263,6 @@
     <ClInclude Include="src\Rotation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\PSOCacheManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -354,6 +351,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\CommonGraphicsConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IndexBufferFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OffScreenRenderTargetFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

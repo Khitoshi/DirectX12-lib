@@ -92,8 +92,9 @@
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\IndexBuffer.h" />
-    <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\IndexBufferFactory.h" />
     <ClInclude Include="src\OffScreenRenderTargetCacheManager.h" />
+    <ClInclude Include="src\OffScreenRenderTargetFactory.h" />
     <ClInclude Include="src\PipelineStateObject.h" />
     <ClInclude Include="src\PSOCacheManager.h" />
     <ClInclude Include="src\RenderContext.h" />

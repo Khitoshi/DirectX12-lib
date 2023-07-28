@@ -1,7 +1,8 @@
 #pragma once
 #include "d3dx12.h"
-#include "RenderContext.h"
-#include "DepthStencil.h"
+
+class RenderContext;
+class DepthStencil;
 
 using namespace Microsoft::WRL;
 
@@ -10,46 +11,54 @@ using namespace Microsoft::WRL;
 /// </summary>
 class OffScreenRenderTarget
 {
+    friend class OffScreenRenderTargetFactory;
 public:
+    /// <summary>
+    /// 生成に使用する設定
+    /// </summary>
     struct OffScreenRenderTargetConf {
-        D3D12_RESOURCE_DESC resourceDesc; 		        //バックバッファの設定
-        D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc;  //バックバッファで使用しているディスクリプタヒープの設定
+        D3D12_RESOURCE_DESC resource_desc; 		            //バックバッファの設定
+        D3D12_DESCRIPTOR_HEAP_DESC descriptor_heap_desc;    //バックバッファで使用しているディスクリプタヒープの設定
 
         bool operator==(const OffScreenRenderTargetConf& conf) const {
             return
-                resourceDesc.Width == conf.resourceDesc.Width &&
-                resourceDesc.Height == conf.resourceDesc.Height &&
-                resourceDesc.Format == conf.resourceDesc.Format &&
-                resourceDesc.DepthOrArraySize == conf.resourceDesc.DepthOrArraySize &&
-                resourceDesc.MipLevels == conf.resourceDesc.MipLevels &&
-                resourceDesc.SampleDesc.Count == conf.resourceDesc.SampleDesc.Count &&
-                resourceDesc.SampleDesc.Quality == conf.resourceDesc.SampleDesc.Quality &&
-                resourceDesc.Dimension == conf.resourceDesc.Dimension &&
-                resourceDesc.Layout == conf.resourceDesc.Layout &&
-                resourceDesc.Flags == conf.resourceDesc.Flags &&
+                resource_desc.Width == conf.resource_desc.Width &&
+                resource_desc.Height == conf.resource_desc.Height &&
+                resource_desc.Format == conf.resource_desc.Format &&
+                resource_desc.DepthOrArraySize == conf.resource_desc.DepthOrArraySize &&
+                resource_desc.MipLevels == conf.resource_desc.MipLevels &&
+                resource_desc.SampleDesc.Count == conf.resource_desc.SampleDesc.Count &&
+                resource_desc.SampleDesc.Quality == conf.resource_desc.SampleDesc.Quality &&
+                resource_desc.Dimension == conf.resource_desc.Dimension &&
+                resource_desc.Layout == conf.resource_desc.Layout &&
+                resource_desc.Flags == conf.resource_desc.Flags &&
 
-                descriptorHeapDesc.NumDescriptors == conf.descriptorHeapDesc.NumDescriptors &&
-                descriptorHeapDesc.Type == conf.descriptorHeapDesc.Type;
+                descriptor_heap_desc.NumDescriptors == conf.descriptor_heap_desc.NumDescriptors &&
+                descriptor_heap_desc.Type == conf.descriptor_heap_desc.Type;
         }
     };
 
-public:
+private:
     OffScreenRenderTarget(OffScreenRenderTargetConf c) :
-        conf(c),
-        resource(),
-        SRVHeap(),
-        RTVHeap()
+        conf_(c),
+        resource_(),
+        srv_heap_(),
+        rtv_heap_(),
+        depth_stencil_view_handle_(),
+        viewport_()
     {};
+
+public:
     ~OffScreenRenderTarget() {};
 
-    //初期化
-    void init(ID3D12Device* device);
     //レンダリング開始処理
     void beginRender(RenderContext* rc);
     //レンダリング終了処理
     void endRender(RenderContext* rc);
 
 private:
+    //初期化
+    void init(ID3D12Device* device);
     //リソースを作成
     void createResource(ID3D12Device* device);
     //シェーダーリソースビューのディスクリプタヒープを作成
@@ -60,20 +69,28 @@ private:
     void createRTVHeap(ID3D12Device* device);
     //レンダーターゲットビューを作成
     void createRenderTargetView(ID3D12Device* device);
-public://設定系
-    void setDepthStencil(const D3D12_CPU_DESCRIPTOR_HANDLE cdh) { this->depthStencilViewHandle = cdh; } //深度ステンシルの設定
-    void setViewport(D3D12_VIEWPORT vp) { viewport = vp; }  //ビューポートの設定
-public://取得系
-    ID3D12Resource* getResource() const { return resource.Get(); }      //リソースの取得
-    ID3D12DescriptorHeap* getSRVHeap() const { return SRVHeap.Get(); }  //シェーダーリソースビューディスクリプタヒープの取得
-    ID3D12DescriptorHeap* getRTVHeap() const { return RTVHeap.Get(); }  //レンダーターゲットビューディスクリプタヒープの取得
-private:
-    OffScreenRenderTargetConf conf;			//設定
-    ComPtr<ID3D12Resource> resource;		//リソース
-    ComPtr<ID3D12DescriptorHeap> SRVHeap;   //シェーダーリソースビューディスクリプタヒープ
-    ComPtr<ID3D12DescriptorHeap> RTVHeap;   //レンダーターゲットビューディスクリプタヒープ
 
-    D3D12_CPU_DESCRIPTOR_HANDLE depthStencilViewHandle; //深度ステンシルビューハンドル
-    D3D12_VIEWPORT viewport;                            //ビューポート
+public://設定系
+    //深度ステンシルの設定
+    void setDepthStencil(const D3D12_CPU_DESCRIPTOR_HANDLE cdh) { this->depth_stencil_view_handle_ = cdh; }
+    //ビューポートの設定
+    void setViewport(const D3D12_VIEWPORT vp) { this->viewport_ = vp; }
+
+public://取得系
+    //リソースの取得
+    ID3D12Resource* getResource()       const { return this->resource_.Get(); }
+    //シェーダーリソースビューディスクリプタヒープの取得
+    ID3D12DescriptorHeap* getSRVHeap()  const { return this->srv_heap_.Get(); }
+    //レンダーターゲットビューディスクリプタヒープの取得
+    ID3D12DescriptorHeap* getRTVHeap()  const { return this->rtv_heap_.Get(); }
+
+private:
+    OffScreenRenderTargetConf conf_;			            //設定
+    ComPtr<ID3D12Resource> resource_;		                //リソース
+    ComPtr<ID3D12DescriptorHeap> srv_heap_;                 //シェーダーリソースビューディスクリプタヒープ
+    ComPtr<ID3D12DescriptorHeap> rtv_heap_;                 //レンダーターゲットビューディスクリプタヒープ
+
+    D3D12_CPU_DESCRIPTOR_HANDLE depth_stencil_view_handle_; //深度ステンシルビューハンドル
+    D3D12_VIEWPORT viewport_;                               //ビューポート
 
 };
