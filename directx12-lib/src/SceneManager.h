@@ -53,10 +53,10 @@ public:
     /// 描画処理
     /// </summary>
     /// <param name="conf"></param>
-    void render(SceneConf conf)
+    void render(RenderContext* rc)
     {
         if (currentScene) {
-            currentScene->render(conf);
+            currentScene->render(rc);
         }
     }
 
@@ -64,7 +64,7 @@ public:
     /// シーン変更処理
     /// </summary>
     /// <param name="conf">描画に必要な設定</param>
-    void changeScene(SceneConf conf)
+    void changeScene(ID3D12Device* device)
     {
         if (!isSceneChange) return;
 
@@ -77,7 +77,7 @@ public:
         //シーン変更
         clear();
         currentScene = std::move(this->nextScene);
-        currentScene->init(conf);
+        currentScene->init(device);
         isSceneChange = false;
     }
 
@@ -107,10 +107,10 @@ public:
     void registerScene()
     {
         sceneFactories = {
-             {"Default",     []() { return std::make_shared<SceneDefault>(); }},
-             {"Triangle",    []() { return std::make_shared<SceneTriangle>(); }},
-             {"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
-             //シーンを追加する場合はここに追加
+            //シーンを追加する場合はここに追加
+            {"Default",     []() { return std::make_shared<SceneDefault>(); }},
+            {"Triangle",    []() { return std::make_shared<SceneTriangle>(); }},
+            {"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
         };
     }
 

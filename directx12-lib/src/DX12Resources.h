@@ -48,7 +48,7 @@ public:
     ~DX12Resources() { waitEndOfDrawing(); }
 
     //初期化処理
-    void init(const HWND hWnd, const int width, const int height);
+    void init(const HWND hWnd);
 
     //レンダリング開始処理
     void beginRender();
@@ -64,7 +64,7 @@ private://生成系
     ComPtr<IDXGIFactory4> createFactory();
     void initCommandQueue();
     //スワップチェイン生成
-    void initSwapChain(const HWND hWnd, const int width, const int height, const int frameBufferCount, IDXGIFactory4* factory);
+    void initSwapChain(const HWND hWnd, IDXGIFactory4* factory);
     //コマンドアロケータ生成
     void initCommandAllocator();
     //コマンドリスト生成
@@ -74,20 +74,17 @@ private://生成系
     //オフスクリーンレンダーターゲット生成
     void initCompositeRenderTarget();
     //深度ステンシル生成
-    void initDepthStencil(const int width, const int height);
+    void initDepthStencil();
     //フェンス生成
     void initFence();
     //ビューポート設定
-    void initViewport(const int width, const int height);
+    void initViewport();
     //シザリング矩形設定
-    void initScissorRect(const int width, const int height);
+    void initScissorRect();
     //レンダーコンテキスト生成
     void initRenderContext();
     //フルスクリーン四角形生成
     void initFullScreenQuad();
-
-    //オフスクリーンレンダーターゲットの設定生成
-    void createOffScreenRenderTargetConf();
 
     //レンダーターゲットビューのハンドルを設定
     void setMainRTVHandle();
@@ -95,8 +92,6 @@ private://生成系
     void setOffScreenRTVHandle();
     //深度ステンシルビューのハンドルを設定
     void updateDSVHandle();
-    //オフスクリーンレンダーターゲットの設定を更新
-    void updateOffScreenRenderTargetConf();
 
 public://取得系
     //デバイス取得
@@ -121,9 +116,6 @@ private:
     D3D12_VIEWPORT viewport_;                                       //ビューポート
     D3D12_RECT scissor_rect_;                                       //シザリング矩形
     std::shared_ptr<RenderContext> render_context_;                 //レンダーコンテキスト
-
-
-
 
     D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_rtv_handle_;	//現在書き込み中のフレームバッファのレンダーターゲットビューのハンドル
     D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_dsv_handle_;	//現在書き込み中のフレームバッファの深度ステンシルビューのハンドル

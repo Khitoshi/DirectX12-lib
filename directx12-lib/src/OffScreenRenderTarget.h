@@ -92,5 +92,4 @@ private:
 
     D3D12_CPU_DESCRIPTOR_HANDLE depth_stencil_view_handle_; //深度ステンシルビューハンドル
     D3D12_VIEWPORT viewport_;                               //ビューポート
-
 };

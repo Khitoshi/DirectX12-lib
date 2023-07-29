@@ -1,19 +1,24 @@
 #pragma once
 #include "d3dx12.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "RenderContext.h"
-#include "Texture.h"
-#include "Rotation.h"
-#include "RootSignatureCacheManager.h"
-#include "ShaderCacheManager.h"
-#include "PSOCacheManager.h"
-#include "OffScreenRenderTarget.h"
-#include "RotationEffect.h"
+
 #include <memory>
 #include <DirectXMath.h>
 #include <stdexcept>
 #include <map>
+
+class RootSignature;
+class PipelineStateObject;
+class VertexBuffer;
+class IndexBuffer;
+class Texture;
+class Camera;
+class RenderContext;
+class Rotation;
+class RotationEffect;
+class OffScreenRenderTarget;
+class Shader;
+class DepthStencil;
+
 using namespace Microsoft::WRL;
 
 /// <summary>
@@ -24,47 +29,50 @@ class Sprite
 public:
     struct SpriteConf
     {
-        ID3D12Device* device;
-        const char* filePath;
+        const char* file_path;
         Camera* camera;
     };
 
 public:
     Sprite(SpriteConf c) :
-        conf(c),
-        rootSignature(),
-        defaultShaderPair(),
-        defaultPipelineStateObject(),
-        vertexBuffer(),
-        indexBuffer(),
-        vertices(),
-        numIndices(),
-        texture()
+        conf_(c),
+        root_signature_(nullptr),
+        pixel_shader_(nullptr),
+        vertex_shader_(nullptr),
+        pso_(nullptr),
+        vertex_buffer_(nullptr),
+        index_buffer_(nullptr),
+        num_indices_(0),
+        vertices_(),
+        texture_(nullptr),
+        off_screen_render_target_(nullptr)
     {};
     ~Sprite() {};
 
     //初期化処理
-    void init();
+    void init(ID3D12Device* device);
     //描画処理
     void draw(RenderContext* rc);
 
 private:
 
     //ルートシグネチャの作成
-    void initRootSignature();
+    void initRootSignature(ID3D12Device* device);
     //シェーダーのロード
     void initShader();
     //パイプラインステートオブジェクトの作成
-    void initPipelineStateObject();
+    void initPipelineStateObject(ID3D12Device* device);
 
     //頂点バッファの作成
-    void initVertexBuffer();
+    void initVertexBuffer(ID3D12Device* device);
     //インデックスバッファの作成
-    void initIndexBuffer();
+    void initIndexBuffer(ID3D12Device* device);
     //テクスチャの作成
-    void initTexture();
+    void initTexture(ID3D12Device* device);
     //オフスクリーンレンダーターゲットの作成
-    void initOffScreenRenderTarget();
+    void initOffScreenRenderTarget(ID3D12Device* device);
+    //深度ステンシルの作成
+    void initDepthStencil(ID3D12Device* device);
 public:
     //頂点データ
     struct Vertex
@@ -77,16 +85,9 @@ public:
     /// 頂点データの設定
     /// </summary>
     /// <param name="vertices">頂点情報</param>
-    void setVertices(Vertex vertices[4]) {
-        this->vertices[0] = vertices[0];
-        this->vertices[1] = vertices[1];
-        this->vertices[2] = vertices[2];
-        this->vertices[3] = vertices[3];
-        vertexBuffer->copy(this->vertices);
-    };
+    void setVertices(Vertex vertices[4]);
 
-public:
-
+public://取得系
     /// <summary>
     /// 頂点データの取得
     /// </summary>
@@ -98,29 +99,28 @@ public:
         if (index < 0 || index >= 4) {
             throw std::out_of_range("index out of range");
         }
-        return vertices[index];
+        return vertices_[index];
     };
 
 private:
     enum class SpriteOptions : uint8_t {
-        None = 1 << 0, // 1
-        Rotated = 1 << 1, // 2
+        NONE = 1 << 0, // 1
+        ROTATED = 1 << 1, // 2
         // 他のオプション...
 
-        Num,
+        NUM,
     };
-    SpriteConf conf;
-    std::shared_ptr<RootSignature> rootSignature;                                   //ルートシグニチャ
-    BasicShaderPair defaultShaderPair;												//デフォルトのシェーダー
-    std::shared_ptr<PipelineStateObject> defaultPipelineStateObject;                       //パイプラインステートオブジェクト
-    std::shared_ptr<VertexBuffer> vertexBuffer;                                     //頂点バッファ
-    std::shared_ptr<IndexBuffer> indexBuffer;                                       //インデックスバッファ
-    Vertex vertices[4];										                        //頂点データ
-    unsigned int numIndices;                                                        //インデックス数
-    std::shared_ptr<Texture> texture;												//テクスチャ
 
-    std::shared_ptr<Rotation> rotation;												//回転
-
-    std::shared_ptr<RotationEffect> rotationEffect;									//回転エフェクト
-    std::shared_ptr<OffScreenRenderTarget> offScreenRenderTarget;					//オフスクリーンレンダーターゲット
+    SpriteConf conf_;
+    std::shared_ptr<RootSignature> root_signature_;                     //ルートシグニチャ
+    std::shared_ptr<Shader> pixel_shader_;                              //ピクセルシェーダー
+    std::shared_ptr<Shader> vertex_shader_;                             //頂点シェーダー
+    std::shared_ptr<PipelineStateObject> pso_;                          //パイプラインステートオブジェクト
+    std::shared_ptr<VertexBuffer> vertex_buffer_;                       //頂点バッファ
+    std::shared_ptr<IndexBuffer> index_buffer_;                         //インデックスバッファ
+    Vertex vertices_[4];										        //頂点データ
+    unsigned int num_indices_;                                          //インデックス数
+    std::shared_ptr<Texture> texture_;									//テクスチャ
+    std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;   //オフスクリーンレンダーターゲット
+    std::shared_ptr< DepthStencil> depth_stencil_;                      //深度ステンシル
 };

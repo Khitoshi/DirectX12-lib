@@ -44,8 +44,6 @@
     <ClCompile Include="src\PipelineStateObject.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\RootSignature.cpp" />
-    <ClCompile Include="src\Rotation.cpp" />
-    <ClCompile Include="src\RotationEffect.cpp" />
     <ClCompile Include="src\SceneTriangle.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderCacheManager.cpp" />
@@ -69,6 +67,7 @@
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\d3dx12.h" />
     <ClInclude Include="src\DepthStencil.h" />
+    <ClInclude Include="src\DepthStencilCacheManager.h" />
     <ClInclude Include="src\DepthStencilFactory.h" />
     <ClInclude Include="src\DescriptorHeapCache.h" />
     <ClInclude Include="src\DeviceContext.h" />
@@ -96,6 +95,7 @@
     <ClInclude Include="src\OffScreenRenderTargetCacheManager.h" />
     <ClInclude Include="src\OffScreenRenderTargetFactory.h" />
     <ClInclude Include="src\PipelineStateObject.h" />
+    <ClInclude Include="src\PipelineStateObjectFactory.h" />
     <ClInclude Include="src\PSOCacheManager.h" />
     <ClInclude Include="src\RenderContext.h" />
     <ClInclude Include="src\RenderContextFactory.h" />
@@ -105,15 +105,14 @@
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RootSignature.h" />
     <ClInclude Include="src\RootSignatureCacheManager.h" />
-    <ClInclude Include="src\RootSignatureConf.h" />
-    <ClInclude Include="src\Rotation.h" />
-    <ClInclude Include="src\RotationEffect.h" />
+    <ClInclude Include="src\RootSignatureFactory.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\SceneDefault.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\SceneTriangle.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderCacheManager.h" />
+    <ClInclude Include="src\ShaderFactory.h" />
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\SceneSprite.h" />
     <ClInclude Include="src\SpriteModifier.h" />
@@ -121,10 +120,12 @@
     <ClInclude Include="src\OffScreenRenderTarget.h" />
     <ClInclude Include="src\SwapChainFactory.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\TextureCacheManager.h" />
+    <ClInclude Include="src\TextureFactory.h" />
     <ClInclude Include="src\Triangle.h" />
     <ClInclude Include="src\VertexBuffer.h" />
+    <ClInclude Include="src\VertexBufferFactory.h" />
     <ClInclude Include="src\Window.h" />
-    <ClInclude Include="src\WindowConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\FullScreenQuadPS.hlsl">

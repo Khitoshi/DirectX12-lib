@@ -5,8 +5,6 @@
 /// </summary>
 void Camera::init()
 {
-
-
 }
 
 /// <summary>

@@ -1,15 +1,8 @@
 #pragma once
 
 #include "d3dx12.h"
-#include "RenderContext.h"
-#include "OffScreenRenderTarget.h"
-/// <summary>
-/// シーン
-/// </summary>
-struct SceneConf {
-    ID3D12Device* device;
-    RenderContext* renderContext;
-};
+
+class RenderContext;
 
 /// <summary>
 /// 仮想的なscene
@@ -18,26 +11,29 @@ class Scene
 {
 public:
     Scene() {};
-    ~Scene() {};
+    virtual ~Scene() {};
 
     /// <summary>
     /// 仮想な初期化
     /// </summary>
     /// <param name="conf"></param>
-    virtual void init(SceneConf conf) = 0;
+    virtual void init(ID3D12Device* device) = 0;
+
     /// <summary>
-    /// 仮想な終了か
+    /// 仮想な終了化
     /// </summary>
     virtual void finalize() = 0;
+
     /// <summary>
     /// 仮想な更新処理
     /// </summary>
     virtual void update() = 0;
+
     /// <summary>
     /// 仮想な描画処理
     /// </summary>
-    /// <param name="conf"></param>
-    virtual void render(SceneConf conf) = 0;
+    /// <param name="rc">描画処理をラッピングしているクラスのポインタ</param>
+    virtual void render(RenderContext* rc) = 0;
 
     /// <summary>
     /// 仮想なImGuiメニュー

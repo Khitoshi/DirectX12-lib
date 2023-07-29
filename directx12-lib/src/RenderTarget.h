@@ -5,7 +5,6 @@
 #include <vector>
 using namespace Microsoft::WRL;
 
-
 /// <summary>
 /// レンダーターゲット生成用クラス
 /// </summary>
@@ -56,5 +55,4 @@ private:
     ComPtr<ID3D12DescriptorHeap> descriptor_heap_;  //ディスクリプタヒープ
     int descriptor_heap_size_;                      //ディスクリプタヒープのサイズ
     std::vector<ComPtr<ID3D12Resource>> resource_;  //リソース
-
 };

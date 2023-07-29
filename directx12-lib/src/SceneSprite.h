@@ -1,33 +1,35 @@
 #pragma once
-#include "Sprite.h"
+
 #include "Scene.h"
-#include "Camera.h"
+#include "Sprite.h"
 #include <memory>
+
+class Camera;
 
 /// <summary>
 /// スプライト描画用シーン
 /// </summary>
-class SceneSprite : public Scene
+class SceneSprite final : public Scene
 {
 public:
     SceneSprite() :
-        sprite(),
-        vertex(),
-        isChangeVertex(false),
-        camera()
+        sprite_(),
+        vertex_(),
+        is_change_vertex_(false),
+        camera_()
     {};
     ~SceneSprite() {};
 
     //初期化処理
-    void init(SceneConf conf);
+    void init(ID3D12Device* device)override;
     //終了処理
-    void finalize();
+    void finalize()override;
     //更新処理
-    void update();
+    void update()override;
     //描画処理
-    void render(SceneConf conf);
+    void render(RenderContext* rc)override;
     //ImGuiメニュー
-    void updateImguiMenu();
+    void updateImguiMenu()override;
 private:
     enum ImageFeature
     {
@@ -35,12 +37,12 @@ private:
         FEATURE_ROTATE = 1 << 0, // 0001
         //FEATURE_SCALE = 1 << 1,  // 0010
         //FEATURE_TRANSLATE = 1 << 2 // 0100
-        // 更に追加機能があればここに定義します...
+
     };
     unsigned int imageFeatures = FEATURE_NONE;
 
-    std::shared_ptr<Sprite> sprite;         //スプライト
-    Sprite::Vertex vertex[4];               //頂点座標
-    bool isChangeVertex;                    //頂点座標を変更したか
-    std::shared_ptr<Camera> camera;         //カメラ
+    std::shared_ptr<Sprite> sprite_;    //スプライト
+    Sprite::Vertex vertex_[4];          //頂点座標
+    bool is_change_vertex_;             //頂点座標を変更したか
+    std::shared_ptr<Camera> camera_;    //カメラ
 };

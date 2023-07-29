@@ -2,6 +2,7 @@
 #include "d3dx12.h"
 #include <DirectXMath.h>
 #include <winerror.h>
+
 using namespace Microsoft::WRL;
 
 /// <summary>
@@ -69,5 +70,4 @@ public://取得系
 public:
     ComPtr<ID3D12Resource>          resource_;               //リソース
     ComPtr<ID3D12DescriptorHeap>    descriptor_heap_;         //ディスクリプタヒープ
-
 };

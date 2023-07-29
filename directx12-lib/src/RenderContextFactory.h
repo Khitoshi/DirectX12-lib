@@ -4,6 +4,9 @@
 #include<memory>
 class GraphicsCommandList;
 
+/// <summary>
+/// レンダーコンテキストのファクトリクラス
+/// </summary>
 class RenderContextFactory
 {
 public:

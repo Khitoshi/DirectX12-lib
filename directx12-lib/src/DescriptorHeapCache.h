@@ -49,7 +49,7 @@ private:
     void create(ID3D12Device* device, DescriptorHeapCacheConf conf, ID3D12DescriptorHeap* descriptorHeap, D3D12_SHADER_RESOURCE_VIEW_DESC desc)
     {
         D3D12_CPU_DESCRIPTOR_HANDLE handle = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-        handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * conf.slot;
+        handle.ptr += static_cast<unsigned long long>(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)) * conf.slot;
 
         device->CreateShaderResourceView(conf.resource, &desc, handle);
         handleMapCache_[conf.slot] = conf.resource;
@@ -57,5 +57,4 @@ private:
 
 private:
     std::map<UINT, ID3D12Resource*> handleMapCache_;    //slotをキーにしたリソースのマップ
-
 };

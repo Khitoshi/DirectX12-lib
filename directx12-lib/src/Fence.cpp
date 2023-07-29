@@ -15,7 +15,7 @@ void Fence::init(ID3D12Device* device)
 /// <summary>
 /// Fenceの生成
 /// </summary>
-/// <param name="device"></param>
+/// <param name="device">GPUデバイス</param>
 void Fence::createFence(ID3D12Device* device)
 {
     if (FAILED(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&this->fence_)))) {

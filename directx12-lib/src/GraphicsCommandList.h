@@ -26,5 +26,4 @@ public:
 
 private:
     ComPtr<ID3D12GraphicsCommandList5> command_list_;   //コマンドリスト
-
 };

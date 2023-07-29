@@ -24,5 +24,4 @@ public://取得系
 
 private:
     ComPtr<ID3D12CommandQueue>command_queue_;   //コマンドキュー
-
 };

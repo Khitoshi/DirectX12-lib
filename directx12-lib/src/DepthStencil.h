@@ -20,6 +20,14 @@ public:
         UINT frame_buffer_count;    //フレームバッファ数
         UINT width;                 //幅
         UINT height;                //高さ
+
+        bool operator==(const DepthStencilConf& conf) const
+        {
+            return
+                frame_buffer_count == conf.frame_buffer_count &&
+                width == conf.width &&
+                height == conf.height;
+        }
     };
 
 private:

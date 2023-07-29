@@ -67,4 +67,3 @@ void ConstantBuffer::createView(ID3D12Device* device)
         throw std::runtime_error("ConstantBuffer::createView() : resource->SetName() Failed.");
     }
 }
-

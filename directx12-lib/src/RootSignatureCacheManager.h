@@ -1,31 +1,35 @@
 #pragma once
-#include "RootSignature.h"
+#include "RootSignatureFactory.h"
 #include "Shader.h"
 #include "HashCombine.h"
 #include <unordered_map>
 
-
-
+/// <summary>
+/// ルートシグネチャのキャッシュを管理するクラス
+/// </summary>
 class RootSignatureCacheManager
 {
 public:
+    /// <summary>
+    /// ハッシュ関数用の構造体
+    /// </summary>
     struct RootSignatureCacheKeyHasher
     {
-        std::size_t operator()(const RootSignatureConf& k) const
+        std::size_t operator()(const RootSignature::RootSignatureConf& k) const
         {
             std::size_t seed = 0;
-            hash_combine(seed, k.samplerFilter);
-            hash_combine(seed, k.textureAddressModeU);
-            hash_combine(seed, k.textureAddressModeV);
-            hash_combine(seed, k.textureAddressModeW);
-            hash_combine(seed, k.numSampler);
-            hash_combine(seed, k.maxCbvDescriptor);
-            hash_combine(seed, k.maxSrvDescriptor);
-            hash_combine(seed, k.maxUavDescriptor);
-            hash_combine(seed, k.offsetInDescriptorsFromTableStartCB);
-            hash_combine(seed, k.offsetInDescriptorsFromTableStartSRV);
-            hash_combine(seed, k.offsetInDescriptorsFromTableStartUAV);
-            hash_combine(seed, k.rootSignatureFlags);
+            hash_combine(seed, k.sampler_filter);
+            hash_combine(seed, k.texture_address_modeU);
+            hash_combine(seed, k.texture_address_modeV);
+            hash_combine(seed, k.texture_address_modeW);
+            hash_combine(seed, k.num_sampler);
+            hash_combine(seed, k.max_cbv_descriptor);
+            hash_combine(seed, k.max_srv_descriptor);
+            hash_combine(seed, k.max_uav_descriptor);
+            hash_combine(seed, k.offset_in_descriptors_from_table_start_cb);
+            hash_combine(seed, k.offset_in_descriptors_from_table_start_srv);
+            hash_combine(seed, k.offset_in_descriptors_from_table_start_uav);
+            hash_combine(seed, k.root_signature_flags);
             return seed;
         }
     };
@@ -35,36 +39,37 @@ private:
     ~RootSignatureCacheManager() {};
 
 public:
+    /// <summary>
+    /// シングルトンなインスタンスを取得する
+    /// </summary>
+    /// <returns>シングルトンなインスタンス</returns>
     static RootSignatureCacheManager& getInstance()
     {
         static RootSignatureCacheManager instance;
         return instance;
     }
 
-    std::shared_ptr<RootSignature> getOrCreate(ID3D12Device* device, const RootSignatureConf& conf) {
-
-        auto it = this->rootSignatureMapCache.find(conf);
+    /// <summary>
+    /// 取得したいルートシグネチャの設定を指定して,ルートシグネチャを取得する
+    /// </summary>
+    /// <param name="device">GPUデバイス</param>
+    /// <param name="conf">設定</param>
+    /// <returns></returns>
+    std::shared_ptr<RootSignature> getOrCreate(ID3D12Device* device, const RootSignature::RootSignatureConf& conf) {
+        auto it = this->root_signature_map_cache_.find(conf);
 
         //キャッシュにあるならそれを返す
-        if (it != this->rootSignatureMapCache.end()) {
+        if (it != this->root_signature_map_cache_.end()) {
             return it->second;
         }
 
-        std::shared_ptr<RootSignature> rootSignature = this->createRootSignature(device, conf);
-        this->rootSignatureMapCache[conf] = rootSignature;
+        //存在しない場合,作成して返す
+        std::shared_ptr<RootSignature> rootSignature = RootSignatureFactory::create(device, conf);
+        this->root_signature_map_cache_[conf] = rootSignature;
         return rootSignature;
     }
 
 private:
-    //ルートシグネチャ生成
-    std::shared_ptr<RootSignature> createRootSignature(ID3D12Device* device, const RootSignatureConf& conf)
-    {
-        std::shared_ptr<RootSignature> rootSignature = std::make_shared<RootSignature>();
-        rootSignature->init(device, conf);
-        return rootSignature;
-    }
-
-private:
-
-    std::unordered_map<RootSignatureConf, std::shared_ptr<RootSignature>, RootSignatureCacheKeyHasher, std::equal_to<RootSignatureConf>> rootSignatureMapCache;
+    //ルートシグネチャのキャッシュ
+    std::unordered_map<RootSignature::RootSignatureConf, std::shared_ptr<RootSignature>, RootSignatureCacheKeyHasher, std::equal_to<RootSignature::RootSignatureConf>> root_signature_map_cache_;
 };

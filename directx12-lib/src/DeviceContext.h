@@ -26,4 +26,3 @@ public://取得系
 private:
     ComPtr<ID3D12Device5>device_;   //GPUデバイス
 };
-

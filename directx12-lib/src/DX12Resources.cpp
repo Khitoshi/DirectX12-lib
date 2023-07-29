@@ -7,13 +7,11 @@
 #include "GraphicsCommandListFactory.h"
 #include "RenderTargetFactory.h"
 #include "CompositeRenderTargetFactory.h"
-#include "DepthStencilFactory.h"
+#include "DepthStencilCacheManager.h"
 #include "FenceFactory.h"
 #include "RenderContextFactory.h"
 #include "FullScreenQuadFactory.h"
-#include "OffScreenRenderTargetCacheManager.h"
 #include "CommonGraphicsConfig.h"
-
 #include <stdexcept>
 
 /// <summary>
@@ -22,24 +20,23 @@
 /// <param name="hWnd">windowハンドル</param>
 /// <param name="width">幅</param>
 /// <param name="height">高さ</param>
-void DX12Resources::init(const HWND hWnd, const int width, const int height)
+void DX12Resources::init(const HWND hWnd)
 {
     //所有権が変わるので解放は合計で1回になる
     ComPtr<IDXGIFactory4> factory = createFactory();
     this->device_context_ = DeviceContextFactory::create(factory.Get());
     initCommandQueue();
-    initSwapChain(hWnd, width, height, frameBufferCount, factory.Get());
+    initSwapChain(hWnd, factory.Get());
     initCommandAllocator();
     initCommandList();
     initRenderTarget();
     initCompositeRenderTarget();
-    initDepthStencil(width, height);
+    initDepthStencil();
     initFence();
-    initViewport(width, height);
-    initScissorRect(width, height);
+    initViewport();
+    initScissorRect();
     initRenderContext();
     initFullScreenQuad();
-    createOffScreenRenderTargetConf();
 }
 
 /// <summary>
@@ -59,8 +56,6 @@ void DX12Resources::beginRender()
 
     //深度ステンシルビューのハンドルを設定
     this->updateDSVHandle();
-
-    updateOffScreenRenderTargetConf();
 }
 
 /// <summary>
@@ -186,11 +181,11 @@ void DX12Resources::initCommandQueue()
 /// <param name="width">幅</param>
 /// <param name="height">高さ</param>
 /// <param name="factory">dxgiファクトリ</param>
-void DX12Resources::initSwapChain(const HWND hWnd, const int width, const int height, const int frameBufferCount, IDXGIFactory4* factory) {
+void DX12Resources::initSwapChain(const HWND hWnd, IDXGIFactory4* factory) {
     SwapChain::SwapChainConf sc_conf = {};
     sc_conf.hWnd = hWnd;
-    sc_conf.width = width;
-    sc_conf.height = height;
+    sc_conf.width = windowWidth;
+    sc_conf.height = windowHeight;
     sc_conf.frame_buffer_count = frameBufferCount;
     sc_conf.factory = factory;
     sc_conf.command_queue = this->command_queue_->getCommandQueue();
@@ -240,13 +235,13 @@ void DX12Resources::initCompositeRenderTarget()
 /// </summary>
 /// <param name="width">幅</param>
 /// <param name="height">高さ</param>
-void DX12Resources::initDepthStencil(const int width, const int height)
+void DX12Resources::initDepthStencil()
 {
     DepthStencil::DepthStencilConf ds_conf = {};
-    ds_conf.width = width;
-    ds_conf.height = height;
+    ds_conf.width = windowWidth;
+    ds_conf.height = windowHeight;
     ds_conf.frame_buffer_count = frameBufferCount;
-    this->depth_stencil_ = DepthStencilFactory::create(ds_conf, this->device_context_->getDevice());
+    this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, this->device_context_->getDevice());
 }
 
 /// <summary>
@@ -262,12 +257,12 @@ void DX12Resources::initFence()
 /// </summary>
 /// <param name="width">幅</param>
 /// <param name="height">高さ</param>
-void DX12Resources::initViewport(const int width, const int height)
+void DX12Resources::initViewport()
 {
     this->viewport_.TopLeftX = 0;
     this->viewport_.TopLeftY = 0;
-    this->viewport_.Width = static_cast<FLOAT>(width);
-    this->viewport_.Height = static_cast<FLOAT>(height);
+    this->viewport_.Width = static_cast<FLOAT>(windowWidth);
+    this->viewport_.Height = static_cast<FLOAT>(windowHeight);
     this->viewport_.MinDepth = D3D12_MIN_DEPTH;
     this->viewport_.MaxDepth = D3D12_MAX_DEPTH;
 }
@@ -277,12 +272,12 @@ void DX12Resources::initViewport(const int width, const int height)
 /// </summary>
 /// <param name="width">幅</param>
 /// <param name="height">高さ</param>
-void DX12Resources::initScissorRect(const int width, const int height)
+void DX12Resources::initScissorRect()
 {
     this->scissor_rect_.left = 0;
     this->scissor_rect_.top = 0;
-    this->scissor_rect_.right = width;
-    this->scissor_rect_.bottom = height;
+    this->scissor_rect_.right = windowWidth;
+    this->scissor_rect_.bottom = windowHeight;
 }
 
 /// <summary>
@@ -299,21 +294,6 @@ void DX12Resources::initRenderContext()
 void DX12Resources::initFullScreenQuad()
 {
     this->full_screen_quad_ = FullScreenQuadFactory::create(this->device_context_->getDevice());
-}
-
-/// <summary>
-/// オフスクリーンレンダーターゲットの設定をする
-/// </summary>
-void DX12Resources::createOffScreenRenderTargetConf()
-{
-    //オフスクリーンで使用する深度ステンシルビューのハンドルを設定
-    OffScreenRenderTargetCacheManager::getInstance().setDepthStencilViewHandle(this->current_frame_buffer_dsv_handle_);
-    OffScreenRenderTargetCacheManager::getInstance().setViewport(this->viewport_);
-
-    OffScreenRenderTarget::OffScreenRenderTargetConf osrt_conf = {};
-    osrt_conf.descriptor_heap_desc = this->render_target_->getDescriptorHeap()->GetDesc();
-    osrt_conf.resource_desc = this->render_target_->getResource(this->frame_index_)->GetDesc();
-    OffScreenRenderTargetCacheManager::getInstance().setConf(osrt_conf);
 }
 
 /// <summary>
@@ -342,20 +322,3 @@ void DX12Resources::updateDSVHandle()
 {
     this->current_frame_buffer_dsv_handle_ = this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
 }
-
-/// <summary>
-/// offscreenレンダーターゲットの設定を更新
-/// </summary>
-void DX12Resources::updateOffScreenRenderTargetConf()
-{
-    //オフスクリーンで使用する深度ステンシルビューのハンドルを設定
-    OffScreenRenderTargetCacheManager::getInstance().setDepthStencilViewHandle(this->current_frame_buffer_dsv_handle_);
-    //オフスクリーンで使用するビューポートを設定
-    OffScreenRenderTargetCacheManager::getInstance().setViewport(this->viewport_);
-
-    OffScreenRenderTarget::OffScreenRenderTargetConf osrt_conf = {};
-    osrt_conf.descriptor_heap_desc = this->render_target_->getDescriptorHeap()->GetDesc();
-    osrt_conf.resource_desc = this->render_target_->getResource(this->frame_index_)->GetDesc();
-    OffScreenRenderTargetCacheManager::getInstance().setConf(osrt_conf);
-}
-

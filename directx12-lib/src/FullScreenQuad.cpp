@@ -1,4 +1,7 @@
 #include "FullScreenQuad.h"
+
+#include "VertexBufferFactory.h"
+
 #include "RenderContext.h"
 #include "ShaderCacheManager.h"
 #include "RootSignatureCacheManager.h"
@@ -8,7 +11,7 @@
 /// <summary>
 /// 初期化処理
 /// </summary>
-/// <param name="device">初期化&生成済みのGPUデバイス</param>
+/// <param name="device">GPUデバイス</param>
 void FullScreenQuad::init(ID3D12Device* device)
 {
     createShader(device);
@@ -53,17 +56,17 @@ void FullScreenQuad::draw(RenderContext* rc, ID3D12Device* device, CompositeRend
 void FullScreenQuad::createShader(ID3D12Device* device)
 {
     {//頂点シェーダー
-        ShaderConf conf = {};
-        conf.currentShaderModelType = ShaderConf::ShaderModelType::Vertex;
-        conf.entryFuncName = "VSMain";
-        conf.filePath = "./src/shaders/FullScreenQuadVS.hlsl";
+        Shader::ShaderConf conf = {};
+        conf.current_shader_model_type = Shader::ShaderConf::ShaderModelType::VERTEX;
+        conf.entry_func_name = "VSMain";
+        conf.file_path = "./src/shaders/FullScreenQuadVS.hlsl";
         this->vertex_shader_ = ShaderCacheManager::getInstance().getOrCreate(conf);
     }
     {//ピクセルシェーダー
-        ShaderConf conf = {};
-        conf.currentShaderModelType = ShaderConf::ShaderModelType::Pixel;
-        conf.entryFuncName = "PSMain";
-        conf.filePath = "./src/shaders/FullScreenQuadPS.hlsl";
+        Shader::ShaderConf conf = {};
+        conf.current_shader_model_type = Shader::ShaderConf::ShaderModelType::PIXEL;
+        conf.entry_func_name = "PSMain";
+        conf.file_path = "./src/shaders/FullScreenQuadPS.hlsl";
         this->pixel_shader_ = ShaderCacheManager::getInstance().getOrCreate(conf);
     }
 }
@@ -82,12 +85,10 @@ void FullScreenQuad::createVertexBuffer(ID3D12Device* device)
         {{  1.0f,  1.0f, 0.0f }, {1,0}}, // 右上
     };
 
-    VertexBufferConf conf = {};
-    conf.device = device;
+    VertexBuffer::VertexBufferConf conf = {};
     conf.size = sizeof(vertices);
     conf.stride = sizeof(Vertex);
-    vertex_buffer_ = std::make_shared<VertexBuffer>();
-    vertex_buffer_->init(conf);
+    vertex_buffer_ = VertexBufferFactory::create(conf, device);
     vertex_buffer_->copy(vertices);
 }
 
@@ -98,15 +99,15 @@ void FullScreenQuad::createVertexBuffer(ID3D12Device* device)
 void FullScreenQuad::createRootSignature(ID3D12Device* device)
 {
     //ルートシグニチャの設定(レジスタを使用しないので空にする)
-    RootSignatureConf conf = {};
-    conf.rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-    conf.samplerFilter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-    conf.textureAddressModeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    conf.textureAddressModeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    conf.textureAddressModeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    conf.numSampler = 1;
-    conf.maxSrvDescriptor = 1;
-    conf.offsetInDescriptorsFromTableStartSRV = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+    RootSignature::RootSignatureConf conf = {};
+    conf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+    conf.sampler_filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+    conf.texture_address_modeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    conf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    conf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    conf.num_sampler = 1;
+    conf.max_srv_descriptor = 1;
+    conf.offset_in_descriptors_from_table_start_srv = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
     this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, conf);
 }
@@ -114,7 +115,7 @@ void FullScreenQuad::createRootSignature(ID3D12Device* device)
 /// <summary>
 /// パイプラインステートオブジェクト作成
 /// </summary>
-/// <param name="device">初期化&生成済みのGPUデバイス</param>
+/// <param name="device">GPUデバイス</param>
 void FullScreenQuad::createPipelineState(ID3D12Device* device)
 {
     // インプットレイアウト
@@ -146,7 +147,7 @@ void FullScreenQuad::createPipelineState(ID3D12Device* device)
     PipelineStateObject::PipelineStateObjectConf conf;
     conf.desc = desc;
 
-    this->pso_ = PSOCacheManager::getInstance().getPSO(device, conf);
+    this->pso_ = PSOCacheManager::getInstance().getOrCreate(device, conf);
 }
 
 void FullScreenQuad::createSRVHeap(ID3D12Device* device)
@@ -172,4 +173,3 @@ void FullScreenQuad::createSRV(ID3D12Device* device, CompositeRenderTarget* osrt
 
     device->CreateShaderResourceView(osrt->getResource(), &srv_desc, this->srv_heap_->GetCPUDescriptorHandleForHeapStart());
 }
-

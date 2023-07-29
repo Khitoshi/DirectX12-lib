@@ -37,7 +37,6 @@ namespace std {
             hash_combine(seed, rDesc.SlopeScaledDepthBias);
             return seed;
         }
-
     };
 
     template<>
@@ -115,5 +114,4 @@ namespace std {
             return seed;
         }
     };
-
 }

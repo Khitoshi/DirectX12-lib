@@ -18,9 +18,8 @@ public:
     /// </returns>
     static std::shared_ptr<RenderTarget> create(const RenderTarget::RenderTargetConf& conf, ID3D12Device* device)
     {
-        std::shared_ptr<RenderTarget> renderTarget(new RenderTarget(conf));
-        renderTarget->init(device);
-        return renderTarget;
+        std::shared_ptr<RenderTarget> render_target(new RenderTarget(conf));
+        render_target->init(device);
+        return render_target;
     }
-
 };

@@ -9,7 +9,9 @@
 #include "ConstantBuffer.h"
 #include "CommonGraphicsConfig.h"
 #include <dxgi1_4.h>
+
 using namespace Microsoft::WRL;
+
 /// <summary>
 /// レンダーコンテキスト
 /// コマンドリスト関係の処理をまとめたクラス
@@ -148,7 +150,6 @@ public:
         this->barriers_.push_back(barrier);
     }
 
-
     /// <summary>
     /// OffScreenRenderTargetへの描き込み開始
     /// PIXEL_SHADER_RESOURCE -> RENDER_TARGET
@@ -191,7 +192,6 @@ public:
             this->barriers_.clear();
         }
     }
-
 
     /// <summary>
     /// ディスクリプタヒープの登録
@@ -253,7 +253,7 @@ public:
     /// <summary>
     /// インデックス付きの描画コールを実行
     /// </summary>
-    /// <param name="indexCount">インデックスの要素数</param>
+    /// <param name="indexCount">インデックスの数</param>
     void drawIndexed(UINT indexCount) {
         this->command_list_->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
     }
@@ -261,10 +261,10 @@ public:
     /// <summary>
     /// インデックスなしの描画コールを実行
     /// </summary>
-    /// <param name="indexCount"></param>
-    void drawInstanced(UINT indexCount)
+    /// <param name="indexCount">インデックスの数</param>
+    void drawInstanced(UINT index_count)
     {
-        this->command_list_->DrawInstanced(indexCount, 1, 0, 0);
+        this->command_list_->DrawInstanced(index_count, 1, 0, 0);
     }
 
     /// <summary>
@@ -284,8 +284,8 @@ public:
         this->command_list_->SetDescriptorHeaps(1, &ds);
         this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
     }
-    void setTexture(ID3D12DescriptorHeap* ds, int dsNum) {
-        this->command_list_->SetDescriptorHeaps(dsNum, &ds);
+    void setTexture(ID3D12DescriptorHeap* ds, int ds_num) {
+        this->command_list_->SetDescriptorHeaps(ds_num, &ds);
         this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
     }
 

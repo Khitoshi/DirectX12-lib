@@ -4,77 +4,57 @@
 #include <string>
 using namespace Microsoft::WRL;
 
-struct ShaderConf
-{
-    std::string filePath;
-    std::string entryFuncName;
-
-    const enum class ShaderModelType
-    {
-        Pixel = 0,
-        Vertex,
-        NumTypes
-    };
-    const std::string ShaderModelNames[(int)ShaderModelType::NumTypes] = {
-        "ps_5_0",
-        "vs_5_0",
-    };
-
-    //シェーダーモデルの設定
-    ShaderModelType currentShaderModelType;
-
-    bool operator==(const ShaderConf& other) const
-    {
-        return filePath == other.filePath &&
-            entryFuncName == other.entryFuncName &&
-            (int)currentShaderModelType == (int)other.currentShaderModelType;
-    }
-};
-
-struct ShaderConfHash
-{
-    size_t operator()(const ShaderConf& shaderConf) const
-    {
-        std::hash<std::string> stringHasher;
-        size_t filePathHash = stringHasher(shaderConf.filePath);
-        size_t entryFuncNameHash = stringHasher(shaderConf.entryFuncName);
-        size_t shaderModelTypeHash = std::hash<int>()(static_cast<int>(shaderConf.currentShaderModelType));
-
-        // Combined hash of all values
-        return filePathHash ^ (entryFuncNameHash << 1) ^ (shaderModelTypeHash << 2);
-    }
-};
-
 /// <summary>
 /// シェーダーのコンパイル用クラス
 /// </summary>
 class Shader
 {
+    friend class ShaderFactory;
 public:
-    Shader() :shaderBlob() {};
+    /// <summary>
+    /// シェーダーの設定
+    /// </summary>
+    struct ShaderConf
+    {
+        std::string file_path;
+        std::string entry_func_name;
+
+        const enum class ShaderModelType
+        {
+            PIXEL = 0,
+            VERTEX,
+            NUM
+        };
+        const std::string ShaderModelNames[(int)ShaderModelType::NUM] = {
+            "ps_5_0",
+            "vs_5_0",
+        };
+
+        //シェーダーモデルの設定
+        ShaderModelType current_shader_model_type;
+
+        bool operator==(const ShaderConf& other) const
+        {
+            return file_path == other.file_path &&
+                entry_func_name == other.entry_func_name &&
+                (int)current_shader_model_type == (int)other.current_shader_model_type;
+        }
+    };
+
+private:
+    Shader() :shader_blob_() {};
+
+public:
     ~Shader() {};
 
+private:
     //シェーダーのロード
     void load(ShaderConf conf);
 
-public:
+public://取得系
     //シェーダーバイナリの取得
-    ID3D10Blob* getShaderBlob() const { return shaderBlob.Get(); }
+    ID3D10Blob* getShaderBlob() const { return shader_blob_.Get(); }
 
 private:
-    ComPtr<ID3D10Blob> shaderBlob;  //シェーダーバイナリ
-};
-
-/// <summary>
-/// 最低限のシェーダーのペア
-/// </summary>
-struct BasicShaderPair {
-    std::shared_ptr<Shader> pixelShader;
-    std::shared_ptr<Shader> vertexShader;
-
-bool operator==(const BasicShaderPair& other) const
-	{
-		return pixelShader == other.pixelShader &&
-			vertexShader == other.vertexShader;
-	}
+    ComPtr<ID3D10Blob> shader_blob_;  //シェーダーバイナリ
 };

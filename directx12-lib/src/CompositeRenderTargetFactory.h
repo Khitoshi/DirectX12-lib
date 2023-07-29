@@ -1,6 +1,6 @@
 #pragma once
-#include <memory>
 #include "CompositeRenderTarget.h"
+#include <memory>
 
 class CompositeRenderTargetFactory
 {

@@ -12,10 +12,10 @@ template <Modifier T>
 class SpriteModifier
 {
 public:
-	SpriteModifier(T mod) : mod(mod) {}
+    SpriteModifier(T mod) : mod(mod) {}
 
-	void init() { mod.init(); }
-	void update() { mod.update(); }
+    void init() { mod.init(); }
+    void update() { mod.update(); }
 private:
-	T mod;
+    T mod;
 };

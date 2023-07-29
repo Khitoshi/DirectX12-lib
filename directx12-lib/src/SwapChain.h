@@ -2,9 +2,8 @@
 
 #include "d3dx12.h"
 #include <dxgi1_4.h>
+
 using namespace Microsoft::WRL;
-
-
 
 /// <summary>
 /// スワップチェイン
@@ -12,7 +11,6 @@ using namespace Microsoft::WRL;
 class SwapChain
 {
     friend class SwapChainFactory;
-
 public:
     //スワップチェインの生成時に使用する設定
     struct SwapChainConf {
@@ -30,6 +28,7 @@ private:
         swap_chain_(),
         current_back_buffer_index_(0)
     {};
+
 public:
     ~SwapChain() {};
 
@@ -39,7 +38,6 @@ public:
 private:
     //スワップチェイン関係の生成
     void init();
-
     //スワップチェインの生成
     void createSwapChain();
     //バックバッファの生成

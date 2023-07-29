@@ -8,42 +8,37 @@
 using namespace Microsoft::WRL;
 
 /// <summary>
-/// テクスチャ生成クラス
+/// テクスチャ
 /// </summary>
 class Texture
 {
-public:
-    struct TextureConf
-    {
-        ID3D12Device* device;
-        const char* filePath;
-    };
-public:
-    Texture(TextureConf c) :
-        conf(c),
-        resource(),
-        descriptorHeap(),
-        metadata()
+    friend class TextureFactory;
+private:
+    Texture() :
+        resource_(),
+        descriptor_heap_(),
+        meta_data_()
     {}
+public:
     ~Texture() {}
 
-    //テクスチャ読み込み
-    void Load();
-
 private:
+    //テクスチャ読み込み
+    void Load(ID3D12Device* device, const char* texture_file_path);
     //テクスチャリソースの作成
-    void CreateTextureResource();
+    void CreateTextureResource(ID3D12Device* device, const char* texture_file_path);
     //ディスクリプタヒープの作成
-    void CreateTextureDescriptorHeap();
+    void CreateTextureDescriptorHeap(ID3D12Device* device);
     //シェーダーリソースビューの作成
-    void CreateShaderResourceView();
+    void CreateShaderResourceView(ID3D12Device* device);
 
 public:
-    ComPtr<ID3D12Resource> GetResource() const { return resource; }
-    ID3D12DescriptorHeap* GetDescriptorHeap() { return descriptorHeap.Get(); }
+    //テクスチャリソースの取得
+    ComPtr<ID3D12Resource> GetResource() const { return this->resource_; }
+    //ディスクリプタヒープの取得
+    ID3D12DescriptorHeap* GetDescriptorHeap() { return this->descriptor_heap_.Get(); }
 private:
-    TextureConf conf;								//テクスチャ生成時に使用する設定
-    ComPtr<ID3D12Resource> resource;				//テクスチャリソース
-    ComPtr<ID3D12DescriptorHeap> descriptorHeap;	//ディスクリプタヒープ
-    DirectX::TexMetadata metadata;					//テクスチャのメタデータ
+    ComPtr<ID3D12Resource> resource_;				//テクスチャリソース
+    ComPtr<ID3D12DescriptorHeap> descriptor_heap_;	//ディスクリプタヒープ
+    DirectX::TexMetadata meta_data_;					//テクスチャのメタデータ
 };

@@ -22,5 +22,4 @@ public:
         cmd_list->init(device, command_allocator);
         return cmd_list;
     }
-
 };

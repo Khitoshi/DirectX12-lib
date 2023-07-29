@@ -27,42 +27,37 @@ void DebugOutputFormatString(const char* format, ...) {
 #endif
 }
 
-
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
     try {
         //windows初期化処理
-        WindowConfig winConf = {};
-        winConf.appName = TEXT("DirectX12");
+        Window::WindowConfig winConf = {};
+        winConf.app_name = TEXT("DirectX12");
         winConf.x = 0;
         winConf.y = 0;
-        winConf.width = 1280;
-        winConf.height = 720;
         std::shared_ptr<Window> window = std::make_shared<Window>(winConf, hInstance, nCmdShow);
         window->init();
         ResourceManager::getInstance()->registerResource("window", window);
 
         //DX12初期化処理
         std::shared_ptr <DX12Resources> dx12Resources = std::make_shared<DX12Resources>();
-        dx12Resources->init(ResourceManager::getInstance()->getResource<Window>("window")->getHWND(), winConf.width, winConf.height);
+        dx12Resources->init(ResourceManager::getInstance()->getResource<Window>("window")->getHWND());
         ResourceManager::getInstance()->registerResource("dx12Resources", dx12Resources);
         dx12Resources = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources");
+        auto device_context = dx12Resources->getDeviceContext();
+
 #ifdef _DEBUG//imgui初期化処理
-        ImGuiManagerConf imguiConf = {};
-        imguiConf.device = ResourceManager::getInstance()->getResource<DX12Resources>("dx12Resources")->getDeviceContext()->getDevice();
+        ImGuiManager::ImGuiManagerConf imguiConf = {};
         imguiConf.hWnd = ResourceManager::getInstance()->getResource<Window>("window")->getHWND();
-        std::shared_ptr<ImGuiManager> imguiManager = std::make_shared<ImGuiManager>();
-        imguiManager->init(imguiConf);
+        std::shared_ptr<ImGuiManager> imguiManager = std::make_shared<ImGuiManager>(imguiConf);
+        imguiManager->init(device_context->getDevice());
         ResourceManager::getInstance()->registerResource("imguiManager", imguiManager);
+
 #endif // _DEBUG
 
         //デバイス取得
         auto device = dx12Resources->getDeviceContext()->getDevice();
         //レンダーコンテキスト取得
         auto rc = dx12Resources->getRenderContext();
-        //シーン共通の描画設定
-        SceneConf sceneConf = {};
-        sceneConf.device = device;
-        sceneConf.renderContext = rc;
         //シーン登録処理
         SceneManager::getInstance().registerScene();
 
@@ -112,13 +107,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             //シーン更新処理
             SceneManager::getInstance().update();
             //シーン描画処理
-            SceneManager::getInstance().render(sceneConf);
+            SceneManager::getInstance().render(rc);
 
             //描画終了処理
             dx12Resources->endRender();
 
             //描画終了処理後にシーン変更を行う
-            SceneManager::getInstance().changeScene(sceneConf);
+            SceneManager::getInstance().changeScene(device);
         }
     }
     catch (const std::exception& e) {

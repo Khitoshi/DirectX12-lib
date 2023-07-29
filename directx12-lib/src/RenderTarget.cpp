@@ -45,7 +45,7 @@ void RenderTarget::createDescriptorHeapSize(ID3D12Device* device)
 void RenderTarget::createResource(ID3D12Device* device)
 {
     //レンダリングターゲットビューのディスクリプタヒープの先頭のハンドルを取得
-    D3D12_CPU_DESCRIPTOR_HANDLE  rtvHandle = this->descriptor_heap_.Get()->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE  rtv_handle = this->descriptor_heap_.Get()->GetCPUDescriptorHandleForHeapStart();
 
     //レンダリングターゲットビューの作成loop
     for (UINT n = 0; n < this->conf_.frame_buffer_count; n++) {
@@ -57,13 +57,13 @@ void RenderTarget::createResource(ID3D12Device* device)
 
         //レンダリングターゲットビューの作成
         device->CreateRenderTargetView(
-            r.Get(), nullptr, rtvHandle
+            r.Get(), nullptr, rtv_handle
         );
 
         //リソースを格納
         this->resource_.push_back(r);
 
         //ハンドルをずらす
-        rtvHandle.ptr += this->descriptor_heap_size_;
+        rtv_handle.ptr += this->descriptor_heap_size_;
     }
 }

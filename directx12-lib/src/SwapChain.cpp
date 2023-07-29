@@ -39,10 +39,6 @@ void SwapChain::createSwapChain()
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     swapChainDesc.SampleDesc.Count = 1;
 
-    //フルスクリーン設定
-    DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullScreenDesc = {};
-    fullScreenDesc.Windowed = TRUE;
-
     //スワップチェイン1生成
     ComPtr<IDXGISwapChain1> swap_chain1;
     if (FAILED(this->conf_.factory->CreateSwapChainForHwnd(

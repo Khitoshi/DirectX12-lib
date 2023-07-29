@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PipelineStateObject.h"
+#include "PipelineStateObjectFactory.h"
 #include "Hashes.h"
 #include <stdexcept>
 #include <map>
@@ -41,7 +41,9 @@ public:
     };
 
 private:
-    PSOCacheManager() {};
+    PSOCacheManager() :
+        pso_cache_()
+    {};
     ~PSOCacheManager() {};
 public:
 
@@ -55,41 +57,21 @@ public:
         return instance;
     }
 
-    std::shared_ptr<PipelineStateObject> getPSO(ID3D12Device* device, const PipelineStateObject::PipelineStateObjectConf conf) {
-
-        auto it = this->psoCache.find(conf);
+    std::shared_ptr<PipelineStateObject> getOrCreate(ID3D12Device* device, const PipelineStateObject::PipelineStateObjectConf conf) {
+        auto it = this->pso_cache_.find(conf);
         // キャッシュにあるか確認
-        if (it != this->psoCache.end()) {
+        if (it != this->pso_cache_.end()) {
             // キャッシュにある場合はそれを返す
             return it->second;
         }
 
         // キャッシュにない場合は新規作成
-        std::shared_ptr<PipelineStateObject> pso = {};
-        psoCache[conf] = pso = createPSO(device, conf);
-        if (pso == nullptr) {
-            throw std::runtime_error("PSOの作成に失敗しました。");
-        }
+        std::shared_ptr<PipelineStateObject> pso = PipelineStateObjectFactory::create(conf, device);
+        this->pso_cache_[conf] = pso;
 
-
-        //return psoCache[params];
         return pso;
     }
 
 private:
-    std::shared_ptr<PipelineStateObject> createPSO(ID3D12Device* device, const PipelineStateObject::PipelineStateObjectConf conf)
-    {
-
-        std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>(conf);
-        pso->init(device);
-
-        //PSOを作成
-        return pso;
-    }
-
-
-private:
-    //std::map<PSOParameters, std::shared_ptr<PipelineStateObject>> psoCache;
-    std::unordered_map<PipelineStateObject::PipelineStateObjectConf, std::shared_ptr<PipelineStateObject>, PSOParametorHasher, std::equal_to<PipelineStateObject::PipelineStateObjectConf>> psoCache;
-
+    std::unordered_map<PipelineStateObject::PipelineStateObjectConf, std::shared_ptr<PipelineStateObject>, PSOParametorHasher, std::equal_to<PipelineStateObject::PipelineStateObjectConf>> pso_cache_;
 };
