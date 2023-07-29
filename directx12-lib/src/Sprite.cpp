@@ -145,7 +145,7 @@ void Sprite::initPipelineStateObject(ID3D12Device* device)
 /// <summary>
 /// 頂点バッファの初期化
 /// </summary>
-/// <param name="conf"></param>
+/// <param name="device">GPUデバイス</param>
 void Sprite::initVertexBuffer(ID3D12Device* device)
 {
     //頂点データ
@@ -176,7 +176,7 @@ void Sprite::initVertexBuffer(ID3D12Device* device)
 /// <summary>
 /// インデックスバッファの初期化
 /// </summary>
-/// <param name="conf"></param>
+/// <param name="device">GPUデバイス</param>
 void Sprite::initIndexBuffer(ID3D12Device* device)
 {
     //インデックスデータ
@@ -200,7 +200,7 @@ void Sprite::initIndexBuffer(ID3D12Device* device)
 /// <summary>
 /// テクスチャの初期化
 /// </summary>
-/// <param name="conf"></param>
+/// <param name="device">GPUデバイス</param>
 void Sprite::initTexture(ID3D12Device* device)
 {
     //テクスチャの初期化
@@ -210,7 +210,7 @@ void Sprite::initTexture(ID3D12Device* device)
 /// <summary>
 /// オフスクリーンレンダーターゲットの初期化
 /// </summary>
-/// <param name="device"></param>
+/// <param name="device">GPUデバイス</param>
 void Sprite::initOffScreenRenderTarget(ID3D12Device* device)
 {
     OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
@@ -246,7 +246,7 @@ void Sprite::initOffScreenRenderTarget(ID3D12Device* device)
 /// <summary>
 /// 深度ステンシルの初期化
 /// </summary>
-/// <param name="device"></param>
+/// <param name="device">GPUデバイス</param>
 void Sprite::initDepthStencil(ID3D12Device* device)
 {
     DepthStencil::DepthStencilConf ds_conf = {};
@@ -259,7 +259,7 @@ void Sprite::initDepthStencil(ID3D12Device* device)
 /// <summary>
 /// 頂点バッファのセット&コピー
 /// </summary>
-/// <param name="vertices"></param>
+/// <param name="vertices">頂点情報</param>
 void Sprite::setVertices(Vertex vertices[4])
 {
     this->vertices_[0] = vertices[0];
@@ -267,4 +267,14 @@ void Sprite::setVertices(Vertex vertices[4])
     this->vertices_[2] = vertices[2];
     this->vertices_[3] = vertices[3];
     this->vertex_buffer_->copy(this->vertices_);
+}
+
+/// <summary>
+/// テクスチャを設定する
+/// </summary>
+/// <param name="device">GPUデバイス</param>
+/// <param name="texture_file_path">テクスチャのファイルパス</param>
+void Sprite::setTexture(ID3D12Device* device, const char* texture_file_path)
+{
+    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
 }

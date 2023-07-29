@@ -16,7 +16,9 @@ public:
         sprite_(),
         vertex_(),
         is_change_vertex_(false),
-        camera_()
+        camera_(),
+        device_(nullptr),
+        is_change_texture_(false)
     {};
     ~SceneSprite() {};
 
@@ -45,4 +47,9 @@ private:
     Sprite::Vertex vertex_[4];          //頂点座標
     bool is_change_vertex_;             //頂点座標を変更したか
     std::shared_ptr<Camera> camera_;    //カメラ
+
+    ID3D12Device* device_;              //デバイス
+
+    static std::string file_path_;      //ファイルパス
+    bool is_change_texture_;            //テクスチャを変更したか
 };

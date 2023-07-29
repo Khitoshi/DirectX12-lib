@@ -62,7 +62,6 @@ private:
     void initShader();
     //パイプラインステートオブジェクトの作成
     void initPipelineStateObject(ID3D12Device* device);
-
     //頂点バッファの作成
     void initVertexBuffer(ID3D12Device* device);
     //インデックスバッファの作成
@@ -86,6 +85,12 @@ public:
     /// </summary>
     /// <param name="vertices">頂点情報</param>
     void setVertices(Vertex vertices[4]);
+
+    /// <summary>
+    /// テクスチャを設定する
+    /// </summary>
+    /// <param name="texture_file_path"></param>
+    void setTexture(ID3D12Device* device, const char* texture_file_path);
 
 public://取得系
     /// <summary>

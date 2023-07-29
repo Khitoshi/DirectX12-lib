@@ -19,10 +19,10 @@ void Texture::CreateTextureResource(ID3D12Device* device, const char* texture_fi
 {
     //ファイルパスをワイド文字に変換
     wchar_t w_file_Path[256];
-    MultiByteToWideChar(CP_ACP, 0, texture_file_path, -1, w_file_Path, _countof(w_file_Path));
+    //MultiByteToWideChar(CP_ACP, 0, texture_file_path, -1, w_file_Path, _countof(w_file_Path));
+    MultiByteToWideChar(CP_UTF8, 0, texture_file_path, -1, w_file_Path, _countof(w_file_Path));
 
     //DirectXTexを使ってテクスチャを読み込む
-    //DirectX::TexMetadata metadata = {};
     DirectX::ScratchImage scratch_img = {};
     if (FAILED(LoadFromWICFile(w_file_Path, DirectX::WIC_FLAGS_NONE, &this->meta_data_, scratch_img))) {
         throw std::runtime_error("failed to load texture");

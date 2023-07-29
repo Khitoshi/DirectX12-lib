@@ -1,6 +1,9 @@
 #include "SceneSprite.h"
 #include "Camera.h"
 #include "imgui/imgui.h"
+#include "imgui/imfilebrowser.h"
+
+std::string SceneSprite::file_path_ = "asset/img/Lena.png";
 
 /// <summary>
 /// 初期化処理
@@ -8,12 +11,14 @@
 /// <param name="device">GPUデバイス</param>
 void SceneSprite::init(ID3D12Device* device)
 {
+    this->device_ = device;
+
     this->camera_ = std::make_shared<Camera>(1280, 720);
     this->camera_->init();
 
     //3角形のリソースを作成&初期化
     Sprite::SpriteConf sprite_conf = {};
-    sprite_conf.file_path = "asset/img/test_image.png";
+    sprite_conf.file_path = file_path_.c_str();
     sprite_conf.camera = this->camera_.get();
     this->sprite_ = std::make_shared<Sprite>(sprite_conf);
     this->sprite_->init(device);
@@ -39,10 +44,19 @@ void SceneSprite::update()
 {
     this->camera_->update();
 
+    //頂点座標を更新
     if (this->is_change_vertex_) {
         this->sprite_->setVertices(this->vertex_);
         this->is_change_vertex_ = false;
     }
+
+    //テクスチャを更新
+    if (this->is_change_texture_) {
+        this->is_change_texture_ = false;
+        this->sprite_->setTexture(this->device_, this->file_path_.c_str());
+    }
+
+
 }
 
 /// <summary>
@@ -60,6 +74,28 @@ void SceneSprite::render(RenderContext* rc)
 void SceneSprite::updateImguiMenu()
 {
     ImGui::Begin("Sprite");
+
+    //テクスチャの動的選択
+    bool static isFileBrowser = true;
+    static ImGui::FileBrowser fileDialog;
+    if (isFileBrowser) {
+        fileDialog.SetTitle("file brower");
+        fileDialog.SetTypeFilters({ ".png",".jpg",".bmp" });
+    }
+    {
+        if (ImGui::Button("open file dialog")) {
+            fileDialog.Open();
+        }
+        fileDialog.Display();
+        if (fileDialog.HasSelected()) {
+            auto u8str = fileDialog.GetSelected().generic_u8string();
+            std::string str(u8str.begin(), u8str.end());
+            file_path_ = str;
+            fileDialog.ClearSelected();
+            this->is_change_texture_ = true;
+        }
+    }
+
 
     //頂点の位置
     for (int i = 0; i < 4; ++i) {

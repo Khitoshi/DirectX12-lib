@@ -82,6 +82,7 @@
     <ClInclude Include="src\HashCombine.h" />
     <ClInclude Include="src\Hashes.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
+    <ClInclude Include="src\imgui\imfilebrowser.h" />
     <ClInclude Include="src\imgui\imgui.h" />
     <ClInclude Include="src\imgui\ImGuiManager.h" />
     <ClInclude Include="src\imgui\imgui_impl_dx12.h" />
