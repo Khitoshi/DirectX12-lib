@@ -81,8 +81,13 @@ void SceneSprite::updateImguiMenu()
     if (isFileBrowser) {
         fileDialog.SetTitle("file brower");
         fileDialog.SetTypeFilters({ ".png",".jpg",".bmp" });
+        if (!fileDialog.SetPwd("./asset/img")) {
+            throw std::runtime_error("fileDialog.SetPwd");
+        }
+
     }
     {
+        ImGui::Text("NOW Texture File Path: %s", this->file_path_.c_str());
         if (ImGui::Button("open file dialog")) {
             fileDialog.Open();
         }

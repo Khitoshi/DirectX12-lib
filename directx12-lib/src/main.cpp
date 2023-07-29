@@ -53,9 +53,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         ResourceManager::getInstance()->registerResource("imguiManager", imguiManager);
 
 #endif // _DEBUG
-
-        //デバイス取得
-        auto device = dx12Resources->getDeviceContext()->getDevice();
         //レンダーコンテキスト取得
         auto rc = dx12Resources->getRenderContext();
         //シーン登録処理
@@ -76,7 +73,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #ifdef _DEBUG
 
             //imguiFrame開始処理
-            ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->beginFrame(rc, device);
+            ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->beginFrame(rc, device_context->getDevice());
             {
                 ImGui::Begin("System");
 
@@ -89,6 +86,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
                 currentFrameRateIndex = (currentFrameRateIndex + 1) % FRAMERATE_BUFFER_SIZE;
                 ImGui::Text("FrameRate: %.1f", ImGui::GetIO().Framerate);
                 ImGui::PlotLines("FrameRateLine", frameRates, FRAMERATE_BUFFER_SIZE);
+                ImGui::Text("Adaptor : %ls", device_context->getGPUInfo().name_);
+                ImGui::Text("Dedicated Video Memory: %d", device_context->getGPUInfo().dedicated_video_memory_);
+                ImGui::Text("Dedicated System Memory: %d", device_context->getGPUInfo().dedicated_system_memory_);
+                ImGui::Text("Shared System Memory: %d", device_context->getGPUInfo().shared_system_memory_);
 
                 ImGui::End();
             }
@@ -100,7 +101,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             //Frame終了処理
             ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->endFrame();
             //imgui描画処理
-            ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->render(rc, device);
+            ResourceManager::getInstance()->getResource<ImGuiManager>("imguiManager")->render(rc, device_context->getDevice());
 
 #endif // _DEBUG
 
@@ -113,7 +114,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
             dx12Resources->endRender();
 
             //描画終了処理後にシーン変更を行う
-            SceneManager::getInstance().changeScene(device);
+            SceneManager::getInstance().changeScene(device_context->getDevice());
         }
     }
     catch (const std::exception& e) {

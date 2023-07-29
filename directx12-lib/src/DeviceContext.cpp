@@ -62,17 +62,19 @@ void DeviceContext::init(IDXGIFactory4* dxgiFactory)
             adapter_vender[(int)GPU_VENDER::INTEL] = adapter_tmp;
             adapter_vender[(int)GPU_VENDER::INTEL]->AddRef();
         }
-
         //アダプターを解放
         adapter_tmp->Release();
     }
 
     //使用するアダプタを決める(現在はNVIDIAが最優先)
     // NVIDIA >> AMD >> intel >> other
-    if (adapter_vender[(int)GPU_VENDER::NVIDIA] != nullptr) use_adapter = adapter_vender[(int)GPU_VENDER::NVIDIA];
+    if (adapter_vender[(int)GPU_VENDER::NVIDIA] != nullptr)use_adapter = adapter_vender[(int)GPU_VENDER::NVIDIA];
     else if (adapter_vender[(int)GPU_VENDER::AMD] != nullptr) use_adapter = adapter_vender[(int)GPU_VENDER::AMD];
-    else if (adapter_vender[(int)GPU_VENDER::INTEL] != nullptr) use_adapter = adapter_vender[(int)GPU_VENDER::INTEL];
+    else if (adapter_vender[(int)GPU_VENDER::INTEL] != nullptr)use_adapter = adapter_vender[(int)GPU_VENDER::INTEL];
     else use_adapter = adapter_max_video_memory;
+    DXGI_ADAPTER_DESC desc;
+    use_adapter->GetDesc(&desc);
+    this->gpu_info_.copy(desc);
 
     //使用している可能性のあるFEATURE_LEVELを列挙
     const D3D_FEATURE_LEVEL FEATURELEVELS[] = {
