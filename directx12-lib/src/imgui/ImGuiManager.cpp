@@ -9,8 +9,9 @@
 /// <summary>
 /// imguiの初期化
 /// </summary>
-/// <param name="conf">imgui生成処理の設定</param>
-void ImGuiManager::init(ID3D12Device* device)
+/// <param name="device">GPUデバイス</param>
+/// <param name="hWnd">ウィンドウハンドルのインターフェース</param>
+void ImGuiManager::init(ID3D12Device* device, const HWND& hWnd)
 {
     createDescriptorHeap(device);
     createOffScreenRenderTarget(device);
@@ -26,7 +27,7 @@ void ImGuiManager::init(ID3D12Device* device)
     ImGui::StyleColorsDark();
 
     // Setup Platform/Renderer backends
-    ImGui_ImplWin32_Init(this->conf_.hWnd);
+    ImGui_ImplWin32_Init(hWnd);
     ImGui_ImplDX12_Init(
         device,
         frameBufferCount,
@@ -68,6 +69,7 @@ void ImGuiManager::endFrame()
 /// imguiの描画
 /// </summary>
 /// <param name="rc">レンダーコンテキスト</param>
+/// <param name="device">GPUデバイス</param>
 void ImGuiManager::render(RenderContext* rc, ID3D12Device* device)
 {
     ImGui::Render();
@@ -93,13 +95,12 @@ void ImGuiManager::deinit()
 /// <summary>
 /// ディスクリプタヒープの作成
 /// </summary>
-/// <param name="conf">imgui生成処理の設定</param>
-/// <returns></returns>
+/// <param name="device">GPUデバイス</param>
 void ImGuiManager::createDescriptorHeap(ID3D12Device* device)
 {
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.NumDescriptors = frameBufferCount;
+    desc.NumDescriptors = 1;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
     if (FAILED(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->descriptor_heap_)))) {
@@ -112,9 +113,8 @@ void ImGuiManager::createOffScreenRenderTarget(ID3D12Device* device)
     //TODO:リファクタリング対象
     OffScreenRenderTarget::OffScreenRenderTargetConf osrt_conf = {};
     {//ディスクリプタヒープの設定
-        //TODO frameBufferCount -> 1 に変更を検討
         D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-        desc.NumDescriptors = frameBufferCount;
+        desc.NumDescriptors = 1;
         desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
         desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
         desc.NodeMask = 0;

@@ -27,15 +27,7 @@ using namespace Microsoft::WRL;
 class Sprite
 {
 public:
-    struct SpriteConf
-    {
-        const char* file_path;
-        Camera* camera;
-    };
-
-public:
-    Sprite(SpriteConf c) :
-        conf_(c),
+    Sprite() :
         root_signature_(nullptr),
         pixel_shader_(nullptr),
         vertex_shader_(nullptr),
@@ -50,7 +42,7 @@ public:
     ~Sprite() {};
 
     //初期化処理
-    void init(ID3D12Device* device);
+    void init(ID3D12Device* device, const char* texture_file_path);
     //描画処理
     void draw(RenderContext* rc);
 
@@ -67,7 +59,7 @@ private:
     //インデックスバッファの作成
     void initIndexBuffer(ID3D12Device* device);
     //テクスチャの作成
-    void initTexture(ID3D12Device* device);
+    void initTexture(ID3D12Device* device, const char* texture_file_path);
     //オフスクリーンレンダーターゲットの作成
     void initOffScreenRenderTarget(ID3D12Device* device);
     //深度ステンシルの作成
@@ -108,15 +100,6 @@ public://取得系
     };
 
 private:
-    enum class SpriteOptions : uint8_t {
-        NONE = 1 << 0, // 1
-        ROTATED = 1 << 1, // 2
-        // 他のオプション...
-
-        NUM,
-    };
-
-    SpriteConf conf_;
     std::shared_ptr<RootSignature> root_signature_;                     //ルートシグニチャ
     std::shared_ptr<Shader> pixel_shader_;                              //ピクセルシェーダー
     std::shared_ptr<Shader> vertex_shader_;                             //頂点シェーダー

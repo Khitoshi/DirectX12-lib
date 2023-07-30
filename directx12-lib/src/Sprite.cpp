@@ -18,14 +18,14 @@
 /// 初期化処理
 /// </summary>
 /// <param name="conf">テクスチャの設定</param>
-void Sprite::init(ID3D12Device* device)
+void Sprite::init(ID3D12Device* device, const char* texture_file_path)
 {
     initRootSignature(device);
     initShader();
     initPipelineStateObject(device);
     initVertexBuffer(device);
     initIndexBuffer(device);
-    initTexture(device);
+    initTexture(device, texture_file_path);
     initOffScreenRenderTarget(device);
     initDepthStencil(device);
 }
@@ -201,10 +201,10 @@ void Sprite::initIndexBuffer(ID3D12Device* device)
 /// テクスチャの初期化
 /// </summary>
 /// <param name="device">GPUデバイス</param>
-void Sprite::initTexture(ID3D12Device* device)
+void Sprite::initTexture(ID3D12Device* device, const char* texture_file_path)
 {
     //テクスチャの初期化
-    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, this->conf_.file_path);
+    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
 }
 
 /// <summary>

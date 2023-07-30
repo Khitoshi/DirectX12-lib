@@ -45,7 +45,7 @@ public:
         frame_index_(0),
         full_screen_quad_()
     {}
-    ~DX12Resources() { waitEndOfDrawing(); }
+    ~DX12Resources() {}
 
     //‰Šú‰»ˆ—
     void init(const HWND hWnd);

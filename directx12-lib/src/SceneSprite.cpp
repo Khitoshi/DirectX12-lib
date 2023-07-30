@@ -3,7 +3,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imfilebrowser.h"
 
-std::string SceneSprite::file_path_ = "asset/img/Lena.png";
+std::string SceneSprite::file_path_("asset/img/Lena.png");
 
 /// <summary>
 /// 初期化処理
@@ -13,15 +13,9 @@ void SceneSprite::init(ID3D12Device* device)
 {
     this->device_ = device;
 
-    this->camera_ = std::make_shared<Camera>(1280, 720);
-    this->camera_->init();
-
     //3角形のリソースを作成&初期化
-    Sprite::SpriteConf sprite_conf = {};
-    sprite_conf.file_path = file_path_.c_str();
-    sprite_conf.camera = this->camera_.get();
-    this->sprite_ = std::make_shared<Sprite>(sprite_conf);
-    this->sprite_->init(device);
+    this->sprite_ = std::make_shared<Sprite>();
+    this->sprite_->init(device, file_path_.c_str());
 
     //頂点座標を設定
     this->vertex_[0] = this->sprite_->getVertices(0);
@@ -42,8 +36,6 @@ void SceneSprite::finalize()
 /// </summary>
 void SceneSprite::update()
 {
-    this->camera_->update();
-
     //頂点座標を更新
     if (this->is_change_vertex_) {
         this->sprite_->setVertices(this->vertex_);
@@ -127,9 +119,9 @@ void SceneSprite::updateImguiMenu()
         }
     }
 
-    static bool isRotation = false;
-    if (ImGui::Checkbox("Rotation", &isRotation))imageFeatures |= FEATURE_ROTATE;
-    else imageFeatures &= ~FEATURE_ROTATE;
+    //static bool isRotation = false;
+    //if (ImGui::Checkbox("Rotation", &isRotation))imageFeatures |= FEATURE_ROTATE;
+    //else imageFeatures &= ~FEATURE_ROTATE;
 
     ImGui::End();
 }

@@ -18,24 +18,15 @@ using namespace Microsoft::WRL;
 class ImGuiManager
 {
 public:
-    /// <summary>
-    /// imgui生成処理の設定
-    /// </summary>
-    struct ImGuiManagerConf {
-        HWND hWnd;
-    };
-
-public:
-    ImGuiManager(ImGuiManagerConf c) :
-        conf_(c),
+    ImGuiManager() :
         descriptor_heap_(nullptr),
         off_screen_render_target_(nullptr),
         depth_stencil_(nullptr)
     {};
-    ~ImGuiManager() { deinit(); };
+    ~ImGuiManager() {};
 
     //初期化処理
-    void init(ID3D12Device* device);
+    void init(ID3D12Device* device, const HWND& hWnd);
     //フレーム開始処理
     void beginFrame(RenderContext* rc, ID3D12Device* device);
     //フレーム終了処理
@@ -52,7 +43,6 @@ private:
     //深度ステンシル生成
     void createDepthStencil(ID3D12Device* device);
 private:
-    ImGuiManagerConf conf_;                                             //設定
     ComPtr<ID3D12DescriptorHeap> descriptor_heap_;                      //ディスクリプタヒープ
     std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;    //オフスクリーンレンダーターゲット
     std::shared_ptr<DepthStencil> depth_stencil_;                       //深度ステンシル

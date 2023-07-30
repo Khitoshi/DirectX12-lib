@@ -28,6 +28,7 @@
     <ClCompile Include="src\DeviceContext.cpp" />
     <ClCompile Include="src\DX12Resources.cpp" />
     <ClCompile Include="src\Fence.cpp" />
+    <ClCompile Include="src\Framework.cpp" />
     <ClCompile Include="src\FullScreenQuad.cpp" />
     <ClCompile Include="src\GraphicsCommandList.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
@@ -39,7 +40,6 @@
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
-    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OffScreenRenderTarget.cpp" />
     <ClCompile Include="src\PipelineStateObject.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
@@ -54,6 +54,7 @@
     <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\Window.cpp" />
+    <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
@@ -75,12 +76,15 @@
     <ClInclude Include="src\DX12Resources.h" />
     <ClInclude Include="src\Fence.h" />
     <ClInclude Include="src\FenceFactory.h" />
+    <ClInclude Include="src\Framework.h" />
+    <ClInclude Include="src\FrameworkFactory.h" />
     <ClInclude Include="src\FullScreenQuad.h" />
     <ClInclude Include="src\FullScreenQuadFactory.h" />
     <ClInclude Include="src\GraphicsCommandList.h" />
     <ClInclude Include="src\GraphicsCommandListFactory.h" />
     <ClInclude Include="src\HashCombine.h" />
     <ClInclude Include="src\Hashes.h" />
+    <ClInclude Include="src\HighResolutionTimer.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imfilebrowser.h" />
     <ClInclude Include="src\imgui\imgui.h" />

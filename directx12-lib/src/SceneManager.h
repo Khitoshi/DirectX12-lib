@@ -5,7 +5,7 @@
 #include <concepts>
 #include "Scene.h"
 #include "imgui/imgui.h"
-
+#include "SceneDefault.h"
 #include "SceneTriangle.h"
 #include "SceneSprite.h"
 #include <functional>

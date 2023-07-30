@@ -16,7 +16,6 @@ public:
         sprite_(),
         vertex_(),
         is_change_vertex_(false),
-        camera_(),
         device_(nullptr),
         is_change_texture_(false)
     {};
@@ -32,21 +31,11 @@ public:
     void render(RenderContext* rc)override;
     //ImGuiメニュー
     void updateImguiMenu()override;
+
 private:
-    enum ImageFeature
-    {
-        FEATURE_NONE = 0,
-        FEATURE_ROTATE = 1 << 0, // 0001
-        //FEATURE_SCALE = 1 << 1,  // 0010
-        //FEATURE_TRANSLATE = 1 << 2 // 0100
-
-    };
-    unsigned int imageFeatures = FEATURE_NONE;
-
     std::shared_ptr<Sprite> sprite_;    //スプライト
     Sprite::Vertex vertex_[4];          //頂点座標
     bool is_change_vertex_;             //頂点座標を変更したか
-    std::shared_ptr<Camera> camera_;    //カメラ
 
     ID3D12Device* device_;              //デバイス
 

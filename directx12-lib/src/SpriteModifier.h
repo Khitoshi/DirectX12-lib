@@ -4,8 +4,8 @@
 template <class T>
 concept Modifier = requires(T & obj)
 {
-    {obj.init()} -> std::convertible_to<void>;
-    {obj.update()} -> std::convertible_to<void>;
+    {obj.init()}    ->  std::convertible_to<void>;
+    {obj.update()}  ->  std::convertible_to<void>;
 };
 
 template <Modifier T>
