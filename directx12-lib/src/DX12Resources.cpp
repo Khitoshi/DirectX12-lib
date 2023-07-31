@@ -137,11 +137,18 @@ ComPtr<IDXGIFactory4> DX12Resources::createFactory() {
         //デバッグの場合デバッグフラグを立てる
         dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
 
-#if 0 // GBV を有効化する場合.
         ComPtr<ID3D12Debug3> debug3;
-        debug.As(&debug3);
+        debug_controller.As(&debug3);
         if (debug3) {
             debug3->SetEnableGPUBasedValidation(true);
+        }
+
+        ComPtr<ID3D12DeviceRemovedExtendedDataSettings1> d3dDredSettings1;
+        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&d3dDredSettings1)))) {
+            // Turn on AutoBreadcrumbs and Page Fault reporting
+            d3dDredSettings1->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+            d3dDredSettings1->SetBreadcrumbContextEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+            d3dDredSettings1->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
         }
 
 #endif
@@ -150,7 +157,6 @@ ComPtr<IDXGIFactory4> DX12Resources::createFactory() {
         throw std::runtime_error("failed to create debug Controller");
     }
 
-#endif
     //factory生成
     ComPtr<IDXGIFactory4> factory;
     if (FAILED(CreateDXGIFactory2(dxgi_factory_flags, IID_PPV_ARGS(&factory)))) {
