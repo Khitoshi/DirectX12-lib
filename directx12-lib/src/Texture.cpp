@@ -58,7 +58,7 @@ void Texture::CreateTextureResource(ID3D12Device* device, const char* texture_fi
         &tex_heap_prop,
         D3D12_HEAP_FLAG_NONE,
         &tex_desc,
-        D3D12_RESOURCE_STATE_COPY_DEST,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         nullptr,
         IID_PPV_ARGS(&this->resource_)))) {
         throw std::runtime_error("failed to create texture");
