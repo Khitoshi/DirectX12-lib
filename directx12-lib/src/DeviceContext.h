@@ -12,13 +12,13 @@ class DeviceContext
 private:
     //GPU情報
     struct GPU_Info {
-        WCHAR* name_;                      //アダプター名
+        std::wstring name_;                      //アダプター名
         SIZE_T dedicated_video_memory_;    //VRAM容量
         SIZE_T dedicated_system_memory_;   //VRAM容量
         SIZE_T shared_system_memory_;      //共有メモリ容量
 
         GPU_Info() :
-            name_(nullptr),
+            name_(),
             dedicated_video_memory_(0),
             dedicated_system_memory_(0),
             shared_system_memory_(0)
@@ -29,8 +29,7 @@ private:
         /// </summary>
         /// <param name="desc">アダプタデスク</param>
         void copy(const DXGI_ADAPTER_DESC& desc) {
-            this->name_ = new WCHAR[128];
-            wcscpy_s(name_, 128, desc.Description);
+            this->name_ = desc.Description;
             this->dedicated_video_memory_ = desc.DedicatedVideoMemory / 1024 / 1024;
             this->dedicated_system_memory_ = desc.DedicatedSystemMemory / 1024 / 1024;
             this->shared_system_memory_ = desc.SharedSystemMemory / 1024 / 1024;

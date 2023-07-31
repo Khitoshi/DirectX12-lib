@@ -8,6 +8,8 @@
 #include <exception>
 #include <iostream>
 
+
+
 /// <summary>
 /// デバッグ用出力関数
 /// </summary>
@@ -71,8 +73,8 @@ void Framework::init()
     this->imgui_manager_->init(this->dx12_resources_->getDeviceContext()->getDevice(), this->hWnd_);
 
     //シーン登録処理
-    SceneManager::getInstance().registerScene();
-
+    //SceneManager::getInstance().registerScene();
+    SceneManager::getInstance().init(this->dx12_resources_->getDeviceContext()->getDevice(), std::make_shared<SceneTriangle>());
 }
 
 /// <summary>
@@ -120,10 +122,12 @@ void Framework::debugRender()
     //currentFrameRateIndex = (currentFrameRateIndex + 1) % FRAMERATE_BUFFER_SIZE;
     ImGui::Text("FrameRate: %.1f", ImGui::GetIO().Framerate);
     //ImGui::PlotLines("FrameRateLine", frameRates, FRAMERATE_BUFFER_SIZE);
-    ImGui::Text("Adaptor : %ls", device_context->getGPUInfo().name_);
-    ImGui::Text("Dedicated Video Memory: %d", device_context->getGPUInfo().dedicated_video_memory_);
-    ImGui::Text("Dedicated System Memory: %d", device_context->getGPUInfo().dedicated_system_memory_);
-    ImGui::Text("Shared System Memory: %d", device_context->getGPUInfo().shared_system_memory_);
+
+    auto gpu_info = device_context->getGPUInfo();
+    ImGui::Text("Adaptor : %ls", gpu_info.name_.c_str());
+    ImGui::Text("Dedicated Video Memory: %d", gpu_info.dedicated_video_memory_);
+    ImGui::Text("Dedicated System Memory: %d", gpu_info.dedicated_system_memory_);
+    ImGui::Text("Shared System Memory: %d", gpu_info.shared_system_memory_);
 
     ImGui::End();
 

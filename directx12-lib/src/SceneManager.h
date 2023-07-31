@@ -5,7 +5,7 @@
 #include <concepts>
 #include "Scene.h"
 #include "imgui/imgui.h"
-#include "SceneDefault.h"
+//#include "SceneDefault.h"
 #include "SceneTriangle.h"
 #include "SceneSprite.h"
 #include <functional>
@@ -16,7 +16,7 @@
 class SceneManager
 {
 private:
-    SceneManager() :currentScene(std::make_shared<SceneDefault>()) {};
+    SceneManager() :currentScene(std::make_shared<SceneTriangle>()) {};
     ~SceneManager() {};
 public:
     /// <summary>
@@ -36,6 +36,15 @@ public:
     {
         if (this->currentScene) {
             this->currentScene->finalize();
+        }
+    }
+
+    void init(ID3D12Device* device, std::shared_ptr<Scene> scene)
+    {
+        registerScene();
+        this->currentScene = scene;
+        if (this->currentScene) {
+            this->currentScene->init(device);
         }
     }
 
@@ -108,7 +117,7 @@ public:
     {
         sceneFactories = {
             //ƒV[ƒ“‚ğ’Ç‰Á‚·‚éê‡‚Í‚±‚±‚É’Ç‰Á
-            {"Default",     []() { return std::make_shared<SceneDefault>(); }},
+            //{"Default",     []() { return std::make_shared<SceneDefault>(); }},
             {"Triangle",    []() { return std::make_shared<SceneTriangle>(); }},
             {"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
         };
