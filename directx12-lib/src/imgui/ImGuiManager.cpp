@@ -1,14 +1,21 @@
 #include "ImGuiManager.h"
+#include "../OffScreenRenderTargetCacheManager.h"
+#include "../CommonGraphicsConfig.h"
+#include "../OffScreenRenderTargetFactory.h"
+#include "../DepthStencilCacheManager.h"
+#include "../RenderContext.h"
 #include <stdexcept>
 
 /// <summary>
 /// imguiの初期化
 /// </summary>
-/// <param name="conf">imgui生成処理の設定</param>
-void ImGuiManager::init(const ImGuiManagerConf conf)
+/// <param name="device">GPUデバイス</param>
+/// <param name="hWnd">ウィンドウハンドルのインターフェース</param>
+void ImGuiManager::init(ID3D12Device* device, const HWND& hWnd)
 {
-    //ディスクリプタヒープの作成
-    this->descriptorHeap = createDescriptorHeap(conf);
+    createDescriptorHeap(device);
+    createOffScreenRenderTarget(device);
+    createDepthStencil(device);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -20,21 +27,30 @@ void ImGuiManager::init(const ImGuiManagerConf conf)
     ImGui::StyleColorsDark();
 
     // Setup Platform/Renderer backends
-    ImGui_ImplWin32_Init(conf.hWnd);
+    ImGui_ImplWin32_Init(hWnd);
     ImGui_ImplDX12_Init(
-        conf.device,
-        conf.frameBufferCount,
+        device,
+        frameBufferCount,
         DXGI_FORMAT_R8G8B8A8_UNORM,
-        this->descriptorHeap.Get(),
-        this->descriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-        this->descriptorHeap->GetGPUDescriptorHandleForHeapStart());
+        this->descriptor_heap_.Get(),
+        this->descriptor_heap_->GetCPUDescriptorHandleForHeapStart(),
+        this->descriptor_heap_->GetGPUDescriptorHandleForHeapStart());
 }
 
 /// <summary>
 /// Frame開始処理
 /// </summary>
-void ImGuiManager::beginFrame()
+void ImGuiManager::beginFrame(RenderContext* rc, ID3D12Device* device)
 {
+    //オフスクリーンレンダーターゲットで書き込みできる状態にする
+    auto render_target = this->off_screen_render_target_->getRTVHeap();
+    auto resource = off_screen_render_target_->getResource();
+    auto depth_stencil = depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+
+    //ビューポートとシザリング矩形の設定
+    rc->transitionOffScreenRenderTargetBegin(resource);
+    rc->simpleStart(render_target->GetCPUDescriptorHandleForHeapStart(), depth_stencil);
+
     // Start the Dear ImGui frame
     ImGui_ImplDX12_NewFrame();
     ImGui_ImplWin32_NewFrame();
@@ -53,11 +69,16 @@ void ImGuiManager::endFrame()
 /// imguiの描画
 /// </summary>
 /// <param name="rc">レンダーコンテキスト</param>
-void ImGuiManager::render(RenderContext* rc)
+/// <param name="device">GPUデバイス</param>
+void ImGuiManager::render(RenderContext* rc, ID3D12Device* device)
 {
     ImGui::Render();
-    rc->setDescriptorHeap(this->descriptorHeap.Get());
+    rc->setDescriptorHeap(this->descriptor_heap_.Get());
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), rc->getCommandList());
+
+    //オフスクリーンレンダーターゲットの書き込みを終了する。
+    this->off_screen_render_target_->endRender(rc);
+    OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(this->off_screen_render_target_.get());
 }
 
 /// <summary>
@@ -74,19 +95,56 @@ void ImGuiManager::deinit()
 /// <summary>
 /// ディスクリプタヒープの作成
 /// </summary>
-/// <param name="conf">imgui生成処理の設定</param>
-/// <returns></returns>
-ComPtr<ID3D12DescriptorHeap> ImGuiManager::createDescriptorHeap(const ImGuiManagerConf conf)
+/// <param name="device">GPUデバイス</param>
+void ImGuiManager::createDescriptorHeap(ID3D12Device* device)
 {
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.NumDescriptors = conf.frameBufferCount;
+    desc.NumDescriptors = 1;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
-    ComPtr<ID3D12DescriptorHeap> heap;
-    if (FAILED(conf.device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&heap)))) {
+    if (FAILED(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->descriptor_heap_)))) {
         throw std::runtime_error("Failed to create descriptor heap");
     }
+}
 
-    return heap;
+void ImGuiManager::createOffScreenRenderTarget(ID3D12Device* device)
+{
+    //TODO:リファクタリング対象
+    OffScreenRenderTarget::OffScreenRenderTargetConf osrt_conf = {};
+    {//ディスクリプタヒープの設定
+        D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+        desc.NumDescriptors = 1;
+        desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+        desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+        desc.NodeMask = 0;
+
+        osrt_conf.descriptor_heap_desc = desc;
+    }
+    {//リソースデスクの設定
+        D3D12_RESOURCE_DESC desc = {};
+        desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        desc.Alignment = 0;
+        desc.Width = windowWidth;
+        desc.Height = windowHeight;
+        desc.DepthOrArraySize = 1;
+        desc.MipLevels = 1;
+        desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        desc.SampleDesc.Count = 1;
+        desc.SampleDesc.Quality = 0;
+        desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+        osrt_conf.resource_desc = desc;
+    }
+
+    this->off_screen_render_target_ = OffScreenRenderTargetFactory::create(osrt_conf, device);
+}
+
+void ImGuiManager::createDepthStencil(ID3D12Device* device)
+{
+    DepthStencil::DepthStencilConf ds_conf = {};
+    ds_conf.frame_buffer_count = frameBufferCount;
+    ds_conf.width = windowWidth;
+    ds_conf.height = windowHeight;
+    this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, device);
 }

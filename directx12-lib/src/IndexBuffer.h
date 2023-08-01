@@ -4,54 +4,58 @@
 using namespace Microsoft::WRL;
 
 /// <summary>
-/// インデックスバッファ生成時に使用する設定
-/// </summary>
-struct IndexBufferConf {
-    ID3D12Device* device;
-    int size;
-    int stride;
-    int count;
-};
-
-/// <summary>
-/// インデックスバッファ生成用&copyするクラス
+/// インデックスバッファにcopyするクラス
 /// </summary>
 class IndexBuffer
 {
+    friend class IndexBufferFactory;
 public:
-    IndexBuffer() :
-        indexBuffer(),
-        indexBufferView(),
-        strideInBytes(0),
-        count(0),
-        sizeInBytes(0)
+    /// <summary>
+    /// インデックスバッファ生成時に使用する設定
+    /// </summary>
+    struct IndexBufferConf {
+        int size;
+        int stride;
+        int count;
+    };
 
+private:
+    IndexBuffer(IndexBufferConf c) :
+        conf_(c),
+        index_buffer_(),
+        index_buffer_view_(),
+        stride_in_bytes_(0),
+        count_(0),
+        size_in_bytes_(0)
     {}
+
+public:
     ~IndexBuffer() {}
 
+private:
     //初期化処理
-    void init(IndexBufferConf conf);
-
-    //リソースにコピー
-    void copy(uint16_t* srcIndices);
-    void copy(uint32_t* srcIndices);
+    void init(ID3D12Device* device);
 
 public:
+    //リソースにコピー
+    void copy(uint16_t* src_indices);
+    void copy(uint32_t* src_indices);
+
+public://取得系
     //インデックスバッファビューの取得
-    D3D12_INDEX_BUFFER_VIEW getIndexBufferView() const { return indexBufferView; }
-
+    const D3D12_INDEX_BUFFER_VIEW& getIndexBufferView() const { return this->index_buffer_view_; }
     //インデックスバッファのストライドの取得
-    int getStrideInBytes() const { return strideInBytes; }
-
+    int getStrideInBytes() const { return this->stride_in_bytes_; }
     //インデックスバッファの数の取得
-    int getCount() const { return count; }
-
+    int getCount() const { return this->count_; }
     //インデックスバッファのサイズの取得
-    int getSizeInBytes() const { return sizeInBytes; }
+    int getSizeInBytes() const { return this->size_in_bytes_; }
+
 private:
-    ComPtr<ID3D12Resource>  indexBuffer;		//インデックスバッファ。
-    D3D12_INDEX_BUFFER_VIEW indexBufferView;	//インデックスバッファビュー。
-    int strideInBytes;							//インデックスバッファのストライド。
-    int count;									//インデックスバッファの数。
-    int sizeInBytes;							//インデックスバッファのサイズ。
+    IndexBufferConf conf_;
+    ComPtr<ID3D12Resource>  index_buffer_;		//インデックスバッファ。
+    D3D12_INDEX_BUFFER_VIEW index_buffer_view_;	//インデックスバッファビュー
+    int stride_in_bytes_;						//インデックスバッファのストライド
+    int count_;									//インデックスバッファの数
+    int size_in_bytes_;							//インデックスバッファのサイズ
 };

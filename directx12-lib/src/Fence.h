@@ -8,34 +8,39 @@ using namespace Microsoft::WRL;
 /// </summary>
 class Fence
 {
-public:
+    friend class FenceFactory;
+private:
     Fence() :
-        fence(),
-        value(0),
-        event()
+        fence_(),
+        value_(0),
+        event_()
     {};
+
+public:
     ~Fence() {};
 
+private:
     //初期化処理
     void init(ID3D12Device* device);
-
-private:
     //フェンスの生成
-    ComPtr<ID3D12Fence> createFence(ID3D12Device* device);
-
+    void createFence(ID3D12Device* device);
     //フェンスの値の生成
-    UINT64 createValue();
-
+    void createValue();
     //フェンスのイベントの生成
-    HANDLE createEvent();
-public:
-    ID3D12Fence* getFence() const { return fence.Get(); } //フェンスの取得
-    UINT64 getValue() const { return value; }            //フェンスの値の取得
-    HANDLE getEvent() const { return event; }            //フェンスのイベントの取得
+    void createEvent();
 
-    void incrementValue() { value++; }                   //フェンスの値のインクリメント
+public://取得系
+    //フェンスの取得
+    ID3D12Fence* getFence() const { return this->fence_.Get(); }
+    //フェンスの値の取得
+    UINT64 getValue() const { return this->value_; }
+    //フェンスのイベントの取得
+    HANDLE getEvent() const { return this->event_; }
+
+    //フェンスの値のインクリメント
+    void incrementValue() { this->value_++; }
 private:
-    ComPtr<ID3D12Fence> fence;  //フェンス
-    UINT64 value;               //フェンスの値
-    HANDLE event;               //フェンスのイベント
+    ComPtr<ID3D12Fence> fence_;  //フェンス
+    UINT64 value_;               //フェンスの値
+    HANDLE event_;               //フェンスのイベント
 };

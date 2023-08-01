@@ -1,10 +1,12 @@
 #include <Windows.h>
 
 #include "Window.h"
+#include "CommonGraphicsConfig.h"
+
 #include <stdexcept>
 
 #ifdef _DEBUG
-#include "imgui\imgui.h"
+#include "imgui/imgui.h"
 //imguiのウィンドウプロシージャを呼び出すための宣言
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif
@@ -72,7 +74,7 @@ bool Window::processMessages() {
 /// 初期化
 /// </summary>
 void Window::init() {
-    this->hwnd = create();
+    create();
 
     show();
 }
@@ -82,7 +84,7 @@ void Window::init() {
 /// </summary>
 void Window::deinit() {
     //ウィンドウクラスの登録解除
-    UnregisterClass(this->winConf.appName, this->hInstance);
+    UnregisterClass(this->conf_.app_name, this->hInstance_);
 }
 
 /// <summary>
@@ -91,7 +93,7 @@ void Window::deinit() {
 /// <returns>
 /// 生成した新しいウィンドウへのハンドル
 /// </returns>
-HWND Window::create() {
+void Window::create() {
     //windowクラスのパラメータ設定
     WNDCLASSEX wc;
     wc.cbSize = sizeof(WNDCLASSEX);		//構造体サイズ
@@ -104,33 +106,31 @@ HWND Window::create() {
     wc.hCursor = NULL;						//カーソルへのハンドル(NULL = ウィンドウに移動するたびにアプリケーションでカーソルの図形を明示的に設定する必要がある)
     wc.hbrBackground = NULL;						//背景ブラシへのハンドル(NULL = 独自背景が必要)
     wc.lpszMenuName = NULL;						//既定のメニューのマクロ(NULL = 規定メニュー無し)
-    wc.lpszClassName = this->winConf.appName;	//ウィンドウクラスの名前を指定
+    wc.lpszClassName = this->conf_.app_name;	//ウィンドウクラスの名前を指定
     wc.hIconSm = NULL;						//アイコンへのハンドル(NULL = 自動で適切なサイズのアイコンを検索)
 
     //ウィンドウクラスの登録
     RegisterClassEx(&wc);
 
     //window生成 & 新しいウィンドウへのハンドルをreturn
-    hwnd = CreateWindow(
-        this->winConf.appName,	//ウィンドウクラスの名前
-        this->winConf.appName,	//ウィンドウの名前,ウィンドウクラスの名前と別名でok
+    this->hwnd_ = CreateWindow(
+        this->conf_.app_name,	//ウィンドウクラスの名前
+        this->conf_.app_name,	//ウィンドウの名前,ウィンドウクラスの名前と別名でok
         WS_OVERLAPPEDWINDOW,	//ウィンドウスタイル
-        this->winConf.x,		//ウィンドウ表示位置:x
-        this->winConf.y,		//ウィンドウ表示位置:y
-        this->winConf.width,	//ウィンドウのサイズ:幅
-        this->winConf.height,	//ウィンドウのサイズ:高さ
+        this->conf_.x,		    //ウィンドウ表示位置:x
+        this->conf_.y,		    //ウィンドウ表示位置:y
+        windowWidth,	        //ウィンドウのサイズ:幅
+        windowHeight,	        //ウィンドウのサイズ:高さ
         NULL,					//親ウィンドウのハンドル
         NULL,					//メニューのハンドル
-        this->hInstance,		//インスタンスのハンドル
+        this->hInstance_,		//インスタンスのハンドル
         NULL					//作成時の引数保存用ポインタ
     );
 
     //ウィンドウハンドル生成チェック
-    if (this->hwnd == NULL) {
+    if (this->hwnd_ == NULL) {
         throw std::runtime_error("ウィンドウ生成失敗");
     }
-
-    return hwnd;
 }
 
 /// <summary>
@@ -138,5 +138,5 @@ HWND Window::create() {
 /// </summary>
 void Window::show() {
     //ウィンドウ表示
-    ShowWindow(this->hwnd, this->nCmdShow);
+    ShowWindow(this->hwnd_, this->nCmd_show_);
 }

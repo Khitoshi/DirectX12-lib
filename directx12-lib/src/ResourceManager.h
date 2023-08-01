@@ -13,17 +13,19 @@
 class ResourceManager
 {
 private:
-    ResourceManager() {};
+    ResourceManager() :
+        resources_()
+    {};
     ResourceManager(const ResourceManager&) = delete;
     ResourceManager& operator=(const ResourceManager&) = delete;
 public:
 
     /// <summary>
-    /// インスタンスの取得
-    /// シングルトンで作成されているため
-    /// グローバルで使用可能
+    /// シングルトンなインスタンスの取得
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// シングルトンなインスタンス
+    /// </returns>
     static ResourceManager* getInstance() {
         static ResourceManager instance;
         return &instance;
@@ -39,9 +41,9 @@ public:
     template <typename T>
     void registerResource(const std::string& name, std::shared_ptr<T> resource) {
         //名前で検索
-        auto it = resources.find(name);
+        auto it = this->resources_.find(name);
         //既に同じ名前で登録されていないか確認
-        if (it != resources.end()) {
+        if (it != this->resources_.end()) {
             //登録済みの場合はエラー
             throw std::runtime_error("Resource already exists: " + name);
             return;
@@ -51,7 +53,7 @@ public:
         //std::lock_guard<std::mutex> lock(mtx);
 
         //登録
-        resources[name] = std::move(resource);
+        this->resources_[name] = std::move(resource);
     }
 
     /// <summary>
@@ -65,8 +67,8 @@ public:
         //std::lock_guard<std::mutex> lock(mtx);
 
         //名前で検索
-        auto it = resources.find(name);
-        if (it != resources.end()) {
+        auto it = this->resources_.find(name);
+        if (it != this->resources_.end()) {
             return std::static_pointer_cast<T>(it->second);
         }
 
@@ -75,7 +77,7 @@ public:
 
 private:
     //リソースの管理用
-    std::map<std::string, std::shared_ptr<void>> resources;
+    std::map<std::string, std::shared_ptr<void>> resources_;
     //マルチスレッド用のロック
     //std::mutex mtx;
 };

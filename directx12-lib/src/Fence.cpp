@@ -4,56 +4,40 @@
 /// <summary>
 /// GPUと同期オブジェクトの初期化
 /// </summary>
-/// <param name="device">デバイスインターフェース</param>
+/// <param name="device">GPUデバイス</param>
 void Fence::init(ID3D12Device* device)
 {
-    fence = createFence(device);
-    value = createValue();
-    event = createEvent();
+    createFence(device);
+    createValue();
+    createEvent();
 }
 
 /// <summary>
 /// Fenceの生成
 /// </summary>
-/// <param name="device"></param>
-/// <returns>
-/// GPUと同期オブジェクト
-/// </returns>
-ComPtr<ID3D12Fence> Fence::createFence(ID3D12Device* device)
+/// <param name="device">GPUデバイス</param>
+void Fence::createFence(ID3D12Device* device)
 {
-    ComPtr<ID3D12Fence> f;
-    if (FAILED(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&f)))) {
+    if (FAILED(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&this->fence_)))) {
         throw std::runtime_error("failed to create fence");
     }
-
-    return f;
 }
 
 /// <summary>
 /// fenceの初期値の生成(設定)
 /// </summary>
-/// <returns>
-/// 設定した初期値
-/// </returns>
-UINT64 Fence::createValue()
+void Fence::createValue()
 {
-    UINT value = 1;
-    return value;
+    this->value_ = 1;
 }
 
 /// <summary>
 /// イベントの生成
 /// </summary>
-/// <returns>
-/// 生成したイベント
-/// </returns>
-HANDLE Fence::createEvent()
+void Fence::createEvent()
 {
-    HANDLE e = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-
-    if (e == nullptr) {
+    this->event_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+    if (this->event_ == nullptr) {
         throw std::runtime_error("failed to create event");
     }
-
-    return e;
 }

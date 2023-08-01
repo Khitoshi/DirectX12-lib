@@ -5,24 +5,9 @@
 /// 初期化処理
 /// </summary>
 /// <param name="device">デバイス</param>
-/// <param name="psoDesc">psoの設定</param>
-void PipelineStateObject::init(PipelineStateObjectConf conf)
+void PipelineStateObject::init(ID3D12Device* device)
 {
-    createGraphicsPipelineStateObject(conf);
-}
-
-/// <summary>
-/// グラフィックス用パイプラインステートオブジェクトの作成
-/// </summary>
-/// <param name="device">デバイス</param>
-/// <param name="psoDesc">psoの設定</param>
-/// <returns>
-/// 生成したパイプラインステートオブジェクト
-/// </returns>
-void PipelineStateObject::createGraphicsPipelineStateObject(PipelineStateObjectConf conf)
-{
-    if (FAILED(conf.device->CreateGraphicsPipelineState(&conf.desc, IID_PPV_ARGS(&this->pipelineStateObject)))) {
+    if (FAILED(device->CreateGraphicsPipelineState(&conf_.desc, IID_PPV_ARGS(&this->pso_)))) {
         throw std::runtime_error("failed to create pipeline state object");
     }
-    return;
 }

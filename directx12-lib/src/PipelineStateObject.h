@@ -5,33 +5,41 @@
 using namespace Microsoft::WRL;
 
 /// <summary>
-/// パイプラインステートオブジェクト生成時に使用する設定
-/// </summary>
-struct PipelineStateObjectConf {
-    ID3D12Device* device;
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC desc;
-};
-
-/// <summary>
 /// パイプラインステートオブジェクトの生成用クラス
 /// </summary>
 class PipelineStateObject
 {
+    friend class PipelineStateObjectFactory;
 public:
-    PipelineStateObject() :pipelineStateObject() {};
-    ~PipelineStateObject() {};
+    /// <summary>
+    /// パイプラインステートオブジェクト生成時に使用する設定
+    /// </summary>
+    struct PipelineStateObjectConf {
+        D3D12_GRAPHICS_PIPELINE_STATE_DESC desc;
 
-    //初期化処理
-    void init(PipelineStateObjectConf conf);
+        bool operator==(const PipelineStateObjectConf& other) const {
+            return memcmp(this, &other, sizeof(PipelineStateObjectConf)) == 0;
+        }
+    };
 
 private:
-    //グラフィックスパイプラインステートオブジェクトの作成
-    void createGraphicsPipelineStateObject(PipelineStateObjectConf conf);
+    PipelineStateObject(const PipelineStateObjectConf& c) :
+        conf_(c),
+        pso_()
+    {};
+
+public:
+    ~PipelineStateObject() {};
+
+private:
+    //初期化処理
+    void init(ID3D12Device* device);
 
 public:
     //パイプラインステートオブジェクトの取得
-    ID3D12PipelineState* getPipelineStateObject() const { return pipelineStateObject.Get(); }
+    ID3D12PipelineState* getPipelineStateObject() const { return pso_.Get(); }
 
 private:
-    ComPtr<ID3D12PipelineState> pipelineStateObject;    //パイプラインステートオブジェクト
+    PipelineStateObjectConf conf_;      //パイプラインステートオブジェクト生成時に使用する設定
+    ComPtr<ID3D12PipelineState> pso_;   //パイプラインステートオブジェクト
 };

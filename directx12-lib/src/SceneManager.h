@@ -5,8 +5,9 @@
 #include <concepts>
 #include "Scene.h"
 #include "imgui/imgui.h"
-
+//#include "SceneDefault.h"
 #include "SceneTriangle.h"
+#include "SceneSprite.h"
 #include <functional>
 
 /// <summary>
@@ -15,7 +16,7 @@
 class SceneManager
 {
 private:
-    SceneManager() :currentScene(std::make_shared<SceneDefault>()) {};
+    SceneManager() :currentScene(std::make_shared<SceneTriangle>()) {};
     ~SceneManager() {};
 public:
     /// <summary>
@@ -38,6 +39,15 @@ public:
         }
     }
 
+    void init(ID3D12Device* device, std::shared_ptr<Scene> scene)
+    {
+        registerScene();
+        this->currentScene = scene;
+        if (this->currentScene) {
+            this->currentScene->init(device);
+        }
+    }
+
     /// <summary>
     /// 更新処理
     /// </summary>
@@ -52,10 +62,10 @@ public:
     /// 描画処理
     /// </summary>
     /// <param name="conf"></param>
-    void render(SceneConf conf)
+    void render(RenderContext* rc)
     {
         if (currentScene) {
-            currentScene->render(conf);
+            currentScene->render(rc);
         }
     }
 
@@ -63,10 +73,10 @@ public:
     /// シーン変更処理
     /// </summary>
     /// <param name="conf">描画に必要な設定</param>
-    void changeScene(SceneConf conf)
+    void changeScene(ID3D12Device* device)
     {
         if (!isSceneChange) return;
-        
+
         //同じシーンの場合は変更しない
         if (typeid(*currentScene) == typeid(*nextScene)) {
             isSceneChange = false;
@@ -76,14 +86,14 @@ public:
         //シーン変更
         clear();
         currentScene = std::move(this->nextScene);
-        currentScene->init(conf);
+        currentScene->init(device);
         isSceneChange = false;
     }
 
     /// <summary>
     /// シーン選択
     /// </summary>
-    void sceneSelect() 
+    void sceneSelect()
     {
         ImGui::Begin("Scene Manager");
         //シーン選択loop
@@ -95,7 +105,7 @@ public:
                 this->isSceneChange = true;
             }
         }
-        
+
         ImGui::End();
     }
 
@@ -105,20 +115,20 @@ public:
     /// <param name="scene"></param>
     void registerScene()
     {
-       sceneFactories = {
-            {"Default", []() { return std::make_shared<SceneDefault>(); }},
-            {"Triangle", []() { return std::make_shared<SceneTriangle>(); }},
-       //シーンを追加する場合はここに追加
-       };
-	}
+        sceneFactories = {
+            //シーンを追加する場合はここに追加
+            //{"Default",     []() { return std::make_shared<SceneDefault>(); }},
+            {"Triangle",    []() { return std::make_shared<SceneTriangle>(); }},
+            {"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
+        };
+    }
 
     void updateImguiMenu()
-	{
-		if (currentScene) {
-			currentScene->updateImguiMenu();
-		}
-	}
-    
+    {
+        if (currentScene) {
+            currentScene->updateImguiMenu();
+        }
+    }
 
 private:
     std::shared_ptr<Scene> currentScene = nullptr;  //現在のシーン
@@ -127,6 +137,7 @@ private:
 
     //シーンのファクトリー
     using SceneFactory = std::function<std::shared_ptr<Scene>()>;
-    std::map<std::string, SceneFactory> sceneFactories;
+    using SceneEntry = std::pair<std::string, SceneFactory>;
+    //std::map<std::string, SceneFactory> sceneFactories;
+    std::vector<SceneEntry> sceneFactories;
 };
-

@@ -5,18 +5,18 @@
 /// <summary>
 /// 何の処理もしないシーン
 /// </summary>
-class SceneDefault: public Scene
+class SceneDefault final : public Scene
 {
 public:
     SceneDefault() {};
     ~SceneDefault() {};
 
     //初期化処理
-    void init(SceneConf conf) {};
+    void init(ID3D12Device* device)override {};
     //終了処理
-    void finalize() {};
+    void finalize()override {};
     //更新処理
-    void update() {};
+    void update()override {};
     //描画処理
-    void render(SceneConf conf) {};
+    void render(RenderContext* rc)override {};
 };
