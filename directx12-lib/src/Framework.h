@@ -5,6 +5,7 @@
 
 class DX12Resources;
 class ImGuiManager;
+class HighResolutionTimer;
 
 /// <summary>
 /// フレームワーククラス
@@ -16,7 +17,9 @@ private:
     Framework(const HWND& h) :
         hWnd_(h),
         dx12_resources_(),
-        imgui_manager_()
+        imgui_manager_(),
+        fps_(0),
+        mspf_(0)
     {}
 public:
     ~Framework() {};
@@ -36,8 +39,14 @@ private:
     //終了処理
     void deinit();
 
+    //フレームレート計算
+    void calculateFrameStats();
+
 private:
     HWND hWnd_;                                     //ウィンドウハンドル
     std::shared_ptr<DX12Resources> dx12_resources_; //DX12リソース
     std::shared_ptr<ImGuiManager> imgui_manager_;   //ImGuiマネージャー
+    std::shared_ptr<HighResolutionTimer> timer_;                     //タイマー
+    float fps_;                                      //FPS
+    float mspf_;
 };

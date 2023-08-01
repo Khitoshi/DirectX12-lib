@@ -5,10 +5,11 @@
 
 #include "DeviceContext.h"
 
+#include "HighResolutionTimer.h"
+
 #include <exception>
 #include <iostream>
-
-
+#include <sstream>
 
 /// <summary>
 /// デバッグ用出力関数
@@ -40,6 +41,11 @@ int Framework::run(std::function<bool()> processMessages)
     try {
         //アプリケーションが終わる時にmessageがWM_QUITになる
         while (processMessages()) {
+
+            timer_->Tick();
+            const float elapsed_time_ = timer_->TimeInterval();
+
+            calculateFrameStats();
             this->update();
             this->render();
         }
@@ -64,6 +70,8 @@ int Framework::run(std::function<bool()> processMessages)
 /// </summary>
 void Framework::init()
 {
+    timer_ = std::make_shared<HighResolutionTimer>();
+
     //DX12初期化処理
     this->dx12_resources_ = std::make_shared<DX12Resources>();
     this->dx12_resources_->init(this->hWnd_);
@@ -118,10 +126,8 @@ void Framework::debugRender()
     ImGui::Text("Mouse Position: (%.1f,%.1f)", mousePos.x, mousePos.y);
 
     //FPS表示
-    //frameRates[currentFrameRateIndex] = ImGui::GetIO().Framerate;
-    //currentFrameRateIndex = (currentFrameRateIndex + 1) % FRAMERATE_BUFFER_SIZE;
-    ImGui::Text("FrameRate: %.1f", ImGui::GetIO().Framerate);
-    //ImGui::PlotLines("FrameRateLine", frameRates, FRAMERATE_BUFFER_SIZE);
+    //ImGui::Text("FrameRate: %.1f", ImGui::GetIO().Framerate);
+    ImGui::Text("FPS: %.f / FRAME TIME: %.f ms", this->fps_, this->mspf_);
 
     auto gpu_info = device_context->getGPUInfo();
     ImGui::Text("Adaptor : %ls", gpu_info.name_.c_str());
@@ -150,4 +156,34 @@ void Framework::deinit()
 {
     this->imgui_manager_->deinit();
     this->dx12_resources_->waitEndOfDrawing();
+}
+
+
+/// <summary>
+/// フレームレート計算処理
+/// </summary>
+void Framework::calculateFrameStats()
+{
+    static int frames = 0;
+    static float time_tlapsed = 0.0f;
+
+    frames++;
+
+    if ((this->timer_->TimeStamp() - time_tlapsed) >= 1.0f)
+    {
+        float fps = (float)frames;
+        float mspf = 1000.0f / fps;
+        this->fps_ = fps;
+        this->mspf_ = mspf;
+
+#if _DEBUG
+        std::ostringstream outs;
+        outs.precision(6);
+        outs << "FPS : " << fps << " / " << "Frame Time : " << mspf << " (ms)";
+        SetWindowTextA(this->hWnd_, outs.str().c_str());
+#endif
+
+        frames = 0;
+        time_tlapsed += 1.0f;
+    }
 }
