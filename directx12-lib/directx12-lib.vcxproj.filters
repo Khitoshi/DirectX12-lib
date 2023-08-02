@@ -43,6 +43,9 @@
     <Filter Include="Shaders\MultiPathCompositing">
       <UniqueIdentifier>{dca62733-f061-4116-80bd-85b795761a5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Cube">
+      <UniqueIdentifier>{f6cc4cdb-98b0-4ab4-975d-8d7312aa1df2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Window.cpp">
@@ -151,6 +154,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Framework.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CubeModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene3dCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -377,6 +386,15 @@
     <ClInclude Include="src\HighResolutionTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene3dCube.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CubeModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConstantBufferFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">
@@ -409,6 +427,12 @@
     <FxCompile Include="src\shaders\MultiPathCompositingVS.hlsl">
       <Filter>Shaders\MultiPathCompositing</Filter>
     </FxCompile>
+    <FxCompile Include="src\shaders\CubeVS.hlsl">
+      <Filter>Shaders\Cube</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\CubePS.hlsl">
+      <Filter>Shaders\Cube</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\Triangle.hlsli">
@@ -426,6 +450,9 @@
     </None>
     <None Include="src\shaders\MultiPathCompositing.hlsli">
       <Filter>Shaders\MultiPathCompositing</Filter>
+    </None>
+    <None Include="src\shaders\Cube.hlsli">
+      <Filter>Shaders\Cube</Filter>
     </None>
   </ItemGroup>
 </Project>

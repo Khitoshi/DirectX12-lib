@@ -7,45 +7,58 @@
 class Camera
 {
 public:
-    Camera(int width, int height) :
-        eye_(0, 0, -5),
-        target_(0, 0, 0),
-        up_(0, 1, 0),
-        width_(width),
-        height_(height),
-        world_matrix_(DirectX::XMMatrixRotationY(DirectX::XM_PIDIV2))
+    Camera() :
+        target_position_length_(1.0f),
+        eye_(DirectX::XMFLOAT3(0.0f, 0.0f, 10.0f)),
+        up_(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f)),
+        target_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.01f)),
+        view_matrix_(DirectX::XMMATRIX()),
+        projection_matrix_(DirectX::XMMATRIX()),
+        forward_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f)),
+        right_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f)),
+        near_(0.1f),
+        far_(100.0f),
+        view_angle_(DirectX::XMConvertToRadians(60.0f)),
+        aspect_(0.0f)
     {};
-    ~Camera() {};
 
-    //初期化
-    void init();
-    //更新
-    void update();
+    //初期化処理
+    void init(const float window_width, const float window_height);
+    //更新処理
+    void update(const float window_width, const float window_height);
 
-public://取得系
-    DirectX::XMMATRIX getViewMatrix()const
-    {
-        return DirectX::XMMatrixLookAtLH(XMLoadFloat3(&eye_), XMLoadFloat3(&target_), XMLoadFloat3(&up_));
-    }
-    DirectX::XMMATRIX getProjectionMatrix()const
-    {
-        //画角90°
-        return DirectX::XMMatrixPerspectiveFovLH(
-            DirectX::XM_PIDIV2,
-            static_cast<float>(width_) / static_cast<float>(height_),//アス比,
-            1.0f, 10.0f);
-    }
-    DirectX::XMMATRIX getWorldMatrix()const
-    {
-        return this->world_matrix_;
-    }
+public:// 設定系
+    void setEye(const DirectX::XMFLOAT3 e) { this->eye_ = e; }
+    void setTarget(const DirectX::XMFLOAT3 t) { this->target_ = t; }
+
+    void setNear(const float n) { this->near_ = n; }
+    void setFar(const float f) { this->far_ = f; }
+
+public:// 取得系
+    DirectX::XMFLOAT3 getEye() const { return this->eye_; }
+    DirectX::XMFLOAT3 getTarget() const { return this->target_; }
+    DirectX::XMMATRIX getViewMatrix() const { return this->view_matrix_; }
+    DirectX::XMMATRIX getProjectionMatrix() const { return this->projection_matrix_; }
+    float getNear() const { return this->near_; }
+    float getFar() const { return this->far_; }
+
+
 private:
-    DirectX::XMFLOAT3 eye_;             //カメラの位置
-    DirectX::XMFLOAT3 target_;          //カメラの注視点
-    DirectX::XMFLOAT3 up_;              //カメラの上方向
+    float target_position_length_;          // 注視点との距離
 
-    int width_;                         //画面の横幅
-    int height_;                        //画面の縦幅
+    DirectX::XMFLOAT3 eye_;                 // 視点
+    DirectX::XMFLOAT3 up_;                  // 上方向
+    DirectX::XMFLOAT3 target_;              // 注視点
 
-    DirectX::XMMATRIX world_matrix_;    //ワールド行列
+    DirectX::XMMATRIX view_matrix_;       // ビュー行列
+    DirectX::XMMATRIX projection_matrix_; // 透視変換行列
+
+    DirectX::XMFLOAT3 forward_;             // 前方向
+    DirectX::XMFLOAT3 right_;               // 右方向
+
+    float near_;                            // ニアクリップ
+    float far_;                             // ファークリップ
+
+    float view_angle_;                      // 視野角
+    float aspect_;                          // アスペクト比
 };

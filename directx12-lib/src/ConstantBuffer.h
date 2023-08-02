@@ -10,34 +10,38 @@ using namespace Microsoft::WRL;
 /// </summary>
 class ConstantBuffer
 {
+    friend class ConstantBufferFactory;
 public:
-    ConstantBuffer() : resource_() {}
+    struct ConstantBufferConf
+    {
+        UINT size;      //定数バッファのサイズ
+    };
+
+private:
+    ConstantBuffer(const ConstantBufferConf& c) :
+        conf_(c),
+        descriptor_heap_(),
+        resource_()
+    {}
+public:
     ~ConstantBuffer() {}
 
-    //初期化処理
-    void init(ID3D12Device* device);
 
     /// <summary>
     /// リソースに行列情報をコピーする
     /// </summary>
     /// <param name="matrix">行列情報</param>
-    void copy(DirectX::XMMATRIX* matrix)
-    {
-        DirectX::XMMATRIX* mat = nullptr;
-        if (FAILED(this->resource_->Map(0, nullptr, (void**)&mat))) {
-            throw std::exception("ConstantBuffer::copy() : resource->Map() Failed.");
-        }
-        memcpy(mat, matrix, sizeof(DirectX::XMMATRIX));
-        this->resource_->Unmap(0, nullptr);
-    }
+    void copy(void* src_constants);
 
 private:
+    //初期化処理
+    void init(ID3D12Device* device);
     //リソース生成
     void createResource(ID3D12Device* device);
     //ディスクリプタヒープ生成
     void createDescriptorHeap(ID3D12Device* device);
     //ビュー生成
-    void createView(ID3D12Device* device);
+    void createView(ID3D12Device* deviceconf_);
 
 public://取得系
     /// <summary>
@@ -68,6 +72,7 @@ public://取得系
     }
 
 public:
+    ConstantBufferConf conf_;
     ComPtr<ID3D12Resource>          resource_;               //リソース
     ComPtr<ID3D12DescriptorHeap>    descriptor_heap_;         //ディスクリプタヒープ
 };
