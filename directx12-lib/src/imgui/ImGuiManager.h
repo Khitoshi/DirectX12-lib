@@ -9,6 +9,7 @@
 class RenderContext;
 class DepthStencil;
 class OffScreenRenderTarget;
+class DescriptorHeap;
 
 using namespace Microsoft::WRL;
 
@@ -43,7 +44,7 @@ private:
     //深度ステンシル生成
     void createDepthStencil(ID3D12Device* device);
 private:
-    ComPtr<ID3D12DescriptorHeap> descriptor_heap_;                      //ディスクリプタヒープ
+    std::shared_ptr<DescriptorHeap> descriptor_heap_;                      //ディスクリプタヒープ
     std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;    //オフスクリーンレンダーターゲット
     std::shared_ptr<DepthStencil> depth_stencil_;                       //深度ステンシル
 };

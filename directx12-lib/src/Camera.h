@@ -8,14 +8,15 @@ class Camera
 {
 public:
     Camera() :
-        target_position_length_(1.0f),
+        target_position_length_(10.0f),
         eye_(DirectX::XMFLOAT3(0.0f, 0.0f, 10.0f)),
         up_(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f)),
         target_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.01f)),
         view_matrix_(DirectX::XMMATRIX()),
         projection_matrix_(DirectX::XMMATRIX()),
-        forward_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f)),
-        right_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f)),
+        view_matrix_inv_(DirectX::XMMATRIX()),
+        forward_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.01f)),
+        right_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.01f)),
         near_(0.1f),
         far_(100.0f),
         view_angle_(DirectX::XMConvertToRadians(60.0f)),
@@ -26,6 +27,9 @@ public:
     void init(const float window_width, const float window_height);
     //更新処理
     void update(const float window_width, const float window_height);
+
+    //回転処理
+    void rotate(const int x, const int y);
 
 public:// 設定系
     void setEye(const DirectX::XMFLOAT3 e) { this->eye_ = e; }
@@ -42,7 +46,6 @@ public:// 取得系
     float getNear() const { return this->near_; }
     float getFar() const { return this->far_; }
 
-
 private:
     float target_position_length_;          // 注視点との距離
 
@@ -52,6 +55,8 @@ private:
 
     DirectX::XMMATRIX view_matrix_;       // ビュー行列
     DirectX::XMMATRIX projection_matrix_; // 透視変換行列
+
+    DirectX::XMMATRIX view_matrix_inv_;    // ビュー行列の逆行列
 
     DirectX::XMFLOAT3 forward_;             // 前方向
     DirectX::XMFLOAT3 right_;               // 右方向

@@ -1,4 +1,5 @@
-#include "CubeModel.h"
+#include "TextureCubeModel.h"
+
 #include "RootSignatureCacheManager.h"
 #include "DescriptorHeapFactory.h"
 #include "PSOCacheManager.h"
@@ -8,22 +9,25 @@
 #include "DepthStencilCacheManager.h"
 #include "ShaderCacheManager.h"
 #include "ConstantBufferFactory.h"
+#include "TextureCacheManager.h"
 #include "RenderContext.h"
 #include "CommonGraphicsConfig.h"
+
 
 /// <summary>
 /// 初期化処理
 /// </summary>
 /// <param name="device"></param>
-void CubeModel::init(ID3D12Device* device)
+void TextureCubeModel::init(ID3D12Device* device, const char* texture_file_path)
 {
-    this->loadShader();
     this->initRootSignature(device);
     this->initDescriptorHeap(device);
+    this->loadShader();
     this->initPipelineStateObject(device);
     this->initVertexBuffer(device);
     this->initIndexBuffer(device);
     this->initConstantBuffer(device);
+    this->initTexture(device, texture_file_path);
     this->initOffScreenRenderTarget(device);
     this->initDepthStencil(device);
 }
@@ -31,7 +35,7 @@ void CubeModel::init(ID3D12Device* device)
 /// <summary>
 /// 更新処理
 /// </summary>
-void CubeModel::update()
+void TextureCubeModel::update()
 {
     this->constant_buffer_->copy(&this->conf_);
 }
@@ -40,7 +44,7 @@ void CubeModel::update()
 /// 描画処理
 /// </summary>
 /// <param name="rc"></param>
-void CubeModel::draw(RenderContext* rc)
+void TextureCubeModel::draw(RenderContext* rc)
 {
     {
         //オフスクリーンレンダーターゲットで書き込みできる状態にする
@@ -62,13 +66,10 @@ void CubeModel::draw(RenderContext* rc)
     rc->setVertexBuffer(this->vertex_buffer_.get());
     //インデックスバッファを設定
     rc->setIndexBuffer(this->index_buffer_.get());
-
-    //定数バッファを設定
-    //rc->setConstantBufferView(this->constant_buffer_.get());
-    std::vector<DescriptorHeap*>ds;
-    ds.push_back(this->descriptor_heap_.get());
-    rc->setDescriptorHeaps(ds);
-    rc->setGraphicsRootDescriptorTable(0, this->descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+    //ディスクリプタヒープを設定
+    rc->setDescriptorHeap(this->srv_cbv_uav_descriptor_heap_.get());
+    rc->setGraphicsRootDescriptorTable(0, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+    rc->setGraphicsRootDescriptorTable(1, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 
     //ドローコール
     rc->drawIndexed(this->num_indices_);
@@ -82,48 +83,46 @@ void CubeModel::draw(RenderContext* rc)
 /// ルートシグネチャの初期化
 /// </summary>
 /// <param name="device"></param>
-void CubeModel::initRootSignature(ID3D12Device* device)
+void TextureCubeModel::initRootSignature(ID3D12Device* device)
 {
     RootSignature::RootSignatureConf rootSignatureConf = {};
-
     rootSignatureConf.sampler_filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
     rootSignatureConf.texture_address_modeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rootSignatureConf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rootSignatureConf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    rootSignatureConf.num_sampler = 0;
     rootSignatureConf.max_cbv_descriptor = 1;
-    rootSignatureConf.offset_in_descriptors_from_table_start_srv = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+    rootSignatureConf.max_srv_descriptor = 1;
+    rootSignatureConf.offset_in_descriptors_from_table_start_cb = 0;
+    rootSignatureConf.offset_in_descriptors_from_table_start_srv = 1;
+    rootSignatureConf.num_sampler = 1;
     rootSignatureConf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
     rootSignatureConf.visibility_cbv = D3D12_SHADER_VISIBILITY_VERTEX;
+    rootSignatureConf.visibility_srv = D3D12_SHADER_VISIBILITY_PIXEL;
     this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
 }
 
-/// <summary>
-/// ディスクリプタヒープの作成
-/// </summary>
-/// <param name="device"></param>
-void CubeModel::initDescriptorHeap(ID3D12Device* device)
+void TextureCubeModel::initDescriptorHeap(ID3D12Device* device)
 {
-    this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
+    this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2);
 }
 
 /// <summary>
 /// シェーダーの読み込み
 /// </summary>
-void CubeModel::loadShader()
+void TextureCubeModel::loadShader()
 {
     {
         Shader::ShaderConf conf = {};
         conf.entry_func_name = "VSMain";
         conf.current_shader_model_type = Shader::ShaderConf::ShaderModelType::VERTEX;
-        conf.file_path = "./src/shaders/CubeVS.hlsl";
+        conf.file_path = "./src/shaders/TextureCubeVS.hlsl";
         this->vertex_shader_ = ShaderCacheManager::getInstance().getOrCreate(conf);
     }
     {
         Shader::ShaderConf conf = {};
         conf.entry_func_name = "PSMain";
         conf.current_shader_model_type = Shader::ShaderConf::ShaderModelType::PIXEL;
-        conf.file_path = "./src/shaders/CubePS.hlsl";
+        conf.file_path = "./src/shaders/TextureCubePS.hlsl";
         this->pixel_shader_ = ShaderCacheManager::getInstance().getOrCreate(conf);
     }
 }
@@ -132,7 +131,7 @@ void CubeModel::loadShader()
 /// パイプラインステートオブジェクトの初期化
 /// </summary>
 /// <param name="device"></param>
-void CubeModel::initPipelineStateObject(ID3D12Device* device)
+void TextureCubeModel::initPipelineStateObject(ID3D12Device* device)
 {
     D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
@@ -152,6 +151,7 @@ void CubeModel::initPipelineStateObject(ID3D12Device* device)
     ds_desc.FrontFace = defaultStencilOp;
     ds_desc.BackFace = defaultStencilOp;
 
+    //ラスタライザーステート
     D3D12_RASTERIZER_DESC rasterizer_desc = {};
     rasterizer_desc.FillMode = D3D12_FILL_MODE_SOLID; // ソリッド表示
     rasterizer_desc.CullMode = D3D12_CULL_MODE_NONE; // カリングオフ
@@ -194,7 +194,7 @@ void CubeModel::initPipelineStateObject(ID3D12Device* device)
 /// 頂点バッファの初期化
 /// </summary>
 /// <param name="device"></param>
-void CubeModel::initVertexBuffer(ID3D12Device* device)
+void TextureCubeModel::initVertexBuffer(ID3D12Device* device)
 {
     //頂点データ
     this->vertices_[0] = { {-0.75f, -0.75f, 0.0f }, { 0, 1 } };    // 左下前
@@ -221,7 +221,7 @@ void CubeModel::initVertexBuffer(ID3D12Device* device)
 /// インデックスバッファの初期化
 /// </summary>
 /// <param name="device"></param>
-void CubeModel::initIndexBuffer(ID3D12Device* device)
+void TextureCubeModel::initIndexBuffer(ID3D12Device* device)
 {
     //インデックスデータ
     unsigned short indices[] = {
@@ -250,20 +250,25 @@ void CubeModel::initIndexBuffer(ID3D12Device* device)
 /// 定数バッファの初期化
 /// </summary>
 /// <param name="device"></param>
-void CubeModel::initConstantBuffer(ID3D12Device* device)
+void TextureCubeModel::initConstantBuffer(ID3D12Device* device)
 {
     ConstantBuffer::ConstantBufferConf conf = {};
-    conf.size = sizeof(CubeModelConf);
-    conf.descriptor_heap = this->descriptor_heap_.get();
+    conf.size = sizeof(TextureCubeModelConf);
+    conf.descriptor_heap = this->srv_cbv_uav_descriptor_heap_.get();
     this->constant_buffer_ = ConstantBufferFactory::create(device, conf);
     constant_buffer_->copy(&this->conf_);
+}
+
+void TextureCubeModel::initTexture(ID3D12Device* device, const char* texture_file_path)
+{
+    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, this->srv_cbv_uav_descriptor_heap_.get(), texture_file_path);
 }
 
 /// <summary>
 /// オフスクリーンレンダーターゲットの初期化
 /// </summary>
 /// <param name="device"></param>
-void CubeModel::initOffScreenRenderTarget(ID3D12Device* device)
+void TextureCubeModel::initOffScreenRenderTarget(ID3D12Device* device)
 {
     OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
 
@@ -299,7 +304,7 @@ void CubeModel::initOffScreenRenderTarget(ID3D12Device* device)
 /// 深度ステンシルの初期化
 /// </summary>
 /// <param name="device"></param>
-void CubeModel::initDepthStencil(ID3D12Device* device)
+void TextureCubeModel::initDepthStencil(ID3D12Device* device)
 {
     DepthStencil::DepthStencilConf ds_conf = {};
     ds_conf.frame_buffer_count = 1;

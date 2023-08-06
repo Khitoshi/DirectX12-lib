@@ -20,12 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\CameraController.cpp" />
     <ClCompile Include="src\CommandAllocator.cpp" />
     <ClCompile Include="src\CommandQueue.cpp" />
     <ClCompile Include="src\CompositeRenderTarget.cpp" />
     <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\CubeModel.cpp" />
     <ClCompile Include="src\DepthStencil.cpp" />
+    <ClCompile Include="src\DescriptorHeap.cpp" />
     <ClCompile Include="src\DeviceContext.cpp" />
     <ClCompile Include="src\DX12Resources.cpp" />
     <ClCompile Include="src\Fence.cpp" />
@@ -41,11 +43,13 @@
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
+    <ClCompile Include="src\InputManager.cpp" />
     <ClCompile Include="src\OffScreenRenderTarget.cpp" />
     <ClCompile Include="src\PipelineStateObject.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\RootSignature.cpp" />
     <ClCompile Include="src\Scene3dCube.cpp" />
+    <ClCompile Include="src\SceneTexture3dCube.cpp" />
     <ClCompile Include="src\SceneTriangle.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderCacheManager.cpp" />
@@ -53,12 +57,14 @@
     <ClCompile Include="src\SceneSprite.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\TextureCubeModel.cpp" />
     <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\CameraController.h" />
     <ClInclude Include="src\ConstantBufferFactory.h" />
     <ClInclude Include="src\CubeModel.h" />
     <ClInclude Include="src\Camera.h" />
@@ -74,7 +80,9 @@
     <ClInclude Include="src\DepthStencil.h" />
     <ClInclude Include="src\DepthStencilCacheManager.h" />
     <ClInclude Include="src\DepthStencilFactory.h" />
-    <ClInclude Include="src\DescriptorHeapCache.h" />
+    <ClInclude Include="src\DescriptorCache.h" />
+    <ClInclude Include="src\DescriptorHeap.h" />
+    <ClInclude Include="src\DescriptorHeapFactory.h" />
     <ClInclude Include="src\DeviceContext.h" />
     <ClInclude Include="src\DeviceContextFactory.h" />
     <ClInclude Include="src\DX12Resources.h" />
@@ -101,6 +109,8 @@
     <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\IndexBufferFactory.h" />
+    <ClInclude Include="src\InputManager.h" />
+    <ClInclude Include="src\MouseInputListener.h" />
     <ClInclude Include="src\OffScreenRenderTargetCacheManager.h" />
     <ClInclude Include="src\OffScreenRenderTargetFactory.h" />
     <ClInclude Include="src\PipelineStateObject.h" />
@@ -119,6 +129,7 @@
     <ClInclude Include="src\Scene3dCube.h" />
     <ClInclude Include="src\SceneDefault.h" />
     <ClInclude Include="src\SceneManager.h" />
+    <ClInclude Include="src\SceneTexture3dCube.h" />
     <ClInclude Include="src\SceneTriangle.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderCacheManager.h" />
@@ -131,6 +142,7 @@
     <ClInclude Include="src\SwapChainFactory.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\TextureCacheManager.h" />
+    <ClInclude Include="src\TextureCubeModel.h" />
     <ClInclude Include="src\TextureFactory.h" />
     <ClInclude Include="src\Triangle.h" />
     <ClInclude Include="src\VertexBuffer.h" />
@@ -238,6 +250,26 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="src\shaders\TextureCubePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\TextureCubeVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+    </FxCompile>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
@@ -262,6 +294,7 @@
     <None Include="src\shaders\MultiPathCompositing.hlsli" />
     <None Include="src\shaders\Rotation.hlsli" />
     <None Include="src\shaders\Sprite.hlsli" />
+    <None Include="src\shaders\TextureCube.hlsli" />
     <None Include="src\shaders\Triangle.hlsli" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

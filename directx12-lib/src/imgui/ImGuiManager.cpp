@@ -4,6 +4,7 @@
 #include "../OffScreenRenderTargetFactory.h"
 #include "../DepthStencilCacheManager.h"
 #include "../RenderContext.h"
+#include "../DescriptorHeapFactory.h"
 #include <stdexcept>
 
 /// <summary>
@@ -32,9 +33,9 @@ void ImGuiManager::init(ID3D12Device* device, const HWND& hWnd)
         device,
         frameBufferCount,
         DXGI_FORMAT_R8G8B8A8_UNORM,
-        this->descriptor_heap_.Get(),
-        this->descriptor_heap_->GetCPUDescriptorHandleForHeapStart(),
-        this->descriptor_heap_->GetGPUDescriptorHandleForHeapStart());
+        this->descriptor_heap_->getDescriptorHeap(),
+        this->descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(),
+        this->descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 }
 
 /// <summary>
@@ -73,7 +74,7 @@ void ImGuiManager::endFrame()
 void ImGuiManager::render(RenderContext* rc, ID3D12Device* device)
 {
     ImGui::Render();
-    rc->setDescriptorHeap(this->descriptor_heap_.Get());
+    rc->setDescriptorHeap(this->descriptor_heap_.get());
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), rc->getCommandList());
 
     //オフスクリーンレンダーターゲットの書き込みを終了する。
@@ -98,14 +99,7 @@ void ImGuiManager::deinit()
 /// <param name="device">GPUデバイス</param>
 void ImGuiManager::createDescriptorHeap(ID3D12Device* device)
 {
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.NumDescriptors = 1;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-    if (FAILED(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->descriptor_heap_)))) {
-        throw std::runtime_error("Failed to create descriptor heap");
-    }
+    this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
 }
 
 void ImGuiManager::createOffScreenRenderTarget(ID3D12Device* device)

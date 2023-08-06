@@ -1,28 +1,22 @@
 #pragma once
-#pragma once
 
 #include "Scene.h"
-#include <memory>
 #include <DirectXMath.h>
-
-class CubeModel;
 class Camera;
 class CameraController;
+class TextureCubeModel;
 
-/// <summary>
-/// ‰½‚Ìˆ—‚à‚µ‚È‚¢ƒV[ƒ“
-/// </summary>
-class Scene3dCube final : public Scene
+class SceneTexture3dCube final : public Scene
 {
 public:
-    Scene3dCube() :
+    SceneTexture3dCube() :
         cube_model_(),
         camera_(),
         is_change_camera_(false),
         camera_angle_(DirectX::XMFLOAT3(0, 0, 0)),
         camera_controller_()
     {};
-    ~Scene3dCube() {};
+    ~SceneTexture3dCube() {};
 
     //‰Šú‰»ˆ—
     void init(ID3D12Device* device)override;
@@ -35,7 +29,7 @@ public:
     //imgui‚Ìmenu‚ğ•\¦
     void updateImguiMenu()override;
 private:
-    std::shared_ptr<CubeModel> cube_model_;
+    std::shared_ptr<TextureCubeModel> cube_model_;
     std::shared_ptr<Camera> camera_;
     bool is_change_camera_;
     DirectX::XMFLOAT3 camera_angle_;

@@ -3,7 +3,7 @@
 #include "RenderContext.h"
 #include "DepthStencil.h"
 #include "CommonGraphicsConfig.h"
-
+#include "DescriptorHeapFactory.h"
 /// <summary>
 /// 初期化
 /// </summary>
@@ -24,7 +24,7 @@ void OffScreenRenderTarget::init(ID3D12Device* device)
 void OffScreenRenderTarget::beginRender(RenderContext* rc)
 {
     rc->transitionOffScreenRenderTargetBegin(this->resource_.Get());
-    rc->simpleStart(this->rtv_heap_->GetCPUDescriptorHandleForHeapStart(), this->depth_stencil_view_handle_);
+    rc->simpleStart(this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(), this->depth_stencil_view_handle_);
 }
 
 /// <summary>
@@ -67,14 +67,8 @@ void OffScreenRenderTarget::createResource(ID3D12Device* device)
 void OffScreenRenderTarget::createSRVHeap(ID3D12Device* device)
 {
     //SRVディスクリプタヒープ作成
-    D3D12_DESCRIPTOR_HEAP_DESC dh_desc = {};
-    dh_desc = this->conf_.descriptor_heap_desc;
-    dh_desc.NumDescriptors = 2;
-    dh_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    dh_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    if (FAILED(device->CreateDescriptorHeap(&dh_desc, IID_PPV_ARGS(this->srv_heap_.ReleaseAndGetAddressOf())))) {
-        throw std::runtime_error("failed to create offscreen render target descriptor heap");
-    }
+    //TODO: 2つのヒープを作成するのは無駄なので、1つにまとめる
+    this->cbv_srv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2);
 }
 
 /// <summary>
@@ -89,7 +83,7 @@ void OffScreenRenderTarget::createShaderResourceView(ID3D12Device* device)
     srv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srv_desc.Texture2D.MipLevels = 1;
     srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    device->CreateShaderResourceView(this->resource_.Get(), &srv_desc, this->srv_heap_->GetCPUDescriptorHandleForHeapStart());
+    device->CreateShaderResourceView(this->resource_.Get(), &srv_desc, this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 }
 
 /// <summary>
@@ -99,12 +93,7 @@ void OffScreenRenderTarget::createShaderResourceView(ID3D12Device* device)
 void OffScreenRenderTarget::createRTVHeap(ID3D12Device* device)
 {
     //RTVディスクリプタヒープ作成
-    D3D12_DESCRIPTOR_HEAP_DESC dh_desc = {};
-    dh_desc = this->conf_.descriptor_heap_desc;
-    dh_desc.NumDescriptors = 1;
-    if (FAILED(device->CreateDescriptorHeap(&dh_desc, IID_PPV_ARGS(this->rtv_heap_.ReleaseAndGetAddressOf())))) {
-        throw std::runtime_error("failed to create offscreen render target descriptor heap");
-    }
+    this->rtv_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1);
 }
 
 /// <summary>
@@ -117,5 +106,15 @@ void OffScreenRenderTarget::createRenderTargetView(ID3D12Device* device)
     D3D12_RENDER_TARGET_VIEW_DESC rtv_desc = {};
     rtv_desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
     rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    device->CreateRenderTargetView(this->resource_.Get(), &rtv_desc, this->rtv_heap_->GetCPUDescriptorHandleForHeapStart());
+    device->CreateRenderTargetView(this->resource_.Get(), &rtv_desc, this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+}
+
+ID3D12DescriptorHeap* OffScreenRenderTarget::getSRVHeap() const
+{
+    return this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap();
+}
+
+ID3D12DescriptorHeap* OffScreenRenderTarget::getRTVHeap() const
+{
+    return this->rtv_descriptor_heap_->getDescriptorHeap();
 }

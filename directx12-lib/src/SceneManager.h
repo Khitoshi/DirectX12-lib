@@ -9,6 +9,7 @@
 #include "SceneTriangle.h"
 #include "SceneSprite.h"
 #include "Scene3dCube.h"
+#include "SceneTexture3dCube.h"
 #include <functional>
 
 /// <summary>
@@ -122,6 +123,7 @@ public:
             {"Triangle",    []() { return std::make_shared<SceneTriangle>(); }},
             {"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
             {"3dCube",      []() { return std::make_shared<Scene3dCube>(); }},
+            {"Texture3dCube",      []() { return std::make_shared<SceneTexture3dCube>(); }},
         };
     }
 

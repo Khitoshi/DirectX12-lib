@@ -7,6 +7,7 @@
 #include <map>
 
 class RootSignature;
+class DescriptorHeap;
 class PipelineStateObject;
 class VertexBuffer;
 class IndexBuffer;
@@ -29,6 +30,7 @@ class Sprite
 public:
     Sprite() :
         root_signature_(nullptr),
+        descriptor_heap_(nullptr),
         pixel_shader_(nullptr),
         vertex_shader_(nullptr),
         pso_(nullptr),
@@ -50,6 +52,8 @@ private:
 
     //ルートシグネチャの作成
     void initRootSignature(ID3D12Device* device);
+    //ディスクリプタヒープの作成
+    void initDescriptorHeap(ID3D12Device* device);
     //シェーダーのロード
     void initShader();
     //パイプラインステートオブジェクトの作成
@@ -101,6 +105,7 @@ public://取得系
 
 private:
     std::shared_ptr<RootSignature> root_signature_;                     //ルートシグニチャ
+    std::shared_ptr<DescriptorHeap> descriptor_heap_;                   //ディスクリプタヒープ
     std::shared_ptr<Shader> pixel_shader_;                              //ピクセルシェーダー
     std::shared_ptr<Shader> vertex_shader_;                             //頂点シェーダー
     std::shared_ptr<PipelineStateObject> pso_;                          //パイプラインステートオブジェクト

@@ -43,8 +43,11 @@
     <Filter Include="Shaders\MultiPathCompositing">
       <UniqueIdentifier>{dca62733-f061-4116-80bd-85b795761a5f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\Cube">
+    <Filter Include="Shaders\SimpleCube">
       <UniqueIdentifier>{f6cc4cdb-98b0-4ab4-975d-8d7312aa1df2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\TextureCube">
+      <UniqueIdentifier>{e5ed4b87-7966-4140-bfef-ba9a10a45a9a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +163,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene3dCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InputManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CameraController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureCubeModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneTexture3dCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DescriptorHeap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -293,7 +311,7 @@
     <ClInclude Include="src\Hashes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DescriptorHeapCache.h">
+    <ClInclude Include="src\DescriptorCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\DeviceContext.h">
@@ -395,6 +413,27 @@
     <ClInclude Include="src\ConstantBufferFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\MouseInputListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InputManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CameraController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneTexture3dCube.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureCubeModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DescriptorHeap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DescriptorHeapFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">
@@ -428,10 +467,16 @@
       <Filter>Shaders\MultiPathCompositing</Filter>
     </FxCompile>
     <FxCompile Include="src\shaders\CubeVS.hlsl">
-      <Filter>Shaders\Cube</Filter>
+      <Filter>Shaders\SimpleCube</Filter>
     </FxCompile>
     <FxCompile Include="src\shaders\CubePS.hlsl">
-      <Filter>Shaders\Cube</Filter>
+      <Filter>Shaders\SimpleCube</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\TextureCubeVS.hlsl">
+      <Filter>Shaders\TextureCube</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\TextureCubePS.hlsl">
+      <Filter>Shaders\TextureCube</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -452,7 +497,10 @@
       <Filter>Shaders\MultiPathCompositing</Filter>
     </None>
     <None Include="src\shaders\Cube.hlsli">
-      <Filter>Shaders\Cube</Filter>
+      <Filter>Shaders\SimpleCube</Filter>
+    </None>
+    <None Include="src\shaders\TextureCube.hlsli">
+      <Filter>Shaders\TextureCube</Filter>
     </None>
   </ItemGroup>
 </Project>

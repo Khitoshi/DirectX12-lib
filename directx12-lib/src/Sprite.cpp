@@ -11,7 +11,7 @@
 #include "PSOCacheManager.h"
 #include "ShaderCacheManager.h"
 #include "RootSignatureCacheManager.h"
-
+#include "DescriptorHeapFactory.h"
 #include "TextureCacheManager.h"
 
 /// <summary>
@@ -21,6 +21,7 @@
 void Sprite::init(ID3D12Device* device, const char* texture_file_path)
 {
     initRootSignature(device);
+    initDescriptorHeap(device);
     initShader();
     initPipelineStateObject(device);
     initVertexBuffer(device);
@@ -57,7 +58,11 @@ void Sprite::draw(RenderContext* rc)
     //インデックスバッファを設定。
     rc->setIndexBuffer(this->index_buffer_.get());
     //テクスチャを設定。
-    rc->setTexture(this->texture_.get());
+
+    //rc->setTexture(this->texture_.get());
+
+    rc->setDescriptorHeap(this->descriptor_heap_.get());
+    rc->setGraphicsRootDescriptorTable(0, this->descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 
     //ドローコール
     rc->drawIndexed(this->num_indices_);
@@ -85,6 +90,15 @@ void Sprite::initRootSignature(ID3D12Device* device)
     rootSignatureConf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
+}
+
+/// <summary>
+/// ディスクリプタヒープの作成
+/// </summary>
+/// <param name="device"></param>
+void Sprite::initDescriptorHeap(ID3D12Device* device)
+{
+    this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
 }
 
 /// <summary>
@@ -204,7 +218,7 @@ void Sprite::initIndexBuffer(ID3D12Device* device)
 void Sprite::initTexture(ID3D12Device* device, const char* texture_file_path)
 {
     //テクスチャの初期化
-    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
+    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, this->descriptor_heap_.get(), texture_file_path);
 }
 
 /// <summary>
@@ -276,5 +290,5 @@ void Sprite::setVertices(Vertex vertices[4])
 /// <param name="texture_file_path">テクスチャのファイルパス</param>
 void Sprite::setTexture(ID3D12Device* device, const char* texture_file_path)
 {
-    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
+    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, this->descriptor_heap_.get(), texture_file_path);
 }

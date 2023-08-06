@@ -2,6 +2,8 @@
 
 #include "TextureFactory.h"
 
+class DescriptorHeap;
+
 /// <summary>
 /// テクスチャのキャッシュを管理するクラス
 /// </summary>
@@ -29,7 +31,7 @@ public:
     /// <param name="device"></param>
     /// <param name="path"></param>
     /// <returns></returns>
-    std::shared_ptr<Texture> getOrCreate(ID3D12Device* device, const char* path)
+    std::shared_ptr<Texture> getOrCreate(ID3D12Device* device, DescriptorHeap* descriptor_heap, const char* path)
     {
         // すでにあるならそれを返す
         auto it = this->texture_caches_.find(path);
@@ -38,7 +40,7 @@ public:
         }
 
         // ないなら作って返す
-        auto texture = TextureFactory::create(device, path);
+        auto texture = TextureFactory::create(device, descriptor_heap, path);
         this->texture_caches_[path] = texture;
         return texture;
     }

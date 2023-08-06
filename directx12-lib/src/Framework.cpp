@@ -42,8 +42,8 @@ int Framework::run(std::function<bool()> processMessages)
         //アプリケーションが終わる時にmessageがWM_QUITになる
         while (processMessages()) {
 
-            timer_->Tick();
-            const float elapsed_time_ = timer_->TimeInterval();
+            HighResolutionTimer::getInstance().Tick();
+            const float elapsed_time_ = HighResolutionTimer::getInstance().TimeInterval();
 
             calculateFrameStats();
             this->update();
@@ -70,8 +70,6 @@ int Framework::run(std::function<bool()> processMessages)
 /// </summary>
 void Framework::init()
 {
-    timer_ = std::make_shared<HighResolutionTimer>();
-
     //DX12初期化処理
     this->dx12_resources_ = std::make_shared<DX12Resources>();
     this->dx12_resources_->init(this->hWnd_);
@@ -169,7 +167,7 @@ void Framework::calculateFrameStats()
 
     frames++;
 
-    if ((this->timer_->TimeStamp() - time_tlapsed) >= 1.0f)
+    if ((HighResolutionTimer::getInstance().TimeStamp() - time_tlapsed) >= 1.0f)
     {
         float fps = (float)frames;
         float mspf = 1000.0f / fps;

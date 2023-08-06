@@ -1,6 +1,6 @@
 #include "ConstantBuffer.h"
+#include "DescriptorHeap.h"
 #include <stdexcept>
-
 /// <summary>
 /// レジスタに行列情報をコピーする
 /// </summary>
@@ -22,7 +22,6 @@ void ConstantBuffer::copy(void* src_constants)
 void ConstantBuffer::init(ID3D12Device* device)
 {
     this->createResource(device);
-    this->createDescriptorHeap(device);
     this->createView(device);
 }
 
@@ -34,7 +33,6 @@ void ConstantBuffer::createResource(ID3D12Device* device)
 {
     auto heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     auto buf = CD3DX12_RESOURCE_DESC::Buffer(this->conf_.size + 0xff & ~0xff);
-    //auto buf = CD3DX12_RESOURCE_DESC::Buffer(this->conf_.size + 255 & ~255);
 
     if (FAILED(device->CreateCommittedResource(
         &heap_prop,
@@ -53,26 +51,6 @@ void ConstantBuffer::createResource(ID3D12Device* device)
 }
 
 /// <summary>
-/// ディスクリプタヒープ生成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
-void ConstantBuffer::createDescriptorHeap(ID3D12Device* device)
-{
-    D3D12_DESCRIPTOR_HEAP_DESC heap_desc = {};
-    heap_desc.NumDescriptors = 1;
-    heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-    if (FAILED(device->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(&this->descriptor_heap_)))) {
-        throw std::runtime_error("ConstantBuffer::createDescriptorHeap() : device->CreateDescriptorHeap() Failed.");
-    }
-
-    if (FAILED(this->descriptor_heap_->SetName(L"Constant Buffer Descriptor Heap"))) {
-        throw std::runtime_error("ConstantBuffer::createDescriptorHeap() : descriptorHeap->SetName() Failed.");
-    }
-}
-
-/// <summary>
 /// ディスクリプタヒープビュー生成
 /// </summary>
 /// <param name="device">GPUデバイス</param>
@@ -81,8 +59,7 @@ void ConstantBuffer::createView(ID3D12Device* device)
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbv_desc = {};
     cbv_desc.BufferLocation = this->resource_->GetGPUVirtualAddress();
     cbv_desc.SizeInBytes = (this->conf_.size + 0xff & ~0xff);
-    //cbv_desc.SizeInBytes = (this->conf_.size + 255 & ~255);
-    device->CreateConstantBufferView(&cbv_desc, this->descriptor_heap_->GetCPUDescriptorHandleForHeapStart());
+    device->CreateConstantBufferView(&cbv_desc, this->conf_.descriptor_heap->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
     if (FAILED(this->resource_->SetName(L"Constant Buffer View"))) {
         throw std::runtime_error("ConstantBuffer::createView() : resource->SetName() Failed.");
     }

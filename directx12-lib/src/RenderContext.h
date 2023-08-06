@@ -8,6 +8,7 @@
 #include "RootSignature.h"
 #include "ConstantBuffer.h"
 #include "CommonGraphicsConfig.h"
+#include "DescriptorHeap.h"
 #include <dxgi1_4.h>
 
 using namespace Microsoft::WRL;
@@ -119,6 +120,20 @@ public:
     }
 
     /// <summary>
+    /// ディスクリプタヒープをテーブルに登録
+    /// </summary>
+    /// <param name="descriptor_heap">ディスクリプタヒープ</param>
+    void setGraphicsRootDescriptorTables(const std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> descriptor_heap_handle)
+    {
+        // ディスクリプタテーブルを登録
+        UINT num = 0;
+        for (auto& d : descriptor_heap_handle) {
+            this->setGraphicsRootDescriptorTable(num, d);
+            num++;
+        }
+    }
+
+    /// <summary>
     /// レンダーターゲット(フロントバッファ)の状態遷移を待つ
     /// TARGET -> PRESENT
     /// </summary>
@@ -194,16 +209,6 @@ public:
     }
 
     /// <summary>
-    /// ディスクリプタヒープの登録
-    /// </summary>
-    /// <param name="descriptorHeap"></param>
-    void setDescriptorHeap(ID3D12DescriptorHeap* descriptor_heap)
-    {
-        ID3D12DescriptorHeap* descriptorHeaps[] = { descriptor_heap };
-        this->command_list_->SetDescriptorHeaps(1, descriptorHeaps);
-    }
-
-    /// <summary>
     /// パイプラインステート登録
     /// </summary>
     /// <param name="pso"></param>
@@ -240,17 +245,6 @@ public:
     }
 
     /// <summary>
-    /// 定数バッファビューを設定
-    /// </summary>
-    /// <param name="cbv">定数バッファ</param>
-    void setConstantBufferView(ConstantBuffer* cbv)
-    {
-        auto ds = cbv->getDescriptorHeap();
-        this->command_list_->SetDescriptorHeaps(1, &ds);
-        this->setGraphicsRootDescriptorTable(0, cbv->getGPUDescriptorHandleForHeapStart());
-    }
-
-    /// <summary>
     /// インデックス付きの描画コールを実行
     /// </summary>
     /// <param name="indexCount">インデックスの数</param>
@@ -275,19 +269,34 @@ public:
         this->command_list_->SetGraphicsRootSignature(rootSignature->getRootSignature());
     }
 
+
     /// <summary>
-    /// テスクチャを設定
+    /// ディスクリプタヒープを単体登録
     /// </summary>
-    /// <param name="texture"></param>
-    void setTexture(Texture* texture) {
-        auto ds = texture->GetDescriptorHeap();
-        this->command_list_->SetDescriptorHeaps(1, &ds);
-        this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
+    /// <param name="descriptor_heap"></param>
+    void setDescriptorHeap(DescriptorHeap* descriptor_heap)
+    {
+        ID3D12DescriptorHeap* heap[] = { descriptor_heap->getDescriptorHeap() };
+        this->command_list_->SetDescriptorHeaps(1, heap);
     }
-    void setTexture(ID3D12DescriptorHeap* ds, int ds_num) {
-        this->command_list_->SetDescriptorHeaps(ds_num, &ds);
-        this->setGraphicsRootDescriptorTable(0, ds->GetGPUDescriptorHandleForHeapStart());
+
+    /// <summary>
+    /// ディスクリプタヒープを複数登録
+    /// </summary>
+    /// <param name="descriptor_heap"></param>
+    void setDescriptorHeaps(const std::vector<DescriptorHeap*> descriptor_heap)
+    {
+        // ラップクラスからディスクリプタヒープに変換して登録
+        std::vector<ID3D12DescriptorHeap*> ds = {};
+        for (auto& d : descriptor_heap) {
+            ds.push_back(d->getDescriptorHeap());
+        }
+
+        this->command_list_->SetDescriptorHeaps(static_cast<UINT>(ds.size()), ds.data());
     }
+
+
+
 
     /// <summary>
     /// 単純な描画開始処理
