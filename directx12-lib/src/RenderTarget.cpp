@@ -1,4 +1,5 @@
 #include "RenderTarget.h"
+#include "DescriptorHeapFactory.h"
 #include <stdexcept>
 
 /// <summary>
@@ -18,15 +19,7 @@ void RenderTarget::init(ID3D12Device* device)
 /// <param name="device">GPUデバイス</param>
 void RenderTarget::createDescriptorHeap(ID3D12Device* device)
 {
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.NumDescriptors = this->conf_.frame_buffer_count;
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    desc.NodeMask = 0;
-
-    if (FAILED(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->descriptor_heap_)))) {
-        throw std::runtime_error("failed to create render target descriptor heap");
-    }
+    this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, this->conf_.frame_buffer_count);
 }
 
 /// <summary>
@@ -45,7 +38,7 @@ void RenderTarget::createDescriptorHeapSize(ID3D12Device* device)
 void RenderTarget::createResource(ID3D12Device* device)
 {
     //レンダリングターゲットビューのディスクリプタヒープの先頭のハンドルを取得
-    D3D12_CPU_DESCRIPTOR_HANDLE  rtv_handle = this->descriptor_heap_.Get()->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE  rtv_handle = this->descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
 
     //レンダリングターゲットビューの作成loop
     for (UINT n = 0; n < this->conf_.frame_buffer_count; n++) {
@@ -66,4 +59,13 @@ void RenderTarget::createResource(ID3D12Device* device)
         //ハンドルをずらす
         rtv_handle.ptr += this->descriptor_heap_size_;
     }
+}
+
+/// <summary>
+/// ディスクリプタヒープを取得
+/// </summary>
+/// <returns></returns>
+ID3D12DescriptorHeap* RenderTarget::getDescriptorHeap() const
+{
+    return this->descriptor_heap_->getDescriptorHeap();
 }
