@@ -24,8 +24,8 @@ void InputManager::addMouseInputListener(MouseInputListener* listener)
 /// <param name="y"></param>
 void InputManager::OnMouseMove(int x, int y)
 {
-    for (auto& mouce_listener : this->mouse_input_listeners_) {
-        mouce_listener->onMouseMove(x, y);
+    for (auto& mouse_listener : this->mouse_input_listeners_) {
+        mouse_listener->onMouseMove(x, y);
     }
 }
 
@@ -34,8 +34,8 @@ void InputManager::OnMouseMove(int x, int y)
 /// </summary>
 void InputManager::onMouseLeftButtonDown()
 {
-    for (auto& mouce_listener : this->mouse_input_listeners_) {
-        mouce_listener->onMouseLeftButtonDown();
+    for (auto& mouse_listener : this->mouse_input_listeners_) {
+        mouse_listener->onMouseLeftButtonDown();
     }
 }
 
@@ -44,8 +44,8 @@ void InputManager::onMouseLeftButtonDown()
 /// </summary>
 void InputManager::onMouseLeftButtonUp()
 {
-    for (auto& mouce_listener : this->mouse_input_listeners_) {
-        mouce_listener->onMouseLeftButtonUp();
+    for (auto& mouse_listener : this->mouse_input_listeners_) {
+        mouse_listener->onMouseLeftButtonUp();
     }
 }
 
@@ -54,8 +54,8 @@ void InputManager::onMouseLeftButtonUp()
 /// </summary>
 void InputManager::onMouseRightButtonDown()
 {
-    for (auto& mouce_listener : this->mouse_input_listeners_) {
-        mouce_listener->onMouseRightButtonDown();
+    for (auto& mouse_listener : this->mouse_input_listeners_) {
+        mouse_listener->onMouseRightButtonDown();
     }
 }
 
@@ -64,7 +64,7 @@ void InputManager::onMouseRightButtonDown()
 /// </summary>
 void InputManager::onMouseRightButtonUp()
 {
-    for (auto& mouce_listener : this->mouse_input_listeners_) {
-        mouce_listener->onMouseRightButtonUp();
+    for (auto& mouse_listener : this->mouse_input_listeners_) {
+        mouse_listener->onMouseRightButtonUp();
     }
 }
