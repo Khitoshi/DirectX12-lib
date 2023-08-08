@@ -50,6 +50,7 @@
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\RootSignature.cpp" />
     <ClCompile Include="src\Scene3dCube.cpp" />
+    <ClCompile Include="src\Scene3dModel.cpp" />
     <ClCompile Include="src\SceneTexture3dCube.cpp" />
     <ClCompile Include="src\SceneTriangle.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="src\RootSignatureFactory.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Scene3dCube.h" />
+    <ClInclude Include="src\Scene3dModel.h" />
     <ClInclude Include="src\SceneDefault.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\SceneTexture3dCube.h" />
@@ -386,10 +388,14 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>lib\assimp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>F:\C++\DirectX12-lib\directx12-lib\lib\assimp\build\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>assimp-vc142-mtd.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -400,12 +406,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>lib\assimp\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>assimp-vc142-mt.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalDependencies>assimp-vc142-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

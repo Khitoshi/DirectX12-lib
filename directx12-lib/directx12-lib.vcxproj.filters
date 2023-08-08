@@ -183,6 +183,9 @@
     <ClCompile Include="src\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene3dModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -439,6 +442,9 @@
     </ClInclude>
     <ClInclude Include="src\Model.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene3dModel.h">
+      <Filter>Header Files\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
