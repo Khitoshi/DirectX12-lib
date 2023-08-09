@@ -1,16 +1,7 @@
 #include "d3dx12.h"
-
-#ifdef _DEBUG
-#pragma comment(lib,"assimp-vc142-mtd.lib")
-#else
-#pragma comment(lib,"assimp-vc142-md.lib")
-#endif // _DEBUG
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include "ModelData.h"
 #include <vector>
+#include <memory>
+#include <DirectXMath.h>
 
 class RootSignature;
 class DescriptorHeap;
@@ -23,6 +14,7 @@ class DepthStencil;
 class Texture;
 class OffScreenRenderTarget;
 class RenderContext;
+class ModelData;
 
 class Model
 {
@@ -43,9 +35,7 @@ public:
         pso_(),
         vertex_buffer_(),
         index_buffer_(),
-        faces_(),
         constant_buffer_(),
-        vertices_(),
         num_indices_(0),
         texture_(),
         depth_stencil_(),
@@ -57,8 +47,7 @@ public:
     void update();
     void draw(RenderContext* rc);
 private:
-    void parseNode(const aiScene* scene, const aiMesh* mesh);
-
+    void loadModel(ID3D12Device* device, const char* model_file_path);
     void loadShader();
     void initRootSignature(ID3D12Device* device);
     void initDescriptorHeap(ID3D12Device* device);
@@ -74,7 +63,7 @@ public:
     void setConf(const ModelConf& c) { conf_ = c; }
 private:
     ModelConf conf_;
-    std::vector<ModelData::MeshVertex> vertices_;
+    std::shared_ptr<ModelData> model_data_;
     std::shared_ptr<RootSignature> root_signature_;                     //ルートシグニチャ
     std::shared_ptr<DescriptorHeap> srv_cbv_uav_descriptor_heap_;                  //ディスクリプタヒープ
     std::shared_ptr<Shader> vertex_shader_;                             //頂点シェーダー
@@ -82,7 +71,6 @@ private:
     std::shared_ptr<PipelineStateObject> pso_;                          //パイプラインステートオブジェクト
     std::shared_ptr<VertexBuffer> vertex_buffer_;                       //頂点バッファ
     std::shared_ptr<IndexBuffer> index_buffer_;                         //インデックスバッファ
-    std::vector<ModelData::MeshFace> faces_;
     UINT num_indices_;
     std::shared_ptr<ConstantBuffer> constant_buffer_;                   //定数バッファ
     std::shared_ptr<DepthStencil> depth_stencil_;                       //深度ステンシル

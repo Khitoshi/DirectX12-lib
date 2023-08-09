@@ -189,6 +189,9 @@
     <ClCompile Include="src\Scene3dCube.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="src\ModelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -450,6 +453,15 @@
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="src\ModelData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ModelLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ModelDataFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StringConvertUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

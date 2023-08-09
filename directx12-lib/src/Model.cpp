@@ -1,12 +1,6 @@
 #include "Model.h"
-
-#ifdef _DEBUG
-#pragma comment(lib,"assimp-vc142-mtd.lib")
-#else
-#pragma comment(lib,"assimp-vc142-md.lib")
-#endif // _DEBUG
-
-
+#include "ModelData.h"
+#include "ModelDataFactory.h"
 #include "RootSignatureCacheManager.h"
 #include "DescriptorHeapFactory.h"
 #include "PSOCacheManager.h"
@@ -19,44 +13,19 @@
 #include "TextureCacheManager.h"
 #include "RenderContext.h"
 #include "CommonGraphicsConfig.h"
-
 #include <stdexcept>
 #include <math.h>
 
 void Model::init(ID3D12Device* device, const char* model_file_path)
 {
-    Assimp::Importer importer;
-
-    //TODO:モデルファイルの読み込みが遅いので、別スレッドで読み込むようにする
-    //TODO:キャッシュを作る
-
-    //モデルファイルを読み込む
-    int flag = 0;
-    flag |= aiProcess_CalcTangentSpace;
-    flag |= aiProcess_Triangulate;
-    flag |= aiProcess_JoinIdenticalVertices;
-    flag |= aiProcess_SortByPType;
-    const aiScene* scene = importer.ReadFile(model_file_path, flag);
-    //読み込みに失敗したらエラーを吐く
-    if (!scene) {
-        const std::string err = importer.GetErrorString();
-        throw std::runtime_error("Failed to load model file." + err);
-    }
-
-    int mesh_num = scene->mNumMeshes;
-    for (int i = 0; i < mesh_num; i++)
-    {
-        aiMesh* mesh = scene->mMeshes[i];
-        parseNode(scene, mesh);
-    }
-
     this->initRootSignature(device);
     this->initDescriptorHeap(device);
     this->loadShader();
     this->initPipelineStateObject(device);
+    this->initConstantBuffer(device);
+    this->loadModel(device, model_file_path);
     this->initVertexBuffer(device);
     this->initIndexBuffer(device);
-    this->initConstantBuffer(device);
     //this->initTexture(device, texture_file_path);
     this->initOffScreenRenderTarget(device);
     this->initDepthStencil(device);
@@ -91,8 +60,8 @@ void Model::draw(RenderContext* rc)
     rc->setIndexBuffer(this->index_buffer_.get());
     //ディスクリプタヒープを設定
     rc->setDescriptorHeap(this->srv_cbv_uav_descriptor_heap_.get());
-    rc->setGraphicsRootDescriptorTable(0, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
-    //rc->setGraphicsRootDescriptorTable(1, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+    rc->setGraphicsRootDescriptorTable(0, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());//定数バッファ
+    //rc->setGraphicsRootDescriptorTable(1, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());//テクスチャ
 
     //ドローコール
     rc->drawIndexed(this->num_indices_);
@@ -100,60 +69,6 @@ void Model::draw(RenderContext* rc)
     //オフスクリーンレンダーターゲットの書き込みを終了する。
     this->off_screen_render_target_->endRender(rc);
     OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(off_screen_render_target_.get());
-}
-
-void Model::parseNode(const aiScene* scene, const aiMesh* mesh)
-{
-    //頂点情報
-    this->vertices_.resize(mesh->mNumVertices);
-    for (UINT i = 0; i < mesh->mNumVertices; i++)
-    {
-        ModelData::MeshVertex vertex = {};
-
-        //頂点座標
-        vertex.position.x = mesh->mVertices[i].x;
-        vertex.position.y = mesh->mVertices[i].y;
-        vertex.position.z = mesh->mVertices[i].z;
-
-        //uv座標
-        if (mesh->mTextureCoords[0])
-        {
-            vertex.uv.x = static_cast<float>(mesh->mTextureCoords[0][i].x);
-            vertex.uv.y = static_cast<float>(mesh->mTextureCoords[0][i].y);
-        }
-
-
-        if (mesh->HasNormals())
-        {
-            //法線ベクトル
-            vertex.normal.x = mesh->mNormals[i].x;
-            vertex.normal.y = mesh->mNormals[i].y;
-            vertex.normal.z = mesh->mNormals[i].z;
-        }
-
-        if (mesh->HasTangentsAndBitangents())
-        {
-            //接線ベクトル
-            vertex.tangent.x = mesh->mTangents[i].x;
-            vertex.tangent.y = mesh->mTangents[i].y;
-            vertex.tangent.z = mesh->mTangents[i].z;
-        }
-
-        //TODO:頂点色を取得する
-
-        this->vertices_[i] = vertex;
-    }
-
-    //インデックス情報
-    faces_.resize(mesh->mNumFaces);
-    for (UINT i = 0; i < mesh->mNumFaces; i++)
-    {
-        this->faces_[i].index[0] = mesh->mFaces[i].mIndices[0];
-        this->faces_[i].index[1] = mesh->mFaces[i].mIndices[1];
-        this->faces_[i].index[2] = mesh->mFaces[i].mIndices[2];
-    }
-
-    return;
 }
 
 /// <summary>
@@ -181,6 +96,11 @@ void Model::initRootSignature(ID3D12Device* device)
 void Model::initDescriptorHeap(ID3D12Device* device)
 {
     this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2);
+}
+
+void Model::loadModel(ID3D12Device* device, const char* model_file_path)
+{
+    model_data_ = ModelDataFactory::create(device, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
 }
 
 /// <summary>
@@ -234,6 +154,7 @@ void Model::initPipelineStateObject(ID3D12Device* device)
     //ラスタライザーステート
     D3D12_RASTERIZER_DESC rasterizer_desc = {};
     rasterizer_desc.FillMode = D3D12_FILL_MODE_SOLID; // ソリッド表示
+    //rasterizer_desc.FillMode = D3D12_FILL_MODE_WIREFRAME;
     rasterizer_desc.CullMode = D3D12_CULL_MODE_NONE; // カリングオフ
     //rasterizer_desc.CullMode = D3D12_CULL_MODE_BACK; // 背面カリングオン
     rasterizer_desc.FrontCounterClockwise = FALSE; // 通常の順序
@@ -277,14 +198,15 @@ void Model::initPipelineStateObject(ID3D12Device* device)
 void Model::initVertexBuffer(ID3D12Device* device)
 {
     //頂点バッファの設定
+    auto vertices = this->model_data_->getVertices();
     VertexBuffer::VertexBufferConf conf = {};
-    conf.size = sizeof(ModelData::MeshVertex) * this->vertices_.size();
+    conf.size = sizeof(ModelData::MeshVertex) * static_cast<int>(vertices.size());
     conf.stride = sizeof(ModelData::MeshVertex);
 
     //初期化
     this->vertex_buffer_ = VertexBufferFactory::create(conf, device);
     //コピー
-    this->vertex_buffer_->copy(this->vertices_.data());
+    this->vertex_buffer_->copy(vertices.data());
 }
 
 /// <summary>
@@ -293,19 +215,18 @@ void Model::initVertexBuffer(ID3D12Device* device)
 /// <param name="device"></param>
 void Model::initIndexBuffer(ID3D12Device* device)
 {
-
-
     //インデックスバッファの設定
-    this->num_indices_ = this->faces_.size() * 3;
+    auto faces = this->model_data_->getFaces();
+    this->num_indices_ = static_cast<UINT>(faces.size() * 3);
     IndexBuffer::IndexBufferConf indexBufferConf = {};
-    indexBufferConf.size = sizeof(ModelData::MeshFace) * this->faces_.size();// 4 bytes * 要素数 indices
+    indexBufferConf.size = sizeof(ModelData::MeshFace) * static_cast<int>(faces.size());// 4 bytes * 要素数 indices
     indexBufferConf.stride = sizeof(UINT);
     indexBufferConf.count = this->num_indices_;
 
     //初期化
     this->index_buffer_ = IndexBufferFactory::create(indexBufferConf, device);
     //コピー
-    this->index_buffer_->copy(this->faces_.data());
+    this->index_buffer_->copy(faces.data());
 }
 
 /// <summary>

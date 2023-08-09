@@ -8,7 +8,7 @@ class Camera
 {
 public:
     Camera() :
-        target_position_length_(99.0f),
+        target_position_length_(10.0f),
         eye_(DirectX::XMFLOAT3(0.0f, 0.0f, 10.0f)),
         up_(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f)),
         target_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.01f)),
@@ -18,7 +18,7 @@ public:
         forward_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.01f)),
         right_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.01f)),
         near_(0.1f),
-        far_(100.0f),
+        far_(1000.0f),
         view_angle_(DirectX::XMConvertToRadians(60.0f)),
         aspect_(0.0f)
     {};

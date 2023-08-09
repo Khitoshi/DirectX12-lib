@@ -21,6 +21,8 @@ void Scene3dModel::init(ID3D12Device* device)
     model = std::make_shared<Model>(conf);
     //model->init(device, "asset/models/box.fbx");
     model->init(device, "asset/models/RKonstantinov.fbx");
+    //model->init(device, "asset/models/suzanne.obj");
+
 }
 
 void Scene3dModel::finalize()
@@ -33,7 +35,6 @@ void Scene3dModel::update()
     DirectX::XMStoreFloat4x4(&conf.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f)));
     DirectX::XMStoreFloat4x4(&conf.view, DirectX::XMMatrixTranspose(this->camera_->getViewMatrix()));
     DirectX::XMStoreFloat4x4(&conf.projection, DirectX::XMMatrixTranspose(this->camera_->getProjectionMatrix()));
-
     this->model->setConf(conf);
     this->model->update();
 }
