@@ -49,6 +49,9 @@
     <Filter Include="Shaders\TextureCube">
       <UniqueIdentifier>{e5ed4b87-7966-4140-bfef-ba9a10a45a9a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\3dModel">
+      <UniqueIdentifier>{611b25a2-5c33-4d60-ac0f-9f35bb86e5a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Window.cpp">
@@ -162,9 +165,6 @@
     <ClCompile Include="src\CubeModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene3dCube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\InputManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -184,7 +184,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene3dModel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene3dCube.cpp">
+      <Filter>Source Files\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -446,6 +449,9 @@
     <ClInclude Include="src\Scene3dModel.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="src\ModelData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">
@@ -490,6 +496,12 @@
     <FxCompile Include="src\shaders\TextureCubePS.hlsl">
       <Filter>Shaders\TextureCube</Filter>
     </FxCompile>
+    <FxCompile Include="src\shaders\3dModelVS.hlsl">
+      <Filter>Shaders\3dModel</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\3dModelPS.hlsl">
+      <Filter>Shaders\3dModel</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\Triangle.hlsli">
@@ -513,6 +525,9 @@
     </None>
     <None Include="src\shaders\TextureCube.hlsli">
       <Filter>Shaders\TextureCube</Filter>
+    </None>
+    <None Include="src\shaders\3dModel.hlsli">
+      <Filter>Shaders\3dModel</Filter>
     </None>
   </ItemGroup>
 </Project>

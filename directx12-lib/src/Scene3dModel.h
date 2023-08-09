@@ -3,6 +3,8 @@
 #include <memory>
 
 class Model;
+class Camera;
+class CameraController;
 
 class Scene3dModel final : public Scene
 {
@@ -19,6 +21,10 @@ public:
     //•`‰æˆ—
     void render(RenderContext* rc)override;
 
+
+
 private:
     std::shared_ptr<Model> model;
+    std::shared_ptr<Camera> camera_;
+    std::shared_ptr<CameraController> camera_controller_;
 };
