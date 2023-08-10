@@ -21,7 +21,7 @@ public:
     //•`‰æˆ—
     void render(RenderContext* rc)override;
 
-
+    void updateImguiMenu() override;
 
 private:
     std::shared_ptr<Model> model;

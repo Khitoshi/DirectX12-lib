@@ -55,7 +55,7 @@ private:
     void initVertexBuffer(ID3D12Device* device);
     void initIndexBuffer(ID3D12Device* device);
     void initConstantBuffer(ID3D12Device* device);
-    void initTexture(ID3D12Device* device, const char* texture_file_path);
+    void initTexture(ID3D12Device* device);
     void initDepthStencil(ID3D12Device* device);
     void initOffScreenRenderTarget(ID3D12Device* device);
 

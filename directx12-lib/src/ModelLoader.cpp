@@ -12,7 +12,7 @@ std::vector<ModelData::MeshVertex> parseVertex(const aiMesh* mesh);
 //インデックス情報解析&格納
 std::vector<ModelData::MeshFace> parseIndex(const aiMesh* mesh);
 //テクスチャ情報解析&格納
-ModelData::Material parseTexture(const aiMaterial* material, const UINT num_materials, const char* model_file_path);
+ModelData::Material parseTexture(const aiMaterial* material, const UINT num_materials);
 
 std::shared_ptr<ModelData> ModelLoader::load(ID3D12Device* device, DescriptorHeap* descriptor_heap, const char* model_file_path)
 {
@@ -20,6 +20,7 @@ std::shared_ptr<ModelData> ModelLoader::load(ID3D12Device* device, DescriptorHea
     //TODO:モデルファイルの読み込みが遅いので、別スレッドで読み込むようにする
     //TODO:キャッシュを作る
     //TODO:mNumMeshesが1の場合にのみ対応しているので、複数メッシュに対応する
+
     Assimp::Importer importer;
     //モデルファイルを読み込む
     int flag = 0;
@@ -47,7 +48,7 @@ std::shared_ptr<ModelData> ModelLoader::load(ID3D12Device* device, DescriptorHea
     for (size_t i = 0; i < scene->mNumMaterials; ++i)
     {
         aiMaterial* material = scene->mMaterials[i];
-        model_data->addMaterial(parseTexture(material, scene->mNumMaterials, model_file_path));
+        model_data->addMaterial(parseTexture(material, scene->mNumMaterials));
     }
 
     //解放
@@ -73,7 +74,8 @@ std::vector<ModelData::MeshVertex> parseVertex(const aiMesh* mesh)
         vertex.position.z = mesh->mVertices[i].z;
 
         //uv座標
-        if (mesh->mTextureCoords[0]) {
+
+        if (mesh->HasTextureCoords(0)) {
             vertex.uv.x = static_cast<float>(mesh->mTextureCoords[0][i].x);
             vertex.uv.y = static_cast<float>(mesh->mTextureCoords[0][i].y);
         }
@@ -116,10 +118,17 @@ std::vector<ModelData::MeshFace> parseIndex(const aiMesh* mesh)
 }
 
 
-ModelData::Material parseTexture(const aiMaterial* material, const UINT num_materials, const char* model_file_path)
+/// <summary>
+/// テクスチャ情報解析&格納
+/// </summary>
+/// <param name="material">マテリアル</param>
+/// <param name="num_materials">マテリアル数</param>
+/// <returns>
+/// 解析したテクスチャ情報
+/// </returns>
+ModelData::Material parseTexture(const aiMaterial* material, const UINT num_materials)
 {
     ModelData::Material materials = {};
-
 
     {//拡散反射成分
         aiColor3D color(0.0f, 0.0f, 0.0f);
@@ -188,7 +197,6 @@ ModelData::Material parseTexture(const aiMaterial* material, const UINT num_mate
             materials.shininess_map.clear();
         }
     }
-
 
     {// 法線マップ
         aiString path;

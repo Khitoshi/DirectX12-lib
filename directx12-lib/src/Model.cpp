@@ -26,7 +26,7 @@ void Model::init(ID3D12Device* device, const char* model_file_path)
     this->loadModel(device, model_file_path);
     this->initVertexBuffer(device);
     this->initIndexBuffer(device);
-    //this->initTexture(device, texture_file_path);
+    this->initTexture(device);
     this->initOffScreenRenderTarget(device);
     this->initDepthStencil(device);
 }
@@ -167,7 +167,6 @@ void Model::initPipelineStateObject(ID3D12Device* device)
     rasterizer_desc.ForcedSampleCount = 0;
     rasterizer_desc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
-
     // インプットレイアウト
     PipelineStateObject::PipelineStateObjectConf conf = {};
     conf.desc.pRootSignature = this->root_signature_->getRootSignature();
@@ -242,9 +241,13 @@ void Model::initConstantBuffer(ID3D12Device* device)
     constant_buffer_->copy(&this->conf_);
 }
 
-void Model::initTexture(ID3D12Device* device, const char* texture_file_path)
+/// <summary>
+/// テクスチャの初期化
+/// </summary>
+/// <param name="device"></param>
+/// <param name="texture_file_path"></param>
+void Model::initTexture(ID3D12Device* device)
 {
-    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, this->srv_cbv_uav_descriptor_heap_.get(), texture_file_path);
 }
 
 /// <summary>

@@ -8,7 +8,7 @@ class Camera
 {
 public:
     Camera() :
-        target_position_length_(10.0f),
+        target_position_length_(50.0f),
         eye_(DirectX::XMFLOAT3(0.0f, 0.0f, 10.0f)),
         up_(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f)),
         target_(DirectX::XMFLOAT3(0.0f, 0.0f, 0.01f)),
@@ -32,6 +32,7 @@ public:
     void rotate(const int x, const int y);
 
 public:// Ý’èŒn
+    void setTargetPositionLength(const float l) { this->target_position_length_ = l; }
     void setEye(const DirectX::XMFLOAT3 e) { this->eye_ = e; }
     void setTarget(const DirectX::XMFLOAT3 t) { this->target_ = t; }
 
@@ -39,6 +40,7 @@ public:// Ý’èŒn
     void setFar(const float f) { this->far_ = f; }
 
 public:// Žæ“¾Œn
+    float getTargetPositionLength() const { return this->target_position_length_; }
     DirectX::XMFLOAT3 getEye() const { return this->eye_; }
     DirectX::XMFLOAT3 getTarget() const { return this->target_; }
     DirectX::XMMATRIX getViewMatrix() const { return this->view_matrix_; }
