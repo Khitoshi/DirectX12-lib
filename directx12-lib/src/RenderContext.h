@@ -25,6 +25,7 @@ private:
         command_list_(command_list),
         current_viewport_(viewport)
     {};
+
 public:
     ~RenderContext() {};
 

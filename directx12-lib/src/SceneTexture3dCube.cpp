@@ -73,7 +73,6 @@ void SceneTexture3dCube::updateImguiMenu()
         DirectX::XMFLOAT3 camera_eye = this->camera_->getEye();
         float eye[3] = { camera_eye.x, camera_eye.y, camera_eye.z };
         if (ImGui::DragFloat3("eye", eye)) {
-            is_change_camera_ = true;
             this->camera_->setEye(DirectX::XMFLOAT3(eye[0], eye[1], eye[2]));
         }
     }
@@ -82,7 +81,6 @@ void SceneTexture3dCube::updateImguiMenu()
         DirectX::XMFLOAT3 camera_target = this->camera_->getTarget();
         float target[3] = { camera_target.x, camera_target.y, camera_target.z };
         if (ImGui::DragFloat3("target", target)) {
-            is_change_camera_ = true;
             this->camera_->setTarget(DirectX::XMFLOAT3(target[0], target[1], target[2]));
         }
     }
@@ -90,7 +88,6 @@ void SceneTexture3dCube::updateImguiMenu()
     {//カメラの
         float camera_far = this->camera_->getFar();
         if (ImGui::DragFloat("far", &camera_far)) {
-            is_change_camera_ = true;
             this->camera_->setFar(camera_far);
         }
     }
@@ -98,8 +95,14 @@ void SceneTexture3dCube::updateImguiMenu()
     {//カメラの
         float camera_near = this->camera_->getNear();
         if (ImGui::DragFloat("near", &camera_near)) {
-            is_change_camera_ = true;
             this->camera_->setNear(camera_near);
+        }
+    }
+
+    {//ターゲットとの距離
+        float camera_target_len = this->camera_->getTargetPositionLength();
+        if (ImGui::DragFloat("target length", &camera_target_len)) {
+            this->camera_->setTargetPositionLength(camera_target_len);
         }
     }
 

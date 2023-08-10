@@ -61,7 +61,7 @@ void Model::draw(RenderContext* rc)
     //ディスクリプタヒープを設定
     rc->setDescriptorHeap(this->srv_cbv_uav_descriptor_heap_.get());
     rc->setGraphicsRootDescriptorTable(0, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());//定数バッファ
-    //rc->setGraphicsRootDescriptorTable(1, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());//テクスチャ
+    rc->setGraphicsRootDescriptorTable(1, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());//テクスチャ
 
     //ドローコール
     rc->drawIndexed(this->num_indices_);

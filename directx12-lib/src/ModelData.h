@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include <string>
 
+class Texture;
+
 class ModelData
 {
 public:
@@ -34,10 +36,11 @@ public:
         DirectX::XMFLOAT3   specular;       //鏡面反射成分
         float               alpha;          //透過成分
         float               shininess;      //鏡面反射強度
-        std::wstring        diffuse_map;     //ディフューズマップファイルパス
-        std::wstring        specular_map;    //スペキュラーマップファイルパス
-        std::wstring        shininess_map;   //シャイネスマップファイルパス
-        std::wstring        normal_map;      //法線マップファイルパス
+
+        std::shared_ptr<Texture> diffuse_texture;
+        std::shared_ptr<Texture> specular_texture;
+        std::shared_ptr<Texture> shininess_texture;
+        std::shared_ptr<Texture> normal_texture;
     };
 
 public://設定系

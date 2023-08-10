@@ -23,4 +23,5 @@ public:
         texture->Load(device, descriptor_heap, texture_file_path);
         return texture;
     }
+
 };

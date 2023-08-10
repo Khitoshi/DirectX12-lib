@@ -1,7 +1,6 @@
 #pragma once
 
 #include "TextureFactory.h"
-
 class DescriptorHeap;
 
 /// <summary>
