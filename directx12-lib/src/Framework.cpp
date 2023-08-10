@@ -65,11 +65,24 @@ int Framework::run(std::function<bool()> processMessages)
     return EXIT_SUCCESS;
 }
 
+void Framework::setDirectoryAndDll()
+{
+#ifdef _DEBUG
+    SetDllDirectoryA(".lib/fbxSDK2020.3.4vs2022/lib/vs2022/x64/debug");
+    LoadLibraryExA("libfbxsdk.dll", NULL, NULL);
+#else
+    SetDllDirectoryA(".lib/fbxSDK2020.3.4vs2022/lib/vs2022/x64/release");
+    LoadLibraryExA("libfbxsdk.dll", NULL, NULL);
+#endif // _DEBUG
+
+}
+
 /// <summary>
 /// çXêVèàóù
 /// </summary>
 void Framework::init()
 {
+    setDirectoryAndDll();
     //DX12èâä˙âªèàóù
     this->dx12_resources_ = std::make_shared<DX12Resources>();
     this->dx12_resources_->init(this->hWnd_);

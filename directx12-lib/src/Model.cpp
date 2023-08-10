@@ -135,7 +135,7 @@ void Model::initPipelineStateObject(ID3D12Device* device)
         {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA },
         {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA },
         //{"COLOR", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA },
-        {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA },
+        //{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA },
     };
 
     //深度ステンシルステート
@@ -199,8 +199,8 @@ void Model::initVertexBuffer(ID3D12Device* device)
     //頂点バッファの設定
     auto vertices = this->model_data_->getVertices();
     VertexBuffer::VertexBufferConf conf = {};
-    conf.size = sizeof(ModelData::MeshVertex) * static_cast<int>(vertices.size());
-    conf.stride = sizeof(ModelData::MeshVertex);
+    conf.size = sizeof(ModelData::Vertices) * static_cast<int>(vertices.size());
+    conf.stride = sizeof(ModelData::Vertices);
 
     //初期化
     this->vertex_buffer_ = VertexBufferFactory::create(conf, device);
@@ -215,10 +215,10 @@ void Model::initVertexBuffer(ID3D12Device* device)
 void Model::initIndexBuffer(ID3D12Device* device)
 {
     //インデックスバッファの設定
-    auto faces = this->model_data_->getFaces();
+    auto faces = this->model_data_->getIndices();
     this->num_indices_ = static_cast<UINT>(faces.size() * 3);
     IndexBuffer::IndexBufferConf indexBufferConf = {};
-    indexBufferConf.size = sizeof(ModelData::MeshFace) * static_cast<int>(faces.size());// 4 bytes * 要素数 indices
+    indexBufferConf.size = sizeof(ModelData::USHORT) * static_cast<int>(faces.size());// 4 bytes * 要素数 indices
     indexBufferConf.stride = sizeof(UINT);
     indexBufferConf.count = this->num_indices_;
 

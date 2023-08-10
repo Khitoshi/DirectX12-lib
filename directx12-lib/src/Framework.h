@@ -27,6 +27,7 @@ public:
     //Às
     int run(std::function<bool()> processMessages);
 private:
+    void setDirectoryAndDll();
     //‰Šú‰»ˆ—
     void init();
     //XVˆ—

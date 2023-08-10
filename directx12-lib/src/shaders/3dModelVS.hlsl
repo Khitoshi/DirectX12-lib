@@ -7,7 +7,7 @@ struct VSInput
     float2 texcoord : TEXCOORD;
     float3 normal : NORMAL;
     //float4 color : COLOR;
-    float3 tangent : TANGENT;
+    //float3 tangent : TANGENT;
 };
 
 cbuffer ConstantBuffer : register(b0)
@@ -32,7 +32,7 @@ VSOutput VSMain(VSInput input)
     output.texcoord = input.texcoord;
     output.normal = input.normal;
     //output.color = input.color;
-    output.tangent = input.tangent;
+    //output.tangent = input.tangent;
 
 
     return output;

@@ -7,7 +7,7 @@ class ModelDataFactory
 public:
     static std::shared_ptr<ModelData> create(ID3D12Device* device, DescriptorHeap* descriptor_heap, const std::string& path)
     {
-        return ModelLoader::load(device, descriptor_heap, path.c_str());
+        return ModelLoader::load(path.c_str());
     }
 
 

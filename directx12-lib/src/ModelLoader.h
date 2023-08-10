@@ -11,5 +11,5 @@ private:
     ModelLoader() {};
     ~ModelLoader() {};
 public:
-    static std::shared_ptr<ModelData> load(ID3D12Device* device, DescriptorHeap* descriptor_heap, const char* model_file_path);
+    static std::shared_ptr<ModelData> load(const char* model_file_path);
 };

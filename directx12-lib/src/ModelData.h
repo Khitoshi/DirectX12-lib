@@ -5,81 +5,39 @@
 #include <Windows.h>
 #include <string>
 
-class Texture;
-
 class ModelData
 {
 public:
     ModelData() :
         vertices_(),
-        faces_()
+        indices_()
     {};
     ~ModelData() {};
 
-    struct MeshVertex
+    struct Vertices
     {
         DirectX::XMFLOAT3 position;
         DirectX::XMFLOAT2 uv;
         DirectX::XMFLOAT3 normal;
         //UINT color = 0xFFFFFFFF;
-        DirectX::XMFLOAT3 tangent;
+        //DirectX::XMFLOAT3 tangent;
     };
 
-    struct MeshFace
-    {
-        UINT index[3];
-    };
-
-    struct Material
-    {
-        DirectX::XMFLOAT3   diffuse;        //ägéUîΩéÀê¨ï™
-        DirectX::XMFLOAT3   specular;       //ãæñ îΩéÀê¨ï™
-        float               alpha;          //ìßâﬂê¨ï™
-        float               shininess;      //ãæñ îΩéÀã≠ìx
-
-        std::shared_ptr<Texture> diffuse_texture;
-        std::shared_ptr<Texture> specular_texture;
-        std::shared_ptr<Texture> shininess_texture;
-        std::shared_ptr<Texture> normal_texture;
-    };
-
-public://ê›íËån
-    void setVertices(const std::vector<MeshVertex>& vertices)
-    {
-        this->vertices_ = vertices;
-    }
-
-    void setFaces(const std::vector<MeshFace>& faces)
-    {
-        this->faces_ = faces;
-    }
-
-    void setMaterials(const std::vector<Material>& materials)
-    {
-        this->materials_ = materials;
-    }
-public://í«â¡ån
-    void addVertex(const MeshVertex& vertex)
-    {
-        this->vertices_.push_back(vertex);
-    }
-
-    void addFace(const MeshFace& face)
-    {
-        this->faces_.push_back(face);
-    }
-
-    void addMaterial(const Material& material)
-    {
-        this->materials_.push_back(material);
-    }
+    typedef unsigned short USHORT;
 
 public://éÊìæån
-    const std::vector<MeshVertex> getVertices() const { return this->vertices_; }
-    const std::vector<MeshFace> getFaces() const { return this->faces_; }
-    const std::vector<Material> getMaterials() const { return this->materials_; }
+    const std::vector<Vertices>& getVertices() const { return vertices_; }
+    const std::vector<USHORT>& getIndices() const { return indices_; }
+
+public://ê›íËån
+    void setVertices(const std::vector<Vertices>& vertices) { vertices_ = vertices; }
+    void setIndices(const std::vector<USHORT>& faces) { indices_ = faces; }
+
+public://í«â¡ån
+    void addVertices(const Vertices& vertices) { vertices_.push_back(vertices); }
+    void addIndices(const USHORT& faces) { indices_.push_back(faces); }
+
 private:
-    std::vector<MeshVertex> vertices_;
-    std::vector<MeshFace> faces_;
-    std::vector<Material> materials_;
+    std::vector<Vertices> vertices_;
+    std::vector<USHORT> indices_;
 };
