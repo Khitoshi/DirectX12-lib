@@ -61,7 +61,7 @@ void Model::draw(RenderContext* rc)
     //ディスクリプタヒープを設定
     rc->setDescriptorHeap(this->srv_cbv_uav_descriptor_heap_.get());
     rc->setGraphicsRootDescriptorTable(0, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());//定数バッファ
-    rc->setGraphicsRootDescriptorTable(1, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());//テクスチャ
+    //rc->setGraphicsRootDescriptorTable(1, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());//テクスチャ
 
     //ドローコール
     rc->drawIndexed(this->num_indices_);
@@ -199,8 +199,8 @@ void Model::initVertexBuffer(ID3D12Device* device)
     //頂点バッファの設定
     auto vertices = this->model_data_->getVertices();
     VertexBuffer::VertexBufferConf conf = {};
-    conf.size = sizeof(ModelData::Vertices) * static_cast<int>(vertices.size());
-    conf.stride = sizeof(ModelData::Vertices);
+    conf.size = sizeof(ModelData::Vertex) * static_cast<int>(vertices.size());
+    conf.stride = sizeof(ModelData::Vertex);
 
     //初期化
     this->vertex_buffer_ = VertexBufferFactory::create(conf, device);
@@ -214,18 +214,22 @@ void Model::initVertexBuffer(ID3D12Device* device)
 /// <param name="device"></param>
 void Model::initIndexBuffer(ID3D12Device* device)
 {
+    //indexBufferConf.size = sizeof(ModelData::USHORT) * static_cast<int>(indices.size());// 4 bytes * 要素数 indices
+    //indexBufferConf.stride = sizeof(UINT);
+    //indexBufferConf.count = this->num_indices_;
+
     //インデックスバッファの設定
-    auto faces = this->model_data_->getIndices();
-    this->num_indices_ = static_cast<UINT>(faces.size() * 3);
+    auto indices = this->model_data_->getIndices();
+    this->num_indices_ = static_cast<UINT>(indices.size());
     IndexBuffer::IndexBufferConf indexBufferConf = {};
-    indexBufferConf.size = sizeof(ModelData::USHORT) * static_cast<int>(faces.size());// 4 bytes * 要素数 indices
-    indexBufferConf.stride = sizeof(UINT);
+    indexBufferConf.size = sizeof(indices.data()) * this->num_indices_;// 4 bytes * 要素数 indices
+    indexBufferConf.stride = sizeof(ModelData::USHORT);
     indexBufferConf.count = this->num_indices_;
 
     //初期化
     this->index_buffer_ = IndexBufferFactory::create(indexBufferConf, device);
     //コピー
-    this->index_buffer_->copy(faces.data());
+    this->index_buffer_->copy(indices.data());
 }
 
 /// <summary>

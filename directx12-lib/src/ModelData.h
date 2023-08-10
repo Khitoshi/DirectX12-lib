@@ -14,30 +14,37 @@ public:
     {};
     ~ModelData() {};
 
-    struct Vertices
+    struct Vertex
     {
         DirectX::XMFLOAT3 position;
         DirectX::XMFLOAT2 uv;
         DirectX::XMFLOAT3 normal;
         //UINT color = 0xFFFFFFFF;
         //DirectX::XMFLOAT3 tangent;
+        bool operator==(const Vertex& k) const {
+            return
+                position.x == k.position.x && position.y == k.position.y && position.z == k.position.z &&
+                uv.x == k.uv.x && uv.y == k.uv.y &&
+                normal.x == k.normal.x && normal.y == k.normal.y && normal.z == k.normal.z;
+        }
     };
 
     typedef unsigned short USHORT;
+    struct Index
+    {
+        USHORT index[3];
+    };
+
 
 public://éÊìæån
-    const std::vector<Vertices>& getVertices() const { return vertices_; }
+    const std::vector<Vertex>& getVertices() const { return vertices_; }
     const std::vector<USHORT>& getIndices() const { return indices_; }
 
-public://ê›íËån
-    void setVertices(const std::vector<Vertices>& vertices) { vertices_ = vertices; }
-    void setIndices(const std::vector<USHORT>& faces) { indices_ = faces; }
-
 public://í«â¡ån
-    void addVertices(const Vertices& vertices) { vertices_.push_back(vertices); }
+    void addVertices(const Vertex& vertices) { vertices_.push_back(vertices); }
     void addIndices(const USHORT& faces) { indices_.push_back(faces); }
 
 private:
-    std::vector<Vertices> vertices_;
+    std::vector <Vertex> vertices_;
     std::vector<USHORT> indices_;
 };

@@ -21,7 +21,6 @@ void Scene3dModel::init(ID3D12Device* device)
     model = std::make_shared<Model>(conf);
     //model->init(device, "asset/models/box.fbx");
     model->init(device, "asset/models/RKonstantinov.fbx");
-    //model->init(device, "asset/models/suzanne.obj");
 
 }
 
