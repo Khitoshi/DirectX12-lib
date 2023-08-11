@@ -7,7 +7,7 @@
 /// <param name="src"></param>
 void ConstantBuffer::copy(void* src_constants)
 {
-    uint8_t* pData = nullptr;
+    int16_t* pData = nullptr;
     if (FAILED(this->resource_->Map(0, nullptr, (void**)&pData))) {
         throw std::exception("ConstantBuffer::copy() : resource->Map() Failed.");
     }

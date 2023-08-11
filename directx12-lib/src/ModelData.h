@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include <string>
 
+class Texture;
+
 class ModelData
 {
 public:
@@ -40,11 +42,18 @@ public://éÊìæån
     const std::vector<Vertex>& getVertices() const { return vertices_; }
     const std::vector<USHORT>& getIndices() const { return indices_; }
 
+public://ê›íËån
+    void setVertices(const std::vector<Vertex>& v) { vertices_ = v; }
+    void setIndices(const std::vector<USHORT>& i) { indices_ = i; }
+    void setDiffuseTexture(const std::shared_ptr<Texture>& d) { diffuse_texture_ = d; }
+
 public://í«â¡ån
-    void addVertices(const Vertex& vertices) { vertices_.push_back(vertices); }
-    void addIndices(const USHORT& faces) { indices_.push_back(faces); }
+    void addVertices(const Vertex& v) { vertices_.push_back(v); }
+    void addIndices(const USHORT& i) { indices_.push_back(i); }
 
 private:
     std::vector <Vertex> vertices_;
     std::vector<USHORT> indices_;
+
+    std::shared_ptr<Texture> diffuse_texture_;
 };

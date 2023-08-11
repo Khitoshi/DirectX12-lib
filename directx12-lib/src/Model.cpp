@@ -61,7 +61,7 @@ void Model::draw(RenderContext* rc)
     //ディスクリプタヒープを設定
     rc->setDescriptorHeap(this->srv_cbv_uav_descriptor_heap_.get());
     rc->setGraphicsRootDescriptorTable(0, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());//定数バッファ
-    //rc->setGraphicsRootDescriptorTable(1, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());//テクスチャ
+    rc->setGraphicsRootDescriptorTable(1, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());//テクスチャ
 
     //ドローコール
     rc->drawIndexed(this->num_indices_);
@@ -140,12 +140,16 @@ void Model::initPipelineStateObject(ID3D12Device* device)
 
     //深度ステンシルステート
     D3D12_DEPTH_STENCIL_DESC ds_desc = {};
-    ds_desc.DepthEnable = FALSE; // 深度テストを無効にする
-    ds_desc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;   // 深度値の書き込みを無効にする
-    ds_desc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;       // 深度比較関数を常に真にする
+    //ds_desc.DepthEnable = FALSE; // 深度テストを無効にする
+    ds_desc.DepthEnable = TRUE; // 深度テストを無効にする
+    //ds_desc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;   // 深度値の書き込みを無効にする
+    ds_desc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+    //ds_desc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;       // 深度比較関数を常に真にする
+    ds_desc.DepthFunc = D3D12_COMPARISON_FUNC_LESS; // 新しいフラグメントが現在の深度よりも小さい場合に描画
     ds_desc.StencilEnable = FALSE;
     ds_desc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
     ds_desc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+
     const D3D12_DEPTH_STENCILOP_DESC defaultStencilOp =
     { D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_COMPARISON_FUNC_ALWAYS };
     ds_desc.FrontFace = defaultStencilOp;
@@ -176,6 +180,7 @@ void Model::initPipelineStateObject(ID3D12Device* device)
     conf.desc.SampleMask = UINT_MAX;
     conf.desc.RasterizerState = rasterizer_desc;
     conf.desc.DepthStencilState = ds_desc;
+    //conf.desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     conf.desc.InputLayout = { inputElementDesc, _countof(inputElementDesc) };
     conf.desc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
     conf.desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -214,10 +219,6 @@ void Model::initVertexBuffer(ID3D12Device* device)
 /// <param name="device"></param>
 void Model::initIndexBuffer(ID3D12Device* device)
 {
-    //indexBufferConf.size = sizeof(ModelData::USHORT) * static_cast<int>(indices.size());// 4 bytes * 要素数 indices
-    //indexBufferConf.stride = sizeof(UINT);
-    //indexBufferConf.count = this->num_indices_;
-
     //インデックスバッファの設定
     auto indices = this->model_data_->getIndices();
     this->num_indices_ = static_cast<UINT>(indices.size());
