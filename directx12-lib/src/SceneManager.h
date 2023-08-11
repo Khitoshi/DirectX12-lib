@@ -10,7 +10,7 @@
 #include "SceneSprite.h"
 #include "Scene3dCube.h"
 #include "SceneTexture3dCube.h"
-#include "Scene3dModel.h"
+#include "SceneFBXModel.h"
 #include <functional>
 
 /// <summary>
@@ -125,7 +125,7 @@ public:
             {"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
             {"3dCube",      []() { return std::make_shared<Scene3dCube>(); }},
             {"Texture3dCube",      []() { return std::make_shared<SceneTexture3dCube>(); }},
-            {"3dModel",      []() { return std::make_shared<Scene3dModel>(); }},
+            {"3dModel",      []() { return std::make_shared<SceneFBXModel>(); }},
         };
     }
 

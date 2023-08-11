@@ -4,18 +4,14 @@
 #include <DirectXMath.h>
 #include <Windows.h>
 #include <string>
-
+#include "Hashes.h"
 class Texture;
 
-class ModelData
+
+class FBXModelData
 {
 public:
-    ModelData() :
-        vertices_(),
-        indices_()
-    {};
-    ~ModelData() {};
-
+    //頂点情報構造体
     struct Vertex
     {
         DirectX::XMFLOAT3 position;
@@ -32,11 +28,34 @@ public:
     };
 
     typedef unsigned short USHORT;
+    //インデックス情報構造体
     struct Index
     {
         USHORT index[3];
     };
 
+    /// <summary>
+    /// ハッシュ関数用の構造体
+    /// </summary>
+    struct ModelDataKeyHasher
+    {
+        std::size_t operator()(const Vertex& k) const
+        {
+            std::size_t seed = 0;
+            hash_combine(seed, k.position);
+            hash_combine(seed, k.uv);
+            hash_combine(seed, k.normal);
+            return seed;
+        }
+    };
+
+public:
+    FBXModelData() :
+        vertices_(),
+        indices_(),
+        diffuse_texture_(nullptr)
+    {};
+    ~FBXModelData() {};
 
 public://取得系
     const std::vector<Vertex>& getVertices() const { return vertices_; }

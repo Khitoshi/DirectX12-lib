@@ -1,6 +1,6 @@
-#include "Model.h"
-#include "ModelData.h"
-#include "ModelDataFactory.h"
+#include "FBXModel.h"
+#include "FBXModelData.h"
+#include "FBXModelDataFactory.h"
 #include "RootSignatureCacheManager.h"
 #include "DescriptorHeapFactory.h"
 #include "PSOCacheManager.h"
@@ -16,8 +16,9 @@
 #include <stdexcept>
 #include <math.h>
 
-void Model::init(ID3D12Device* device, const char* model_file_path)
+void FBXModel::init(ID3D12Device* device, const char* model_file_path)
 {
+    this->device_ = device;
     this->initRootSignature(device);
     this->initDescriptorHeap(device);
     this->loadShader();
@@ -26,17 +27,16 @@ void Model::init(ID3D12Device* device, const char* model_file_path)
     this->loadModel(device, model_file_path);
     this->initVertexBuffer(device);
     this->initIndexBuffer(device);
-    this->initTexture(device);
     this->initOffScreenRenderTarget(device);
     this->initDepthStencil(device);
 }
 
-void Model::update()
+void FBXModel::update()
 {
     this->constant_buffer_->copy(&this->conf_);
 }
 
-void Model::draw(RenderContext* rc)
+void FBXModel::draw(RenderContext* rc)
 {
     {
         //オフスクリーンレンダーターゲットで書き込みできる状態にする
@@ -75,7 +75,7 @@ void Model::draw(RenderContext* rc)
 /// ルートシグネチャの初期化
 /// </summary>
 /// <param name="device"></param>
-void Model::initRootSignature(ID3D12Device* device)
+void FBXModel::initRootSignature(ID3D12Device* device)
 {
     RootSignature::RootSignatureConf rootSignatureConf = {};
     rootSignatureConf.sampler_filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -93,20 +93,20 @@ void Model::initRootSignature(ID3D12Device* device)
     this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
 }
 
-void Model::initDescriptorHeap(ID3D12Device* device)
+void FBXModel::initDescriptorHeap(ID3D12Device* device)
 {
     this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2);
 }
 
-void Model::loadModel(ID3D12Device* device, const char* model_file_path)
+void FBXModel::loadModel(ID3D12Device* device, const char* model_file_path)
 {
-    model_data_ = ModelDataFactory::create(device, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
+    model_data_ = FBXModelDataFactory::create(device, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
 }
 
 /// <summary>
 /// シェーダーの読み込み
 /// </summary>
-void Model::loadShader()
+void FBXModel::loadShader()
 {
     {
         Shader::ShaderConf conf = {};
@@ -128,7 +128,7 @@ void Model::loadShader()
 /// パイプラインステートオブジェクトの初期化
 /// </summary>
 /// <param name="device"></param>
-void Model::initPipelineStateObject(ID3D12Device* device)
+void FBXModel::initPipelineStateObject(ID3D12Device* device)
 {
     D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA},
@@ -199,13 +199,13 @@ void Model::initPipelineStateObject(ID3D12Device* device)
 /// 頂点バッファの初期化
 /// </summary>
 /// <param name="device"></param>
-void Model::initVertexBuffer(ID3D12Device* device)
+void FBXModel::initVertexBuffer(ID3D12Device* device)
 {
     //頂点バッファの設定
     auto vertices = this->model_data_->getVertices();
     VertexBuffer::VertexBufferConf conf = {};
-    conf.size = sizeof(ModelData::Vertex) * static_cast<int>(vertices.size());
-    conf.stride = sizeof(ModelData::Vertex);
+    conf.size = sizeof(FBXModelData::Vertex) * static_cast<int>(vertices.size());
+    conf.stride = sizeof(FBXModelData::Vertex);
 
     //初期化
     this->vertex_buffer_ = VertexBufferFactory::create(conf, device);
@@ -217,14 +217,14 @@ void Model::initVertexBuffer(ID3D12Device* device)
 /// インデックスバッファの初期化
 /// </summary>
 /// <param name="device"></param>
-void Model::initIndexBuffer(ID3D12Device* device)
+void FBXModel::initIndexBuffer(ID3D12Device* device)
 {
     //インデックスバッファの設定
     auto indices = this->model_data_->getIndices();
     this->num_indices_ = static_cast<UINT>(indices.size());
     IndexBuffer::IndexBufferConf indexBufferConf = {};
     indexBufferConf.size = sizeof(indices.data()) * this->num_indices_;// 4 bytes * 要素数 indices
-    indexBufferConf.stride = sizeof(ModelData::USHORT);
+    indexBufferConf.stride = sizeof(FBXModelData::USHORT);
     indexBufferConf.count = this->num_indices_;
 
     //初期化
@@ -237,7 +237,7 @@ void Model::initIndexBuffer(ID3D12Device* device)
 /// 定数バッファの初期化
 /// </summary>
 /// <param name="device"></param>
-void Model::initConstantBuffer(ID3D12Device* device)
+void FBXModel::initConstantBuffer(ID3D12Device* device)
 {
     ConstantBuffer::ConstantBufferConf conf = {};
     conf.size = sizeof(ModelConf);
@@ -246,20 +246,12 @@ void Model::initConstantBuffer(ID3D12Device* device)
     constant_buffer_->copy(&this->conf_);
 }
 
-/// <summary>
-/// テクスチャの初期化
-/// </summary>
-/// <param name="device"></param>
-/// <param name="texture_file_path"></param>
-void Model::initTexture(ID3D12Device* device)
-{
-}
 
 /// <summary>
 /// オフスクリーンレンダーターゲットの初期化
 /// </summary>
 /// <param name="device"></param>
-void Model::initOffScreenRenderTarget(ID3D12Device* device)
+void FBXModel::initOffScreenRenderTarget(ID3D12Device* device)
 {
     OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
 
@@ -292,10 +284,21 @@ void Model::initOffScreenRenderTarget(ID3D12Device* device)
 }
 
 /// <summary>
+/// モデルの設定
+/// </summary>
+/// <param name="model_file_path"></param>
+void FBXModel::setModel(const char* model_file_path)
+{
+    this->model_data_ = FBXModelDataFactory::create(this->device_, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
+    this->initIndexBuffer(this->device_);
+    this->initVertexBuffer(device_);
+}
+
+/// <summary>
 /// 深度ステンシルの初期化
 /// </summary>
 /// <param name="device"></param>
-void Model::initDepthStencil(ID3D12Device* device)
+void FBXModel::initDepthStencil(ID3D12Device* device)
 {
     DepthStencil::DepthStencilConf ds_conf = {};
     ds_conf.frame_buffer_count = 1;

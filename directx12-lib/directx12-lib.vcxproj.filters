@@ -177,16 +177,16 @@
     <ClCompile Include="src\DescriptorHeap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Model.cpp">
+    <ClCompile Include="src\FBXModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene3dModel.cpp">
+    <ClCompile Include="src\SceneFBXModel.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene3dCube.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="src\ModelLoader.cpp">
+    <ClCompile Include="src\FBXModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SceneTexture3dCube.cpp">
@@ -446,22 +446,25 @@
     <ClInclude Include="src\DescriptorHeapFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Model.h">
+    <ClInclude Include="src\FBXModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene3dModel.h">
+    <ClInclude Include="src\SceneFBXModel.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="src\ModelData.h">
+    <ClInclude Include="src\FBXModelData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ModelLoader.h">
+    <ClInclude Include="src\FBXModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ModelDataFactory.h">
+    <ClInclude Include="src\FBXModelDataFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\StringConvertUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FBXModelDataCacheManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

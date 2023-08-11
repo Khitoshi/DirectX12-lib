@@ -1,51 +1,106 @@
-#include "Scene3dModel.h"
-#include "Model.h"
+#include "SceneFBXModel.h"
+#include "FBXModel.h"
 #include "Camera.h"
 #include "CameraController.h"
 #include "CommonGraphicsConfig.h"
 #include "InputManager.h"
 #include "RenderContext.h"
-#include "imgui\imgui.h"
+#include "imgui/imgui.h"
+#include "imgui/imfilebrowser.h"
+#include <string>
+std::string SceneFBXModel::file_path_("asset/models/RKonstantinov.fbx");
 
-void Scene3dModel::init(ID3D12Device* device)
+/// <summary>
+/// 初期化処理
+/// </summary>
+/// <param name="device">GPUデバイス</param>
+void SceneFBXModel::init(ID3D12Device* device)
 {
     this->camera_ = std::make_shared<Camera>();
     this->camera_->init(windowWidth, windowHeight);
     this->camera_controller_ = std::make_shared<CameraController>(this->camera_.get());
     InputManager::Instance().addMouseInputListener(this->camera_controller_.get());
 
-    Model::ModelConf conf = {};
+    FBXModel::ModelConf conf = {};
     DirectX::XMStoreFloat4x4(&conf.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f)));
     DirectX::XMStoreFloat4x4(&conf.view, DirectX::XMMatrixTranspose(this->camera_->getViewMatrix()));
     DirectX::XMStoreFloat4x4(&conf.projection, DirectX::XMMatrixTranspose(this->camera_->getProjectionMatrix()));
-    model = std::make_shared<Model>(conf);
+    model = std::make_shared<FBXModel>(conf);
     //model->init(device, "asset/models/box.fbx");
-    model->init(device, "asset/models/RKonstantinov.fbx");
+    model->init(device, file_path_.c_str());
 
 }
 
-void Scene3dModel::finalize()
+/// <summary>
+/// 終了化処理
+/// </summary>
+void SceneFBXModel::finalize()
 {
 }
 
-void Scene3dModel::update()
+/// <summary>
+/// 更新処理
+/// </summary>
+void SceneFBXModel::update()
 {
-    Model::ModelConf conf = {};
+    //モデルの切り替え
+    if (is_change_model_) {
+        model->setModel(file_path_.c_str());
+        is_change_model_ = false;
+    }
+
+    FBXModel::ModelConf conf = {};
     DirectX::XMStoreFloat4x4(&conf.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f)));
     DirectX::XMStoreFloat4x4(&conf.view, DirectX::XMMatrixTranspose(this->camera_->getViewMatrix()));
     DirectX::XMStoreFloat4x4(&conf.projection, DirectX::XMMatrixTranspose(this->camera_->getProjectionMatrix()));
     this->model->setConf(conf);
     this->model->update();
+
+
 }
 
-void Scene3dModel::render(RenderContext* rc)
+/// <summary>
+/// 描画処理
+/// </summary>
+/// <param name="rc"></param>
+void SceneFBXModel::render(RenderContext* rc)
 {
     model->draw(rc);
 }
 
-void Scene3dModel::updateImguiMenu()
+/// <summary>
+/// デバッグ用のメニューを表示する
+/// </summary>
+void SceneFBXModel::updateImguiMenu()
 {
     ImGui::Begin("3dModel");
+
+    //テクスチャの動的選択
+    bool static isFileBrowser = true;
+    static ImGui::FileBrowser fileDialog;
+    if (isFileBrowser) {
+        fileDialog.SetTitle("file brower");
+        fileDialog.SetTypeFilters({ ".fbx" });
+        if (!fileDialog.SetPwd("./asset/models")) {
+            throw std::runtime_error("fileDialog.SetPwd");
+        }
+
+    }
+    {
+        ImGui::Text("NOW Models File Path:\n %s", this->file_path_.c_str());
+        if (ImGui::Button("open file dialog")) {
+            fileDialog.Open();
+        }
+        fileDialog.Display();
+        if (fileDialog.HasSelected()) {
+            auto u8str = fileDialog.GetSelected().generic_u8string();
+            std::string str(u8str.begin(), u8str.end());
+            file_path_ = str;
+            fileDialog.ClearSelected();
+            this->is_change_model_ = true;
+        }
+    }
+
     {//カメラの位置を変更する
         DirectX::XMFLOAT3 camera_eye = this->camera_->getEye();
         float eye[3] = { camera_eye.x, camera_eye.y, camera_eye.z };

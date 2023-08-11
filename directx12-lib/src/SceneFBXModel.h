@@ -1,30 +1,33 @@
 #pragma once
 #include "Scene.h"
 #include <memory>
-
-class Model;
+#include <string>
+class FBXModel;
 class Camera;
 class CameraController;
 
-class Scene3dModel final : public Scene
+class SceneFBXModel final : public Scene
 {
 public:
-    Scene3dModel() {};
-    ~Scene3dModel() {};
+    SceneFBXModel() :
+        model(nullptr),
+        camera_(nullptr),
+        camera_controller_(nullptr),
+        is_change_model_(false)
+    {};
+    ~SceneFBXModel() {};
 
-    //‰Šú‰»ˆ—
     void init(ID3D12Device* device)override;
-    //I—¹ˆ—
     void finalize()override;
-    //XVˆ—
     void update()override;
-    //•`‰æˆ—
     void render(RenderContext* rc)override;
-
     void updateImguiMenu() override;
 
 private:
-    std::shared_ptr<Model> model;
+    std::shared_ptr<FBXModel> model;
     std::shared_ptr<Camera> camera_;
     std::shared_ptr<CameraController> camera_controller_;
+    static std::string file_path_;
+
+    bool is_change_model_;
 };

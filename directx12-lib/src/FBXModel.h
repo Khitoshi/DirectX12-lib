@@ -14,9 +14,9 @@ class DepthStencil;
 class Texture;
 class OffScreenRenderTarget;
 class RenderContext;
-class ModelData;
+class FBXModelData;
 
-class Model
+class FBXModel
 {
 public:
     //定数バッファへのデータ転送用構造体
@@ -27,9 +27,11 @@ public:
         DirectX::XMFLOAT4X4  projection;
     };
 public:
-    Model(const ModelConf& c) :
+    FBXModel(const ModelConf& c) :
         conf_(c),
+        model_data_(),
         root_signature_(),
+        srv_cbv_uav_descriptor_heap_(),
         vertex_shader_(),
         pixel_shader_(),
         pso_(),
@@ -39,9 +41,10 @@ public:
         num_indices_(0),
         texture_(),
         depth_stencil_(),
-        off_screen_render_target_()
+        off_screen_render_target_(),
+        device_(0)
     {};
-    ~Model() {};
+    ~FBXModel() {};
 
     void init(ID3D12Device* device, const char* model_file_path);
     void update();
@@ -55,15 +58,15 @@ private:
     void initVertexBuffer(ID3D12Device* device);
     void initIndexBuffer(ID3D12Device* device);
     void initConstantBuffer(ID3D12Device* device);
-    void initTexture(ID3D12Device* device);
     void initDepthStencil(ID3D12Device* device);
     void initOffScreenRenderTarget(ID3D12Device* device);
 
 public:
     void setConf(const ModelConf& c) { conf_ = c; }
+    void setModel(const char* model_file_path);
 private:
     ModelConf conf_;
-    std::shared_ptr<ModelData> model_data_;
+    std::shared_ptr<FBXModelData> model_data_;
     std::shared_ptr<RootSignature> root_signature_;                     //ルートシグニチャ
     std::shared_ptr<DescriptorHeap> srv_cbv_uav_descriptor_heap_;                  //ディスクリプタヒープ
     std::shared_ptr<Shader> vertex_shader_;                             //頂点シェーダー
@@ -76,4 +79,6 @@ private:
     std::shared_ptr<DepthStencil> depth_stencil_;                       //深度ステンシル
     std::shared_ptr<Texture> texture_;
     std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;   //オフスクリーンレンダーターゲット
+
+    ID3D12Device* device_;
 };
