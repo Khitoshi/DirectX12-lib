@@ -140,16 +140,15 @@ void TextureCubeModel::initPipelineStateObject(ID3D12Device* device)
 
     //深度ステンシルステート
     D3D12_DEPTH_STENCIL_DESC ds_desc = {};
-    ds_desc.DepthEnable = FALSE; // 深度テストを無効にする
-    ds_desc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;   // 深度値の書き込みを無効にする
-    ds_desc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;       // 深度比較関数を常に真にする
+    //ds_desc.DepthEnable = FALSE; // 深度テストを無効にする
+    ds_desc.DepthEnable = TRUE; // 深度テストを無効にする
+    //ds_desc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;   // 深度値の書き込みを無効にする
+    ds_desc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+    //ds_desc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;       // 深度比較関数を常に真にする
+    ds_desc.DepthFunc = D3D12_COMPARISON_FUNC_LESS; // 新しいフラグメントが現在の深度よりも小さい場合に描画
     ds_desc.StencilEnable = FALSE;
     ds_desc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
     ds_desc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
-    const D3D12_DEPTH_STENCILOP_DESC defaultStencilOp =
-    { D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_COMPARISON_FUNC_ALWAYS };
-    ds_desc.FrontFace = defaultStencilOp;
-    ds_desc.BackFace = defaultStencilOp;
 
     //ラスタライザーステート
     D3D12_RASTERIZER_DESC rasterizer_desc = {};
@@ -261,7 +260,10 @@ void TextureCubeModel::initConstantBuffer(ID3D12Device* device)
 
 void TextureCubeModel::initTexture(ID3D12Device* device, const char* texture_file_path)
 {
-    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, this->srv_cbv_uav_descriptor_heap_.get(), texture_file_path);
+    //テクスチャの初期化
+    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
+    //ディスクリプタヒープに登録
+    this->texture_->CreateShaderResourceView(device, this->srv_cbv_uav_descriptor_heap_.get(), 1);
 }
 
 /// <summary>

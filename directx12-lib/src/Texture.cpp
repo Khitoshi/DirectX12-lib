@@ -6,20 +6,8 @@
 /// テクスチャ読み込み
 /// </summary>
 /// <param name="device">GPUデバイス</param>
-/// <param name="descriptor_heap">リソースを格納したいディスクリプタヒープ</param>
 /// <param name="texture_file_path">テスクチャのファイルパス</param>
-void Texture::Load(ID3D12Device* device, DescriptorHeap* descriptor_heap, const char* texture_file_path)
-{
-    CreateTextureResource(device, texture_file_path);
-    CreateShaderResourceView(device, descriptor_heap);
-}
-
-/// <summary>
-/// テクスチャリソースの作成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
-/// <param name="texture_file_path">テスクチャのファイルパス</param>
-void Texture::CreateTextureResource(ID3D12Device* device, const char* texture_file_path)
+void Texture::Load(ID3D12Device* device, const char* texture_file_path)
 {
     //ファイルパスをワイド文字に変換
     wchar_t w_file_Path[256];
@@ -77,6 +65,7 @@ void Texture::CreateTextureResource(ID3D12Device* device, const char* texture_fi
         static_cast<UINT>(img->slicePitch)))) {
         throw std::runtime_error("failed to write texture");
     }
+
 }
 
 /// <summary>
@@ -84,7 +73,8 @@ void Texture::CreateTextureResource(ID3D12Device* device, const char* texture_fi
 /// </summary>
 /// <param name="device">GPUデバイス</param>
 /// <param name="descriptor_heap">リソースを格納したいディスクリプタヒープ</param>
-void Texture::CreateShaderResourceView(ID3D12Device* device, DescriptorHeap* descriptor_heap)
+/// <param name="slot">リソースを格納したいポインタの位置</param>
+void Texture::CreateShaderResourceView(ID3D12Device* device, DescriptorHeap* descriptor_heap, const UINT slot)
 {
     //通常テクスチャビュー作成
     D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
@@ -92,8 +82,7 @@ void Texture::CreateShaderResourceView(ID3D12Device* device, DescriptorHeap* des
     srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
     srv_desc.Texture2D.MipLevels = 1;
-    //TODO:テスト用にハンドルのポインタを直接操作しているが、引数にして渡すようにする
     auto handle = descriptor_heap->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-    handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * slot;
     device->CreateShaderResourceView(this->resource_.Get(), &srv_desc, handle);
 }

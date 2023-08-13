@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <fbxsdk.h>
 #include <fbxsdk/fileio/fbxiosettings.h>
-#include "TextureFactory.h"
+#include "TextureCacheManager.h"
 
 
 //  法線を解析
@@ -13,7 +13,7 @@ DirectX::XMFLOAT3 parseNormal(const FbxMesh& mesh, const UINT& polygon_index, co
 //  uv座標を解析
 DirectX::XMFLOAT2 parseUV(const FbxMesh& mesh, const UINT& polygon_index, const UINT& vertex_index, const FbxGeometryElementUV& uvElement);
 //  マテリアルを解析
-std::shared_ptr<Texture> parseMaterial(ID3D12Device* device, DescriptorHeap* descriptor_heap, const fbxsdk::FbxNode* node);
+std::shared_ptr<Texture> parseMaterial(ID3D12Device* device, const fbxsdk::FbxNode* node);
 
 /// <summary>
 /// モデルのロード
@@ -92,8 +92,8 @@ std::shared_ptr<FBXModelData> FBXModelLoader::load(ID3D12Device* device, Descrip
                 //UVを取得
                 if (uv_element) vertices.uv = parseUV(*mesh, poly_i, ver_i, *uv_element);
 
+                //頂点のインデックスを取得
                 UINT new_index;
-                //uto itr = std::find(model_data->getVertices().begin(), model_data->getVertices().end(), vertices);
                 auto itr = index_map.find(vertices);
                 if (itr == index_map.end()) {
                     model_data->addVertices(vertices);
@@ -108,7 +108,8 @@ std::shared_ptr<FBXModelData> FBXModelLoader::load(ID3D12Device* device, Descrip
             }
         }
         //マテリアルの取得
-        model_data->setDiffuseTexture(parseMaterial(device, descriptor_heap, child_node));
+        model_data->setDiffuseTexture(parseMaterial(device, child_node));
+        model_data->getDiffuseTexture()->CreateShaderResourceView(device, descriptor_heap, 1);
     }
 
     // FBX SDKを破棄
@@ -161,10 +162,9 @@ DirectX::XMFLOAT2 parseUV(const FbxMesh& mesh, const UINT& polygon_index, const 
 /// <returns>
 /// テクスチャのインスタンス
 /// </returns>
-std::shared_ptr<Texture> parseMaterial(ID3D12Device* device, DescriptorHeap* descriptor_heap, const fbxsdk::FbxNode* node)
+std::shared_ptr<Texture> parseMaterial(ID3D12Device* device, const fbxsdk::FbxNode* node)
 {
-    std::shared_ptr<Texture> texture;
-
+    std::shared_ptr<Texture> diffuse_texture = nullptr;
     int material_count = node->GetMaterialCount();
     for (int mat_i = 0; mat_i < material_count; mat_i++) {
         //マテリアルの取得
@@ -182,12 +182,13 @@ std::shared_ptr<Texture> parseMaterial(ID3D12Device* device, DescriptorHeap* des
 
         //テクスチャのロード
         const char* texture_file_path = tex_file->GetFileName();
-        texture = TextureFactory::create(device, descriptor_heap, texture_file_path);
+        diffuse_texture = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
     }
 
-    if (!texture) {
-        texture = TextureFactory::create(device, descriptor_heap, "asset/models/dummy/dummy.DDS");
+    //ディフューズマップがない場合はダミーのテクスチャを作成
+    if (!diffuse_texture) {
+        diffuse_texture = TextureCacheManager::getInstance().getOrCreate(device, "asset/models/dummy/dummy.DDS");
     }
 
-    return texture;
+    return diffuse_texture;
 }

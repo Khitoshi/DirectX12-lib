@@ -26,11 +26,17 @@ public:
         //TODO:現在テクスチャではディスクリプタヒープにすぐに入れているのをリソースの作成だけにして
         //手動でディスクリプタヒープに入れるようにする
 
+        //キャッシュにあるかどうか
+        auto it = fbx_model_cache_.find(model_file_path);
+        if (it != fbx_model_cache_.end())
+        {
+            it->second->
+        }
 
-        return FBXModelDataFactory::create(device, descriptor_heap, model_file_path);
+        return FBXModelDataFactory::create(device, model_file_path);
     }
 
-
 private:
+    std::unordered_map<const std::string, std::shared_ptr<FBXModelData>> fbx_model_cache_;  //キャッシュ
 
 };

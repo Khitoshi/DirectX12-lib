@@ -6,6 +6,7 @@ class FBXModel;
 class Camera;
 class CameraController;
 
+// FBXƒ‚ƒfƒ‹‚ğ“Ç‚İ‚ñ‚Å•\¦‚·‚éscene
 class SceneFBXModel final : public Scene
 {
 public:

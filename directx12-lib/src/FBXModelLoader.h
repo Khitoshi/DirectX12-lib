@@ -11,6 +11,7 @@ class FBXModelLoader
 private:
     FBXModelLoader() {};
     ~FBXModelLoader() {};
+
 public:
     //fbxƒ‚ƒfƒ‹‚ğƒ[ƒh‚·‚é
     static std::shared_ptr<FBXModelData> load(ID3D12Device* device, DescriptorHeap* descriptor_heap, const char* model_file_path);

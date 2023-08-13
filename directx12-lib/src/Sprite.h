@@ -36,9 +36,9 @@ public:
         pso_(nullptr),
         vertex_buffer_(nullptr),
         index_buffer_(nullptr),
+        texture_(nullptr),
         num_indices_(0),
         vertices_(),
-        texture_(nullptr),
         off_screen_render_target_(nullptr)
     {};
     ~Sprite() {};
@@ -111,9 +111,9 @@ private:
     std::shared_ptr<PipelineStateObject> pso_;                          //パイプラインステートオブジェクト
     std::shared_ptr<VertexBuffer> vertex_buffer_;                       //頂点バッファ
     std::shared_ptr<IndexBuffer> index_buffer_;                         //インデックスバッファ
+    std::shared_ptr<Texture> texture_;                                  //テクスチャ
     Vertex vertices_[4];										        //頂点データ
     unsigned int num_indices_;                                          //インデックス数
-    std::shared_ptr<Texture> texture_;									//テクスチャ
     std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;   //オフスクリーンレンダーターゲット
     std::shared_ptr< DepthStencil> depth_stencil_;                      //深度ステンシル
 };

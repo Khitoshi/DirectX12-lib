@@ -47,20 +47,17 @@ void Sprite::draw(RenderContext* rc)
         rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depth_stencil);
     }
 
-    //ルートシグネチャを設定。
+    //ルートシグネチャを設定
     rc->setRootSignature(this->root_signature_.get());
-    //パイプラインステートを設定。
+    //パイプラインステートを設定
     rc->setPipelineState(this->pso_.get());
-    //プリミティブのトポロジーを設定。
+    //プリミティブのトポロジーを設定
     rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //頂点バッファを設定。
+    //頂点バッファを設定
     rc->setVertexBuffer(this->vertex_buffer_.get());
-    //インデックスバッファを設定。
+    //インデックスバッファを設定
     rc->setIndexBuffer(this->index_buffer_.get());
-    //テクスチャを設定。
-
-    //rc->setTexture(this->texture_.get());
-
+    //ディスクリプタヒープを設定
     rc->setDescriptorHeap(this->descriptor_heap_.get());
     rc->setGraphicsRootDescriptorTable(0, this->descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 
@@ -218,7 +215,9 @@ void Sprite::initIndexBuffer(ID3D12Device* device)
 void Sprite::initTexture(ID3D12Device* device, const char* texture_file_path)
 {
     //テクスチャの初期化
-    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, this->descriptor_heap_.get(), texture_file_path);
+    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
+    //ディスクリプタヒープに登録
+    this->texture_->CreateShaderResourceView(device, this->descriptor_heap_.get(), 0);
 }
 
 /// <summary>
@@ -290,5 +289,8 @@ void Sprite::setVertices(Vertex vertices[4])
 /// <param name="texture_file_path">テクスチャのファイルパス</param>
 void Sprite::setTexture(ID3D12Device* device, const char* texture_file_path)
 {
-    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, this->descriptor_heap_.get(), texture_file_path);
+    //テクスチャの初期化
+    this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
+    //ディスクリプタヒープに登録
+    this->texture_->CreateShaderResourceView(device, this->descriptor_heap_.get(), 0);
 }

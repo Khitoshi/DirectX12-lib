@@ -23,13 +23,11 @@ public:
     ~Texture() {}
 
 private:
-    //テクスチャ読み込み
-    void Load(ID3D12Device* device, DescriptorHeap* descriptor_heap, const char* texture_file_path);
-    //テクスチャリソースの作成
-    void CreateTextureResource(ID3D12Device* device, const char* texture_file_path);
+    //テクスチャを読み込み，リソースを作成
+    void Load(ID3D12Device* device, const char* texture_file_path);
+public:
     //シェーダーリソースビューの作成
-    void CreateShaderResourceView(ID3D12Device* device, DescriptorHeap* descriptor_heap);
-
+    void CreateShaderResourceView(ID3D12Device* device, DescriptorHeap* descriptor_heap, const UINT slot);
 public:
     //テクスチャリソースの取得
     ComPtr<ID3D12Resource> GetResource() const { return this->resource_; }
@@ -37,4 +35,5 @@ public:
 private:
     ComPtr<ID3D12Resource> resource_;	//テクスチャリソース
     DirectX::TexMetadata meta_data_;    //テクスチャのメタデータ
+
 };

@@ -26,7 +26,6 @@ void SceneFBXModel::init(ID3D12Device* device)
     DirectX::XMStoreFloat4x4(&conf.view, DirectX::XMMatrixTranspose(this->camera_->getViewMatrix()));
     DirectX::XMStoreFloat4x4(&conf.projection, DirectX::XMMatrixTranspose(this->camera_->getProjectionMatrix()));
     model = std::make_shared<FBXModel>(conf);
-    //model->init(device, "asset/models/box.fbx");
     model->init(device, file_path_.c_str());
 
 }
@@ -55,8 +54,6 @@ void SceneFBXModel::update()
     DirectX::XMStoreFloat4x4(&conf.projection, DirectX::XMMatrixTranspose(this->camera_->getProjectionMatrix()));
     this->model->setConf(conf);
     this->model->update();
-
-
 }
 
 /// <summary>
@@ -131,15 +128,12 @@ void SceneFBXModel::updateImguiMenu()
         }
     }
 
-
     {//ターゲットとの距離
         float camera_target_len = this->camera_->getTargetPositionLength();
         if (ImGui::DragFloat("target length", &camera_target_len)) {
             this->camera_->setTargetPositionLength(camera_target_len);
         }
     }
-
-
 
     ImGui::End();
 }

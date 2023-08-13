@@ -65,6 +65,9 @@ int Framework::run(std::function<bool()> processMessages)
     return EXIT_SUCCESS;
 }
 
+/// <summary>
+/// dll‚Ìİ’è‚Æ“Ç‚İ‚İ
+/// </summary>
 void Framework::setDirectoryAndDll()
 {
 #ifdef _DEBUG

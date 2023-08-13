@@ -16,6 +16,11 @@
 #include <stdexcept>
 #include <math.h>
 
+/// <summary>
+/// 初期化処理
+/// </summary>
+/// <param name="device">GPUデバイス</param>
+/// <param name="model_file_path">モデルのファイルパス</param>
 void FBXModel::init(ID3D12Device* device, const char* model_file_path)
 {
     this->device_ = device;
@@ -31,11 +36,18 @@ void FBXModel::init(ID3D12Device* device, const char* model_file_path)
     this->initDepthStencil(device);
 }
 
+/// <summary>
+/// 更新処理
+/// </summary>
 void FBXModel::update()
 {
     this->constant_buffer_->copy(&this->conf_);
 }
 
+/// <summary>
+/// 描画処理
+/// </summary>
+/// <param name="rc">レンダーコンテキスト</param>
 void FBXModel::draw(RenderContext* rc)
 {
     {
@@ -93,11 +105,20 @@ void FBXModel::initRootSignature(ID3D12Device* device)
     this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
 }
 
+/// <summary>
+/// ディスクリプタヒープの初期化
+/// </summary>
+/// <param name="device"></param>
 void FBXModel::initDescriptorHeap(ID3D12Device* device)
 {
     this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2);
 }
 
+/// <summary>
+/// モデルの読み込み
+/// </summary>
+/// <param name="device">GPUデバイス</param>
+/// <param name="model_file_path">モデルのファイルパス</param>
 void FBXModel::loadModel(ID3D12Device* device, const char* model_file_path)
 {
     model_data_ = FBXModelDataFactory::create(device, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
@@ -161,6 +182,7 @@ void FBXModel::initPipelineStateObject(ID3D12Device* device)
     //rasterizer_desc.FillMode = D3D12_FILL_MODE_WIREFRAME;
     rasterizer_desc.CullMode = D3D12_CULL_MODE_NONE; // カリングオフ
     //rasterizer_desc.CullMode = D3D12_CULL_MODE_BACK; // 背面カリングオン
+    //rasterizer_desc.CullMode = D3D12_CULL_MODE_FRONT;
     rasterizer_desc.FrontCounterClockwise = FALSE; // 通常の順序
     rasterizer_desc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
     rasterizer_desc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
@@ -216,7 +238,7 @@ void FBXModel::initVertexBuffer(ID3D12Device* device)
 /// <summary>
 /// インデックスバッファの初期化
 /// </summary>
-/// <param name="device"></param>
+/// <param name="device">GPUデバイス</param>
 void FBXModel::initIndexBuffer(ID3D12Device* device)
 {
     //インデックスバッファの設定
@@ -236,7 +258,7 @@ void FBXModel::initIndexBuffer(ID3D12Device* device)
 /// <summary>
 /// 定数バッファの初期化
 /// </summary>
-/// <param name="device"></param>
+/// <param name="device">GPUデバイス</param>
 void FBXModel::initConstantBuffer(ID3D12Device* device)
 {
     ConstantBuffer::ConstantBufferConf conf = {};
@@ -250,7 +272,7 @@ void FBXModel::initConstantBuffer(ID3D12Device* device)
 /// <summary>
 /// オフスクリーンレンダーターゲットの初期化
 /// </summary>
-/// <param name="device"></param>
+/// <param name="device">GPUデバイス</param>
 void FBXModel::initOffScreenRenderTarget(ID3D12Device* device)
 {
     OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
@@ -284,20 +306,9 @@ void FBXModel::initOffScreenRenderTarget(ID3D12Device* device)
 }
 
 /// <summary>
-/// モデルの設定
-/// </summary>
-/// <param name="model_file_path"></param>
-void FBXModel::setModel(const char* model_file_path)
-{
-    this->model_data_ = FBXModelDataFactory::create(this->device_, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
-    this->initIndexBuffer(this->device_);
-    this->initVertexBuffer(device_);
-}
-
-/// <summary>
 /// 深度ステンシルの初期化
 /// </summary>
-/// <param name="device"></param>
+/// <param name="device">GPUデバイス</param>
 void FBXModel::initDepthStencil(ID3D12Device* device)
 {
     DepthStencil::DepthStencilConf ds_conf = {};
@@ -305,4 +316,15 @@ void FBXModel::initDepthStencil(ID3D12Device* device)
     ds_conf.width = windowWidth;
     ds_conf.height = windowHeight;
     this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, device);
+}
+
+/// <summary>
+/// モデルの設定
+/// </summary>
+/// <param name="model_file_path">モデルのファイルパス</param>
+void FBXModel::setModel(const char* model_file_path)
+{
+    this->model_data_ = FBXModelDataFactory::create(this->device_, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
+    this->initIndexBuffer(this->device_);
+    this->initVertexBuffer(device_);
 }

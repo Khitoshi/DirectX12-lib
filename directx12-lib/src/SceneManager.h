@@ -12,6 +12,7 @@
 #include "SceneTexture3dCube.h"
 #include "SceneFBXModel.h"
 #include <functional>
+#include "InputManager.h"
 
 /// <summary>
 /// シーン管理クラス
@@ -87,6 +88,7 @@ public:
         }
 
         //シーン変更
+        InputManager::Instance().clearMouseInputListener();
         clear();
         currentScene = std::move(this->nextScene);
         currentScene->init(device);
@@ -123,9 +125,9 @@ public:
             //{"Default",     []() { return std::make_shared<SceneDefault>(); }},
             {"Triangle",    []() { return std::make_shared<SceneTriangle>(); }},
             {"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
-            {"3dCube",      []() { return std::make_shared<Scene3dCube>(); }},
-            {"Texture3dCube",      []() { return std::make_shared<SceneTexture3dCube>(); }},
-            {"3dModel",      []() { return std::make_shared<SceneFBXModel>(); }},
+            {"Cube",      []() { return std::make_shared<Scene3dCube>(); }},
+            {"TextureCube",      []() { return std::make_shared<SceneTexture3dCube>(); }},
+            {"FBXModel",      []() { return std::make_shared<SceneFBXModel>(); }},
         };
     }
 

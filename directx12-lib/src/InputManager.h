@@ -37,6 +37,9 @@ public:
     // マウスの右ボタンが離されたことを通知する
     void onMouseRightButtonUp();
 
+    //  リスナーの全解除
+    void clearMouseInputListener() { mouse_input_listeners_.clear(); }
+
 private:
     std::vector<MouseInputListener*> mouse_input_listeners_;
 };

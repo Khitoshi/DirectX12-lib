@@ -8,6 +8,7 @@
 class Texture;
 
 
+//fbxモデルデータ
 class FBXModelData
 {
 public:
@@ -17,8 +18,7 @@ public:
         DirectX::XMFLOAT3 position;
         DirectX::XMFLOAT2 uv;
         DirectX::XMFLOAT3 normal;
-        //UINT color = 0xFFFFFFFF;
-        //DirectX::XMFLOAT3 tangent;
+
         bool operator==(const Vertex& k) const {
             return
                 position.x == k.position.x && position.y == k.position.y && position.z == k.position.z &&
@@ -53,14 +53,14 @@ public:
     FBXModelData() :
         vertices_(),
         indices_(),
-        diffuse_texture_(nullptr)
+        diffuse_texture_()
     {};
     ~FBXModelData() {};
 
 public://取得系
     const std::vector<Vertex>& getVertices() const { return vertices_; }
     const std::vector<USHORT>& getIndices() const { return indices_; }
-
+    const std::shared_ptr<Texture>& getDiffuseTexture() const { return diffuse_texture_; }
 public://設定系
     void setVertices(const std::vector<Vertex>& v) { vertices_ = v; }
     void setIndices(const std::vector<USHORT>& i) { indices_ = i; }
@@ -75,4 +75,5 @@ private:
     std::vector<USHORT> indices_;
 
     std::shared_ptr<Texture> diffuse_texture_;
+
 };

@@ -17,10 +17,10 @@ public:
     /// <returns>
     /// 生成&ロードしたテクスチャのインスタンス
     /// </returns>
-    static std::shared_ptr<Texture> create(ID3D12Device* device, DescriptorHeap* descriptor_heap, const char* texture_file_path)
+    static std::shared_ptr<Texture> create(ID3D12Device* device, const char* texture_file_path)
     {
         std::shared_ptr<Texture> texture(new Texture());
-        texture->Load(device, descriptor_heap, texture_file_path);
+        texture->Load(device, texture_file_path);
         return texture;
     }
 
