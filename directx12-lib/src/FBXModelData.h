@@ -39,7 +39,7 @@ public:
     // シェーダーと共有するマテリアルデータ
     struct ShaderMaterial
     {
-        DirectX::XMFLOAT4 diffuse_color;
+        DirectX::XMFLOAT4 diffuse_color = DirectX::XMFLOAT4(0, 0, 0, 1);
 
         bool operator==(const ShaderMaterial& k) const {
             return diffuse_color.x == k.diffuse_color.x && diffuse_color.y == k.diffuse_color.y && 
