@@ -18,6 +18,7 @@ public:
     {
         UINT size;      //定数バッファのサイズ
         DescriptorHeap* descriptor_heap; //ディスクリプタヒープ
+        UINT slot; //スロット番号
     };
 
 private:
@@ -41,7 +42,7 @@ private:
     //リソース生成
     void createResource(ID3D12Device* device);
     //ビュー生成
-    void createView(ID3D12Device* deviceconf_);
+    void createView(ID3D12Device* device);
 
 public://取得系
     /// <summary>

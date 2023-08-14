@@ -6,5 +6,6 @@ struct VSOutput
     float3 normal : NORMAL;
     //float4 color : COLOR;
     //float3 tangent : TANGENT;
+    float4 diffuse_color : COLOR;
 };
 

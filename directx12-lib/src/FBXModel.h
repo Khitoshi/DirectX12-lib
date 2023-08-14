@@ -79,5 +79,7 @@ private:
     std::shared_ptr<DepthStencil> depth_stencil_;                       //深度ステンシル
     std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;   //オフスクリーンレンダーターゲット
 
+    std::shared_ptr<ConstantBuffer> material_constant_buffer_;                   //定数バッファ
+
     ID3D12Device* device_;
 };

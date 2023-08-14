@@ -255,6 +255,7 @@ void CubeModel::initConstantBuffer(ID3D12Device* device)
     ConstantBuffer::ConstantBufferConf conf = {};
     conf.size = sizeof(CubeModelConf);
     conf.descriptor_heap = this->descriptor_heap_.get();
+    conf.slot = 0;
     this->constant_buffer_ = ConstantBufferFactory::create(device, conf);
     constant_buffer_->copy(&this->conf_);
 }

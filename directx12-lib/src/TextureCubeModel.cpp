@@ -254,6 +254,7 @@ void TextureCubeModel::initConstantBuffer(ID3D12Device* device)
     ConstantBuffer::ConstantBufferConf conf = {};
     conf.size = sizeof(TextureCubeModelConf);
     conf.descriptor_heap = this->srv_cbv_uav_descriptor_heap_.get();
+    conf.slot = 0;
     this->constant_buffer_ = ConstantBufferFactory::create(device, conf);
     constant_buffer_->copy(&this->conf_);
 }

@@ -13,7 +13,7 @@ DirectX::XMFLOAT3 parseNormal(const FbxMesh& mesh, const UINT& polygon_index, co
 //  uv座標を解析
 DirectX::XMFLOAT2 parseUV(const FbxMesh& mesh, const UINT& polygon_index, const UINT& vertex_index, const FbxGeometryElementUV& uvElement);
 //  マテリアルを解析
-std::shared_ptr<Texture> parseMaterial(ID3D12Device* device, const fbxsdk::FbxNode* node);
+FBXModelData::Material parseMaterial(ID3D12Device* device, DescriptorHeap* descriptor_heap,const fbxsdk::FbxNode* node);
 
 /// <summary>
 /// モデルのロード
@@ -61,9 +61,9 @@ std::shared_ptr<FBXModelData> FBXModelLoader::load(ID3D12Device* device, Descrip
     // ルートノードを取得
     FbxNode* root_node = scene->GetRootNode();
     const UINT child_count = root_node->GetChildCount();
-    for (UINT i = 0; i < child_count; i++)
+    for (UINT child_i = 0; child_i < child_count; child_i++)
     {
-        FbxNode* child_node = root_node->GetChild(i);
+        FbxNode* child_node = root_node->GetChild(child_i);
         FbxMesh* mesh = child_node->GetMesh();
         if (!mesh) continue;
 
@@ -108,8 +108,10 @@ std::shared_ptr<FBXModelData> FBXModelLoader::load(ID3D12Device* device, Descrip
             }
         }
         //マテリアルの取得
-        model_data->setDiffuseTexture(parseMaterial(device, child_node));
-        model_data->getDiffuseTexture()->CreateShaderResourceView(device, descriptor_heap, 1);
+        //model_data->setDiffuseTexture(parseMaterial(device, child_node));
+        //model_data->getDiffuseTexture()->CreateShaderResourceView(device, descriptor_heap, 1);
+        model_data->addMaterial(parseMaterial(device, descriptor_heap, child_node));
+
     }
 
     // FBX SDKを破棄
@@ -162,9 +164,9 @@ DirectX::XMFLOAT2 parseUV(const FbxMesh& mesh, const UINT& polygon_index, const 
 /// <returns>
 /// テクスチャのインスタンス
 /// </returns>
-std::shared_ptr<Texture> parseMaterial(ID3D12Device* device, const fbxsdk::FbxNode* node)
+FBXModelData::Material parseMaterial(ID3D12Device* device, DescriptorHeap* descriptor_heap, const fbxsdk::FbxNode* node)
 {
-    std::shared_ptr<Texture> diffuse_texture = nullptr;
+    FBXModelData::Material model_texture;
     int material_count = node->GetMaterialCount();
     for (int mat_i = 0; mat_i < material_count; mat_i++) {
         //マテリアルの取得
@@ -173,22 +175,30 @@ std::shared_ptr<Texture> parseMaterial(ID3D12Device* device, const fbxsdk::FbxNo
 
         //テクスチャの数を確認 0以下なら次のマテリアルへ
         FbxProperty tex_prop = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
-        int texture_count = tex_prop.GetSrcObjectCount<FbxFileTexture>();
-        if (texture_count <= 0)continue;
+        //DiffuseMapの取得
+        if (tex_prop.IsValid()) {
+            const FbxDouble3 color = tex_prop.Get<FbxDouble3>();
+            model_texture.shader_material.diffuse_color.x = static_cast<float>(color[0]);
+            model_texture.shader_material.diffuse_color.y = static_cast<float>(color[1]);
+            model_texture.shader_material.diffuse_color.z = static_cast<float>(color[2]);
+            model_texture.shader_material.diffuse_color.w = 1.0f;
 
-        //テクスチャの取得
-        FbxFileTexture* tex_file = tex_prop.GetSrcObject<FbxFileTexture>();
-        if (!tex_file) continue;
-
-        //テクスチャのロード
-        const char* texture_file_path = tex_file->GetFileName();
-        diffuse_texture = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
+            const FbxFileTexture* fbx_texture = tex_prop.GetSrcObject<FbxFileTexture>();
+            //model_texture.diffuse_texture_name = fbx_texture ? fbx_texture->GetRelativeFileName() : "asset/models/dummy/dummy.DDS";
+            model_texture.diffuse_texture_name = fbx_texture ? fbx_texture->GetFileName() : "";
+        }
     }
 
-    //ディフューズマップがない場合はダミーのテクスチャを作成
-    if (!diffuse_texture) {
-        diffuse_texture = TextureCacheManager::getInstance().getOrCreate(device, "asset/models/dummy/dummy.DDS");
+    if (!model_texture.diffuse_texture_name.empty()) {
+        model_texture.texture = TextureCacheManager::getInstance().getOrCreate(device, model_texture.diffuse_texture_name.c_str());
+        model_texture.texture->CreateShaderResourceView(device, descriptor_heap, 2);
+    }
+    else {//ダミーテクスチャ
+        model_texture.texture = TextureCacheManager::getInstance().getOrCreate(device, "asset/models/dummy/dummy.DDS");
+        model_texture.texture->CreateShaderResourceView(device, descriptor_heap, 2);
+
+
     }
 
-    return diffuse_texture;
+    return model_texture;
 }

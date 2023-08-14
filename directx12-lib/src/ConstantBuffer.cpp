@@ -59,7 +59,9 @@ void ConstantBuffer::createView(ID3D12Device* device)
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbv_desc = {};
     cbv_desc.BufferLocation = this->resource_->GetGPUVirtualAddress();
     cbv_desc.SizeInBytes = (this->conf_.size + 0xff & ~0xff);
-    device->CreateConstantBufferView(&cbv_desc, this->conf_.descriptor_heap->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+    D3D12_CPU_DESCRIPTOR_HANDLE handle = this->conf_.descriptor_heap->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+    handle.ptr += static_cast<unsigned long long>(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)) * this->conf_.slot;
+    device->CreateConstantBufferView(&cbv_desc, handle);
     if (FAILED(this->resource_->SetName(L"Constant Buffer View"))) {
         throw std::runtime_error("ConstantBuffer::createView() : resource->SetName() Failed.");
     }

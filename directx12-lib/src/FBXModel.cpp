@@ -28,8 +28,8 @@ void FBXModel::init(ID3D12Device* device, const char* model_file_path)
     this->initDescriptorHeap(device);
     this->loadShader();
     this->initPipelineStateObject(device);
-    this->initConstantBuffer(device);
     this->loadModel(device, model_file_path);
+    this->initConstantBuffer(device);
     this->initVertexBuffer(device);
     this->initIndexBuffer(device);
     this->initOffScreenRenderTarget(device);
@@ -94,10 +94,10 @@ void FBXModel::initRootSignature(ID3D12Device* device)
     rootSignatureConf.texture_address_modeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rootSignatureConf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rootSignatureConf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    rootSignatureConf.max_cbv_descriptor = 1;
+    rootSignatureConf.max_cbv_descriptor = 2;
     rootSignatureConf.max_srv_descriptor = 1;
     rootSignatureConf.offset_in_descriptors_from_table_start_cb = 0;
-    rootSignatureConf.offset_in_descriptors_from_table_start_srv = 1;
+    rootSignatureConf.offset_in_descriptors_from_table_start_srv = 2;
     rootSignatureConf.num_sampler = 1;
     rootSignatureConf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
     rootSignatureConf.visibility_cbv = D3D12_SHADER_VISIBILITY_VERTEX;
@@ -111,7 +111,7 @@ void FBXModel::initRootSignature(ID3D12Device* device)
 /// <param name="device"></param>
 void FBXModel::initDescriptorHeap(ID3D12Device* device)
 {
-    this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2);
+    this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 3);
 }
 
 /// <summary>
@@ -261,11 +261,26 @@ void FBXModel::initIndexBuffer(ID3D12Device* device)
 /// <param name="device">GPUデバイス</param>
 void FBXModel::initConstantBuffer(ID3D12Device* device)
 {
-    ConstantBuffer::ConstantBufferConf conf = {};
-    conf.size = sizeof(ModelConf);
-    conf.descriptor_heap = this->srv_cbv_uav_descriptor_heap_.get();
-    this->constant_buffer_ = ConstantBufferFactory::create(device, conf);
-    constant_buffer_->copy(&this->conf_);
+    {
+        ConstantBuffer::ConstantBufferConf conf = {};
+        conf.size = sizeof(ModelConf);
+        conf.descriptor_heap = this->srv_cbv_uav_descriptor_heap_.get();
+        conf.slot = 0;
+        this->constant_buffer_ = ConstantBufferFactory::create(device, conf);
+        this->constant_buffer_->copy(&this->conf_);
+    }
+
+    
+    {
+        ConstantBuffer::ConstantBufferConf conf = {};
+        conf.size = this->model_data_->getShaderMaterials().size() * sizeof(FBXModelData::ShaderMaterial);
+        conf.descriptor_heap = this->srv_cbv_uav_descriptor_heap_.get();
+        conf.slot = 1;
+        material_constant_buffer_ = ConstantBufferFactory::create(device, conf);
+        material_constant_buffer_->copy(this->model_data_->getShaderMaterials().data());
+    }
+    
+
 }
 
 

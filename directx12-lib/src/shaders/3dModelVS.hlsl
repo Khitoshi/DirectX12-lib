@@ -15,6 +15,11 @@ cbuffer ConstantBuffer : register(b0)
     float4x4 projection; // プロジェクション行列
 }
 
+cbuffer Material : register(b1)
+{
+    float4 diffuse_color; //diffuseカラー
+}
+
 VSOutput VSMain(VSInput input)
 {
     VSOutput output;
@@ -30,6 +35,7 @@ VSOutput VSMain(VSInput input)
     output.position = pos;
     output.texcoord = input.texcoord;
     output.normal = input.normal;
+    output.diffuse_color = diffuse_color;
 
     return output;
 }
