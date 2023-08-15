@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include <DirectXMath.h>
-
+#include <map>
 class RootSignature;
 class DescriptorHeap;
 class Shader;
@@ -72,8 +72,8 @@ private:
     std::shared_ptr<Shader> vertex_shader_;                             //頂点シェーダー
     std::shared_ptr<Shader> pixel_shader_;                              //ピクセルシェーダー
     std::shared_ptr<PipelineStateObject> pso_;                          //パイプラインステートオブジェクト
-    std::shared_ptr<VertexBuffer> vertex_buffer_;                       //頂点バッファ
-    std::shared_ptr<IndexBuffer> index_buffer_;                         //インデックスバッファ
+    std::map<uint64_t, std::shared_ptr<VertexBuffer>> vertex_buffer_;                       //頂点バッファ
+    std::map<uint64_t, std::shared_ptr<IndexBuffer>> index_buffer_;                         //インデックスバッファ
     UINT num_indices_;                                                  //インデックス数
     std::shared_ptr<ConstantBuffer> constant_buffer_;                   //定数バッファ
     std::shared_ptr<DepthStencil> depth_stencil_;                       //深度ステンシル

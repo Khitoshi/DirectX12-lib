@@ -62,12 +62,6 @@ void IndexBuffer::copy(void* src_indices)
 {
     uint8_t* pData = nullptr;
     if (SUCCEEDED(this->index_buffer_->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
-        /*
-        for (int i = 0; i < this->count_; i++) {
-            pData[i] = src_indices[i];
-            //頂点データをマッピング先に登録
-        }
-        */
         memcpy(pData, src_indices, this->index_buffer_view_.SizeInBytes);
     }
     this->index_buffer_->Unmap(0, nullptr);

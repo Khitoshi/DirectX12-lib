@@ -17,7 +17,8 @@ cbuffer ConstantBuffer : register(b0)
 
 cbuffer Material : register(b1)
 {
-    float4 diffuse_color; //diffuseカラー
+    //float4 diffuse_color; //diffuseカラー
+    //float4 specular_color; //diffuseカラー
 }
 
 VSOutput VSMain(VSInput input)
@@ -35,7 +36,8 @@ VSOutput VSMain(VSInput input)
     output.position = pos;
     output.texcoord = input.texcoord;
     output.normal = input.normal;
-    output.diffuse_color = diffuse_color;
+    //output.diffuse_color = diffuse_color;
+    //output.specular_color = specular_color;
 
     return output;
 }

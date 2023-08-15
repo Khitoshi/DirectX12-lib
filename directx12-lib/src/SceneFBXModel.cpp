@@ -8,7 +8,11 @@
 #include "imgui/imgui.h"
 #include "imgui/imfilebrowser.h"
 #include <string>
-std::string SceneFBXModel::file_path_("asset/models/RKonstantinov.fbx");
+//std::string SceneFBXModel::file_path_("asset/models/RKonstantinov.fbx");
+//std::string SceneFBXModel::file_path_("asset/models/box.fbx");
+//std::string SceneFBXModel::file_path_("asset/models/CornellBox-Emptysquashed.fbx");
+std::string SceneFBXModel::file_path_("asset/models/.test/cube.001.2.fbx");
+//std::string SceneFBXModel::file_path_("asset/models/.test/cube.000.fbx");
 
 /// <summary>
 /// ‰Šú‰»ˆ—

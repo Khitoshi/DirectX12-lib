@@ -9,11 +9,11 @@
 
 
 //  法線を解析
-DirectX::XMFLOAT3 parseNormal(const FbxMesh& mesh, const UINT& polygon_index, const UINT& vertex_index);
+DirectX::XMFLOAT3 fetchNormal(const FbxMesh& mesh, const UINT& polygon_index, const UINT& vertex_index);
 //  uv座標を解析
-DirectX::XMFLOAT2 parseUV(const FbxMesh& mesh, const UINT& polygon_index, const UINT& vertex_index, const FbxGeometryElementUV& uvElement);
+DirectX::XMFLOAT2 fetchUV(const FbxMesh& mesh, const UINT& polygon_index, const UINT& vertex_index, const FbxGeometryElementUV& uvElement);
 //  マテリアルを解析
-FBXModelData::Material parseMaterial(ID3D12Device* device, DescriptorHeap* descriptor_heap,const fbxsdk::FbxNode* node);
+std::vector<FBXModelData::SubSet> fetchMaterial(ID3D12Device* device, DescriptorHeap* descriptor_heap, const fbxsdk::FbxNode* node);
 
 /// <summary>
 /// モデルのロード
@@ -54,7 +54,6 @@ std::shared_ptr<FBXModelData> FBXModelLoader::load(ID3D12Device* device, Descrip
 
     // 最終的に使用するモデルデータのインスタンスを生成
     std::shared_ptr<FBXModelData> model_data = std::make_shared<FBXModelData>();
-
     //インデックスの計算をするためのマップ
     std::unordered_map<FBXModelData::Vertex, FBXModelData::USHORT, FBXModelData::ModelDataKeyHasher, std::equal_to<FBXModelData::Vertex>> index_map;
 
@@ -72,46 +71,109 @@ std::shared_ptr<FBXModelData> FBXModelLoader::load(ID3D12Device* device, Descrip
         //UVを取得
         FbxGeometryElementUV* uv_element = mesh->GetElementUV();
 
+        //マテリアルの取得
+        UINT size = 0;
+        for (auto& materials : fetchMaterial(device, descriptor_heap, child_node)) {
+            model_data->addMaterial(materials);
+            size = model_data->getSubsetMaps().size();
+        }
+
         for (UINT poly_i = 0; poly_i < mesh->GetPolygonCount(); ++poly_i) {
             // ポリゴンの頂点数（通常は3または4）
             UINT polygon_size = mesh->GetPolygonSize(poly_i);
             if (polygon_size != 3) throw std::exception("Polygon size is not 3");
 
-            // このポリゴンが使用する頂点情報を取得
-            for (UINT ver_i = 0; ver_i < polygon_size; ++ver_i) {
-                FBXModelData::USHORT control_point_index = mesh->GetPolygonVertex(poly_i, ver_i);
-                FbxVector4 vertex = mesh->GetControlPointAt(control_point_index);
-                FBXModelData::Vertex vertices = {};
+            //マテリアルのインデックスを取得
+            //int materialIndex = mesh->GetElementMaterial()->GetIndexArray().GetAt(poly_i);
+            int materialIndex = size > 0 ? mesh->GetElementMaterial()->GetIndexArray().GetAt(poly_i) : 0;
+            FbxSurfaceMaterial* material = mesh->GetNode()->GetMaterial(materialIndex);
 
-                //頂点を取得
-                vertices.position = DirectX::XMFLOAT3(DirectX::XMFLOAT3(vertex[0], vertex[1], vertex[2]));
+            if (material) {
+                uint64_t materialUniqueId = static_cast<uint64_t>(material->GetUniqueID());
+                // このポリゴンが使用する頂点情報を取得
+                for (UINT ver_i = 0; ver_i < polygon_size; ++ver_i) {
+                    FBXModelData::USHORT control_point_index = mesh->GetPolygonVertex(poly_i, ver_i);
+                    FbxVector4 vertex = mesh->GetControlPointAt(control_point_index);
+                    FBXModelData::Vertex vertices = {};
 
-                //法線を取得
-                if (normal_element) vertices.normal = parseNormal(*mesh, poly_i, ver_i);
+                    //頂点を取得
+                    vertices.position = DirectX::XMFLOAT3(DirectX::XMFLOAT3(vertex[0], vertex[1], vertex[2]));
 
-                //UVを取得
-                if (uv_element) vertices.uv = parseUV(*mesh, poly_i, ver_i, *uv_element);
+                    //法線を取得
+                    if (normal_element) vertices.normal = fetchNormal(*mesh, poly_i, ver_i);
 
-                //頂点のインデックスを取得
-                UINT new_index;
-                auto itr = index_map.find(vertices);
-                if (itr == index_map.end()) {
-                    model_data->addVertices(vertices);
-                    new_index = model_data->getVertices().size() - 1;
-                    index_map[vertices] = new_index;
+                    //UVを取得
+                    if (uv_element) vertices.uv = fetchUV(*mesh, poly_i, ver_i, *uv_element);
+
+                    //頂点のインデックスを取得
+                    UINT new_index;
+                    auto itr = index_map.find(vertices);
+                    if (itr == index_map.end()) {
+                        model_data->addVertices(materialUniqueId, vertices);
+                        //new_index = model_data->getVertices().size() - 1;
+                        new_index = model_data->getVertex(materialUniqueId).size() - 1;
+                        index_map[vertices] = new_index;
+                    }
+                    else {
+                        new_index = itr->second;
+                    }
+
+                    model_data->addIndices(materialUniqueId, new_index);
                 }
-                else {
-                    new_index = itr->second;
-                }
-
-                model_data->addIndices(new_index);
             }
-        }
-        //マテリアルの取得
-        //model_data->setDiffuseTexture(parseMaterial(device, child_node));
-        //model_data->getDiffuseTexture()->CreateShaderResourceView(device, descriptor_heap, 1);
-        model_data->addMaterial(parseMaterial(device, descriptor_heap, child_node));
+            else {
+                {
+                    FBXModelData::SubSet subset;
+                    subset.unique_id = 0;
+                    subset.material.diffuse_map_name = "asset/models/dummy/dummy.DDS";
+                    subset.material.shader_material.diffuse_color.x = .0f;
+                    subset.material.shader_material.diffuse_color.y = .0f;
+                    subset.material.shader_material.diffuse_color.z = .0f;
+                    subset.material.shader_material.diffuse_color.w = 1.0f;
+                    subset.material.material_index = 0;
+                    subset.material.shader_material.diffuse_map_index = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 0;
+                    subset.material.diffuse_map = TextureCacheManager::getInstance().getOrCreate(device, "asset/models/dummy/dummy.DDS");
+                    subset.material.diffuse_map->CreateShaderResourceView(device, descriptor_heap, 1 + subset.material.material_index);
 
+                    model_data->addMaterial(subset);
+                }
+
+                uint64_t materialUniqueId = static_cast<uint64_t>(0);
+                // このポリゴンが使用する頂点情報を取得
+                for (UINT ver_i = 0; ver_i < polygon_size; ++ver_i) {
+                    FBXModelData::USHORT control_point_index = mesh->GetPolygonVertex(poly_i, ver_i);
+                    FbxVector4 vertex = mesh->GetControlPointAt(control_point_index);
+                    FBXModelData::Vertex vertices = {};
+
+                    //頂点を取得
+                    vertices.position = DirectX::XMFLOAT3(DirectX::XMFLOAT3(vertex[0], vertex[1], vertex[2]));
+
+                    //法線を取得
+                    if (normal_element) vertices.normal = fetchNormal(*mesh, poly_i, ver_i);
+
+                    //UVを取得
+                    if (uv_element) vertices.uv = fetchUV(*mesh, poly_i, ver_i, *uv_element);
+
+                    //頂点のインデックスを取得
+                    UINT new_index;
+                    auto itr = index_map.find(vertices);
+                    if (itr == index_map.end()) {
+                        model_data->addVertices(materialUniqueId, vertices);
+                        //new_index = model_data->getVertices().size() - 1;
+                        new_index = model_data->getVertex(materialUniqueId).size() - 1;
+                        index_map[vertices] = new_index;
+                    }
+                    else {
+                        new_index = itr->second;
+                    }
+
+                    model_data->addIndices(materialUniqueId, new_index);
+                }
+
+            }
+
+
+        }
     }
 
     // FBX SDKを破棄
@@ -121,33 +183,16 @@ std::shared_ptr<FBXModelData> FBXModelLoader::load(ID3D12Device* device, Descrip
     return model_data;
 }
 
-/// <summary>
-/// 法線情報の解析
-/// </summary>
-/// <param name="mesh">メッシュ</param>
-/// <param name="polygon_index">ポリゴン番号</param>
-/// <param name="vertex_index">頂点番号</param>
-/// <returns>
-/// 解析した法線情報
-/// </returns>
-DirectX::XMFLOAT3 parseNormal(const FbxMesh& mesh, const UINT& polygon_index, const UINT& vertex_index)
+
+DirectX::XMFLOAT3 fetchNormal(const FbxMesh& mesh, const UINT& polygon_index, const UINT& vertex_index)
 {
     FbxVector4 normal;
     mesh.GetPolygonVertexNormal(polygon_index, vertex_index, normal);
     return DirectX::XMFLOAT3(DirectX::XMFLOAT3(normal[0], normal[1], normal[2]));
 }
 
-/// <summary>
-/// UV情報の解析
-/// </summary>
-/// <param name="mesh">メッシュ</param>
-/// <param name="polygon_index">ポリゴン番号</param>
-/// <param name="vertex_index">頂点番号</param>
-/// <param name="uvElement">uv情報</param>
-/// <returns>
-/// 解析したUV情報
-/// </returns>
-DirectX::XMFLOAT2 parseUV(const FbxMesh& mesh, const UINT& polygon_index, const UINT& vertex_index, const FbxGeometryElementUV& uv_element)
+
+DirectX::XMFLOAT2 fetchUV(const FbxMesh& mesh, const UINT& polygon_index, const UINT& vertex_index, const FbxGeometryElementUV& uv_element)
 {
     FbxVector2 uv;
     bool unmapped;
@@ -155,50 +200,75 @@ DirectX::XMFLOAT2 parseUV(const FbxMesh& mesh, const UINT& polygon_index, const 
     return DirectX::XMFLOAT2(uv[0], 1.0f - uv[1]);
 }
 
-/// <summary>
-/// テクスチャの解析
-/// </summary>
-/// <param name="device">GPUデバイス</param>
-/// <param name="descriptor_heap">テクスチャ情報を入れたいディスクリプタヒープ</param>
-/// <param name="node">fbxのnode</param>
-/// <returns>
-/// テクスチャのインスタンス
-/// </returns>
-FBXModelData::Material parseMaterial(ID3D12Device* device, DescriptorHeap* descriptor_heap, const fbxsdk::FbxNode* node)
+
+std::vector<FBXModelData::SubSet> fetchMaterial(ID3D12Device* device, DescriptorHeap* descriptor_heap, const fbxsdk::FbxNode* node)
 {
-    FBXModelData::Material model_texture;
+    std::vector<FBXModelData::SubSet> subsets = {};
     int material_count = node->GetMaterialCount();
     for (int mat_i = 0; mat_i < material_count; mat_i++) {
+        FBXModelData::SubSet subset;
         //マテリアルの取得
         FbxSurfaceMaterial* material = node->GetMaterial(mat_i);
         if (!material) continue;
 
-        //テクスチャの数を確認 0以下なら次のマテリアルへ
-        FbxProperty tex_prop = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
+        subset.unique_id = material->GetUniqueID();
+        subset.material.material_index = mat_i;
+
         //DiffuseMapの取得
+        FbxProperty tex_prop = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
         if (tex_prop.IsValid()) {
             const FbxDouble3 color = tex_prop.Get<FbxDouble3>();
-            model_texture.shader_material.diffuse_color.x = static_cast<float>(color[0]);
-            model_texture.shader_material.diffuse_color.y = static_cast<float>(color[1]);
-            model_texture.shader_material.diffuse_color.z = static_cast<float>(color[2]);
-            model_texture.shader_material.diffuse_color.w = 1.0f;
+            subset.material.shader_material.diffuse_color.x = static_cast<float>(color[0]);
+            subset.material.shader_material.diffuse_color.y = static_cast<float>(color[1]);
+            subset.material.shader_material.diffuse_color.z = static_cast<float>(color[2]);
+            subset.material.shader_material.diffuse_color.w = 1.0f;
+
 
             const FbxFileTexture* fbx_texture = tex_prop.GetSrcObject<FbxFileTexture>();
-            //model_texture.diffuse_texture_name = fbx_texture ? fbx_texture->GetRelativeFileName() : "asset/models/dummy/dummy.DDS";
-            model_texture.diffuse_texture_name = fbx_texture ? fbx_texture->GetFileName() : "";
+            subset.material.diffuse_map_name = fbx_texture ? fbx_texture->GetFileName() : "";
+        }
+
+        /*
+        tex_prop = material->FindProperty(FbxSurfaceMaterial::sSpecular);
+        if (tex_prop.IsValid()) {//DiffuseMapの取得
+            const FbxDouble3 color = tex_prop.Get<FbxDouble3>();
+            model_texture.shader_material.specular_color.x = static_cast<float>(color[0]);
+            model_texture.shader_material.specular_color.y = static_cast<float>(color[1]);
+            model_texture.shader_material.specular_color.z = static_cast<float>(color[2]);
+            model_texture.shader_material.specular_color.w = 1.0f;
+
+            const FbxFileTexture* fbx_texture = tex_prop.GetSrcObject<FbxFileTexture>();
+            model_texture.specular_map_name = fbx_texture ? fbx_texture->GetFileName() : "";
+        }
+        */
+        subset.material.shader_material.diffuse_map_index = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * mat_i;
+        subsets.push_back(subset);
+    }
+
+    for (auto& subset : subsets)
+    {
+        //diffuseマップがある場合はdiffuseマップを読み込む,ない場合はダミーのテクスチャを読み込む
+        if (!subset.material.diffuse_map_name.empty()) {
+            subset.material.diffuse_map = TextureCacheManager::getInstance().getOrCreate(device, subset.material.diffuse_map_name.c_str());
+            subset.material.diffuse_map->CreateShaderResourceView(device, descriptor_heap, 1 + subset.material.material_index);
+        }
+        else {
+            subset.material.diffuse_map = TextureCacheManager::getInstance().getOrCreate(device, "asset/models/dummy/dummy.DDS");
+            subset.material.diffuse_map->CreateShaderResourceView(device, descriptor_heap, 1 + subset.material.material_index);
         }
     }
 
-    if (!model_texture.diffuse_texture_name.empty()) {
-        model_texture.texture = TextureCacheManager::getInstance().getOrCreate(device, model_texture.diffuse_texture_name.c_str());
-        model_texture.texture->CreateShaderResourceView(device, descriptor_heap, 2);
+    //specularマップがある場合
+    /*
+    if (!model_texture.specular_map_name.empty()) {
+        model_texture.specular_map = TextureCacheManager::getInstance().getOrCreate(device, model_texture.specular_map_name.c_str());
+        model_texture.specular_map->CreateShaderResourceView(device, descriptor_heap, 3);
     }
     else {//ダミーテクスチャ
-        model_texture.texture = TextureCacheManager::getInstance().getOrCreate(device, "asset/models/dummy/dummy.DDS");
-        model_texture.texture->CreateShaderResourceView(device, descriptor_heap, 2);
-
-
+        model_texture.specular_map = TextureCacheManager::getInstance().getOrCreate(device, "asset/models/dummy/dummy.DDS");
+        model_texture.specular_map->CreateShaderResourceView(device, descriptor_heap, 3);
     }
+    */
 
-    return model_texture;
+    return subsets;
 }
