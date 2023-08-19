@@ -46,37 +46,46 @@ void RootSignature::createRootSignature(
     D3D12_STATIC_SAMPLER_DESC* sampler
 )
 {
-    std::vector<CD3DX12_ROOT_PARAMETER1> rootParameters = {};
+    //全てのディスクリプタのサイズ分でrangeとparameterを作成
+    const size_t all_descriptor_size = this->conf_.num_cbv + this->conf_.num_srv + this->conf_.num_uav;
+    std::vector<CD3DX12_DESCRIPTOR_RANGE1> ranges(all_descriptor_size);
+    std::vector<CD3DX12_ROOT_PARAMETER1> rootParameters(all_descriptor_size);
 
-    //CBV
-    if (this->conf_.max_cbv_descriptor > 0) {
-        CD3DX12_DESCRIPTOR_RANGE1 ranges = {};
-        CD3DX12_ROOT_PARAMETER1 param = {};
-        ranges.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, this->conf_.max_cbv_descriptor, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, this->conf_.offset_in_descriptors_from_table_start_cb);
-        param.InitAsDescriptorTable(1, &ranges, this->conf_.visibility_cbv);
-        rootParameters.push_back(param);
+    const UINT offset = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+    UINT descriptor_index = 0;
+    {//CBV
+        UINT shader_register = 0;
+        for (UINT i = 0; i < this->conf_.num_cbv; i++) {
+            ranges[descriptor_index].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, shader_register, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, offset);
+            rootParameters[descriptor_index].InitAsDescriptorTable(1, &ranges[descriptor_index], this->conf_.visibility_cbv);
+            shader_register++;
+            descriptor_index++;
+        }
     }
 
-    //SRV
-    if (this->conf_.max_srv_descriptor > 0) {
-        CD3DX12_DESCRIPTOR_RANGE1 ranges = {};
-        CD3DX12_ROOT_PARAMETER1 param = {};
-        ranges.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, this->conf_.max_srv_descriptor, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, this->conf_.offset_in_descriptors_from_table_start_srv);
-        param.InitAsDescriptorTable(1, &ranges, this->conf_.visibility_srv);
-        rootParameters.push_back(param);
-    }
-
-    //UAV
-    if (this->conf_.max_uav_descriptor > 0) {
-        CD3DX12_DESCRIPTOR_RANGE1 ranges = {};
-        CD3DX12_ROOT_PARAMETER1 param = {};
-        ranges.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, this->conf_.max_uav_descriptor, 0, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, this->conf_.offset_in_descriptors_from_table_start_uav);
-        param.InitAsDescriptorTable(1, &ranges, this->conf_.visibility_uav);
-        rootParameters.push_back(param);
+    {//SRV
+        UINT shader_register = 0;
+        for (UINT i = 0; i < this->conf_.num_srv; i++) {
+            ranges[descriptor_index].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, shader_register, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, offset);
+            rootParameters[descriptor_index].InitAsDescriptorTable(1, &ranges[descriptor_index], this->conf_.visibility_srv);
+            shader_register++;
+            descriptor_index++;
+        }
     }
 
 
+    {//UAV
+        UINT shader_register = 0;
+        for (UINT i = 0; i < this->conf_.num_uav; i++) {
+            ranges[descriptor_index].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, shader_register, 0, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC, offset);
+            rootParameters[descriptor_index].InitAsDescriptorTable(1, &ranges[descriptor_index], this->conf_.visibility_uav);
+            shader_register++;
+            descriptor_index++;
+        }
+    }
 
+    //サンプラの設定
     CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
     rootSignatureDesc.Init_1_1(static_cast<UINT>(rootParameters.size()), rootParameters.data(), this->conf_.num_sampler, sampler, this->conf_.root_signature_flags);
 

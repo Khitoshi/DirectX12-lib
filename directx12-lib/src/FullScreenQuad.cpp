@@ -107,8 +107,7 @@ void FullScreenQuad::createRootSignature(ID3D12Device* device)
     conf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     conf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     conf.num_sampler = 1;
-    conf.max_srv_descriptor = 1;
-    conf.offset_in_descriptors_from_table_start_srv = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+    conf.num_srv = 1;
 
     this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, conf);
 }

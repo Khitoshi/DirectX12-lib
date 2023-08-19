@@ -76,6 +76,9 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
     D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle = this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
     rc->setGraphicsRootDescriptorTable(0, gpu_handle);
 
+    gpu_handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 1;
+    rc->setGraphicsRootDescriptorTable(1, gpu_handle);
+
     //ドローコール
     rc->drawInstanced(4);
 }
@@ -171,8 +174,7 @@ void CompositeRenderTarget::initRootSignature(ID3D12Device* device)
     rs_conf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rs_conf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rs_conf.num_sampler = 1;
-    rs_conf.max_srv_descriptor = 2;
-    rs_conf.offset_in_descriptors_from_table_start_srv = 0;
+    rs_conf.num_srv = 2;
     rs_conf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
     this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rs_conf);
 }

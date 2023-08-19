@@ -3,6 +3,8 @@
 #include "TextureFactory.h"
 class DescriptorHeap;
 
+struct aiMaterial;
+
 /// <summary>
 /// テクスチャのキャッシュを管理するクラス
 /// </summary>

@@ -4,8 +4,10 @@
 struct VSInput
 {
     float3 position : POSITION;
-    float2 texcoord : TEXCOORD;
     float3 normal : NORMAL;
+    float2 texcoord : TEXCOORD;
+    float3 tangent : TANGENT;
+    float4 color : COLOR;
 };
 
 cbuffer ConstantBuffer : register(b0)
@@ -15,10 +17,10 @@ cbuffer ConstantBuffer : register(b0)
     float4x4 projection; // プロジェクション行列
 }
 
-cbuffer Material : register(b1)
+
+cbuffer MaterialConf : register(b1)
 {
-    //float4 diffuse_color; //diffuseカラー
-    //float4 specular_color; //diffuseカラー
+    float4 diffuse_color;
 }
 
 VSOutput VSMain(VSInput input)
@@ -34,10 +36,11 @@ VSOutput VSMain(VSInput input)
     pos = mul(pos, projection); //プロジェクション行列適用
 
     output.position = pos;
-    output.texcoord = input.texcoord;
     output.normal = input.normal;
-    //output.diffuse_color = diffuse_color;
-    //output.specular_color = specular_color;
+    output.texcoord = input.texcoord;
+    output.tangent = input.tangent;
+    output.color = input.color;
+    output.diffuse_color = diffuse_color;
 
     return output;
 }

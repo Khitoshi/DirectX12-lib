@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AssimpLoader.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\CameraController.cpp" />
     <ClCompile Include="src\CommandAllocator.cpp" />
@@ -45,7 +46,6 @@
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\InputManager.cpp" />
     <ClCompile Include="src\FBXModel.cpp" />
-    <ClCompile Include="src\FBXModelLoader.cpp" />
     <ClCompile Include="src\OffScreenRenderTarget.cpp" />
     <ClCompile Include="src\PipelineStateObject.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
@@ -67,6 +67,7 @@
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AssimpLoader.h" />
     <ClInclude Include="src\CameraController.h" />
     <ClInclude Include="src\ConstantBufferFactory.h" />
     <ClInclude Include="src\CubeModel.h" />
@@ -89,9 +90,9 @@
     <ClInclude Include="src\DeviceContext.h" />
     <ClInclude Include="src\DeviceContextFactory.h" />
     <ClInclude Include="src\DX12Resources.h" />
-    <ClInclude Include="src\FBXModelDataCacheManager.h" />
     <ClInclude Include="src\Fence.h" />
     <ClInclude Include="src\FenceFactory.h" />
+    <ClInclude Include="src\FileUtil.h" />
     <ClInclude Include="src\Framework.h" />
     <ClInclude Include="src\FrameworkFactory.h" />
     <ClInclude Include="src\FullScreenQuad.h" />
@@ -115,9 +116,7 @@
     <ClInclude Include="src\IndexBufferFactory.h" />
     <ClInclude Include="src\InputManager.h" />
     <ClInclude Include="src\FBXModel.h" />
-    <ClInclude Include="src\FBXModelData.h" />
-    <ClInclude Include="src\FBXModelDataFactory.h" />
-    <ClInclude Include="src\FBXModelLoader.h" />
+    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\MouseInputListener.h" />
     <ClInclude Include="src\OffScreenRenderTargetCacheManager.h" />
     <ClInclude Include="src\OffScreenRenderTargetFactory.h" />
@@ -146,7 +145,7 @@
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\SceneSprite.h" />
     <ClInclude Include="src\SpriteModifier.h" />
-    <ClInclude Include="src\StringConvertUtil.h" />
+    <ClInclude Include="src\StringUtil.h" />
     <ClInclude Include="src\SwapChain.h" />
     <ClInclude Include="src\OffScreenRenderTarget.h" />
     <ClInclude Include="src\SwapChainFactory.h" />
@@ -415,14 +414,14 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./lib/fbxSDK2020.3.4vs2022/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./lib/assimp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\lib\fbxSDK2020.3.4vs2022\lib\vs2022\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
-      <AdditionalDependencies>libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);./lib\assimp\build\lib/$(Configuration)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>assimp-vc142-mtd.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalDependencies>assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -433,16 +432,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./lib/fbxSDK2020.3.4vs2022/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./lib/assimp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\lib\fbxSDK2020.3.4vs2022\lib\vs2022\x64\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
-      <AdditionalDependencies>libfbxsdk-mt.lib;libxml2-mt.lib;zlib-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);./lib\assimp\build\lib/$(Configuration)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>assimp-vc142-mt.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalDependencies>libfbxsdk-mt.lib;libxml2-mt.lib;zlib-mt.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

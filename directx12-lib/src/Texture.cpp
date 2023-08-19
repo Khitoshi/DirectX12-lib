@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "DescriptorHeap.h"
 #include <stdexcept>
+#include <assimp/texture.h>
 
 /// <summary>
 /// テクスチャ読み込み

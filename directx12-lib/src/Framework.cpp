@@ -71,11 +71,12 @@ int Framework::run(std::function<bool()> processMessages)
 void Framework::setDirectoryAndDll()
 {
 #ifdef _DEBUG
-    SetDllDirectoryA(".lib/fbxSDK2020.3.4vs2022/lib/vs2022/x64/debug");
-    LoadLibraryExA("libfbxsdk.dll", NULL, NULL);
+    SetDllDirectoryA("lib/assimp/build/lib/Debug");
+    LoadLibraryExA("assimp-vc142-mtd.dll", NULL, NULL);
+
 #else
-    SetDllDirectoryA(".lib/fbxSDK2020.3.4vs2022/lib/vs2022/x64/release");
-    LoadLibraryExA("libfbxsdk.dll", NULL, NULL);
+    SetDllDirectoryA("lib/assimp/build/lib/Release");
+    LoadLibraryExA("assimp-vc142-mt.dll", NULL, NULL);
 #endif // _DEBUG
 
 }

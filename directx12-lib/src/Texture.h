@@ -7,7 +7,7 @@
 using namespace Microsoft::WRL;
 
 class DescriptorHeap;
-
+struct aiTexture;
 /// <summary>
 /// テクスチャ
 /// </summary>

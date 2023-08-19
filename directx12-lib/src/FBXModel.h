@@ -14,8 +14,9 @@ class DepthStencil;
 class Texture;
 class OffScreenRenderTarget;
 class RenderContext;
-class FBXModelData;
-
+//class FBXModelData;
+//struct Mesh;
+#include "Mesh.h"
 //fbxモデルクラス
 class FBXModel
 {
@@ -30,14 +31,14 @@ public:
 public:
     FBXModel(const ModelConf& c) :
         conf_(c),
-        model_data_(),
+        meshes_(),
         root_signature_(),
         srv_cbv_uav_descriptor_heap_(),
         vertex_shader_(),
         pixel_shader_(),
         pso_(),
-        vertex_buffer_(),
-        index_buffer_(),
+        vertex_buffers_(),
+        index_buffers_(),
         constant_buffer_(),
         num_indices_(0),
         depth_stencil_(),
@@ -58,6 +59,7 @@ private:
     void initVertexBuffer(ID3D12Device* device);
     void initIndexBuffer(ID3D12Device* device);
     void initConstantBuffer(ID3D12Device* device);
+    void initTexture(ID3D12Device* device);
     void initDepthStencil(ID3D12Device* device);
     void initOffScreenRenderTarget(ID3D12Device* device);
 
@@ -66,20 +68,24 @@ public:
     void setModel(const char* model_file_path);
 private:
     ModelConf conf_;
-    std::shared_ptr<FBXModelData> model_data_;
-    std::shared_ptr<RootSignature> root_signature_;                     //ルートシグニチャ
-    std::shared_ptr<DescriptorHeap> srv_cbv_uav_descriptor_heap_;       //ディスクリプタヒープ
-    std::shared_ptr<Shader> vertex_shader_;                             //頂点シェーダー
-    std::shared_ptr<Shader> pixel_shader_;                              //ピクセルシェーダー
-    std::shared_ptr<PipelineStateObject> pso_;                          //パイプラインステートオブジェクト
-    std::map<uint64_t, std::shared_ptr<VertexBuffer>> vertex_buffer_;                       //頂点バッファ
-    std::map<uint64_t, std::shared_ptr<IndexBuffer>> index_buffer_;                         //インデックスバッファ
-    UINT num_indices_;                                                  //インデックス数
-    std::shared_ptr<ConstantBuffer> constant_buffer_;                   //定数バッファ
-    std::shared_ptr<DepthStencil> depth_stencil_;                       //深度ステンシル
-    std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;   //オフスクリーンレンダーターゲット
+    std::vector<Mesh> meshes_;
+    std::shared_ptr<RootSignature> root_signature_;
+    std::shared_ptr<DescriptorHeap> srv_cbv_uav_descriptor_heap_;
 
-    std::shared_ptr<ConstantBuffer> material_constant_buffer_;                   //定数バッファ
+    std::shared_ptr<Shader> vertex_shader_;
+    std::shared_ptr<Shader> pixel_shader_;
+
+    std::shared_ptr<PipelineStateObject> pso_;
+
+    std::vector<std::shared_ptr<VertexBuffer>> vertex_buffers_;
+    std::vector<std::shared_ptr<IndexBuffer>> index_buffers_;
+
+    std::vector<UINT> num_indices_;
+    std::shared_ptr<ConstantBuffer> constant_buffer_;
+    std::shared_ptr<DepthStencil> depth_stencil_;
+    std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;
+
+    std::vector<std::shared_ptr<ConstantBuffer>> mesh_color_constant_buffers_;
 
     ID3D12Device* device_;
 };

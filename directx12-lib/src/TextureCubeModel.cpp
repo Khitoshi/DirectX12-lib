@@ -90,10 +90,8 @@ void TextureCubeModel::initRootSignature(ID3D12Device* device)
     rootSignatureConf.texture_address_modeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rootSignatureConf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rootSignatureConf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    rootSignatureConf.max_cbv_descriptor = 1;
-    rootSignatureConf.max_srv_descriptor = 1;
-    rootSignatureConf.offset_in_descriptors_from_table_start_cb = 0;
-    rootSignatureConf.offset_in_descriptors_from_table_start_srv = 1;
+    rootSignatureConf.num_cbv = 1;
+    rootSignatureConf.num_srv = 1;;
     rootSignatureConf.num_sampler = 1;
     rootSignatureConf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
     rootSignatureConf.visibility_cbv = D3D12_SHADER_VISIBILITY_VERTEX;

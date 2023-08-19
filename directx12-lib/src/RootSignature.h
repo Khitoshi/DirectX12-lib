@@ -22,12 +22,12 @@ public:
         D3D12_TEXTURE_ADDRESS_MODE texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
         D3D12_TEXTURE_ADDRESS_MODE texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
         int num_sampler = 0;
-        UINT max_cbv_descriptor = 0;
-        UINT max_srv_descriptor = 0;
-        UINT max_uav_descriptor = 0;
-        UINT offset_in_descriptors_from_table_start_cb = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-        UINT offset_in_descriptors_from_table_start_srv = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-        UINT offset_in_descriptors_from_table_start_uav = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+        UINT num_cbv = 0;
+        UINT num_srv = 0;
+        UINT num_uav = 0;
+        //UINT offset_in_descriptors_from_table_start_cb = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+        //UINT offset_in_descriptors_from_table_start_srv = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+        //UINT offset_in_descriptors_from_table_start_uav = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
         D3D12_ROOT_SIGNATURE_FLAGS root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
         D3D12_SHADER_VISIBILITY visibility_cbv = D3D12_SHADER_VISIBILITY_ALL;
@@ -44,13 +44,13 @@ public:
 
                 num_sampler == other.num_sampler &&
 
-                max_cbv_descriptor == other.max_cbv_descriptor &&
-                max_srv_descriptor == other.max_srv_descriptor &&
-                max_uav_descriptor == other.max_uav_descriptor &&
+                num_cbv == other.num_cbv &&
+                num_srv == other.num_srv &&
+                num_uav == other.num_uav &&
 
-                offset_in_descriptors_from_table_start_cb == other.offset_in_descriptors_from_table_start_cb &&
-                offset_in_descriptors_from_table_start_srv == other.offset_in_descriptors_from_table_start_srv &&
-                offset_in_descriptors_from_table_start_uav == other.offset_in_descriptors_from_table_start_uav &&
+                //offset_in_descriptors_from_table_start_cb == other.offset_in_descriptors_from_table_start_cb &&
+                //offset_in_descriptors_from_table_start_srv == other.offset_in_descriptors_from_table_start_srv &&
+                //offset_in_descriptors_from_table_start_uav == other.offset_in_descriptors_from_table_start_uav &&
 
                 root_signature_flags == other.root_signature_flags &&
 
