@@ -10,7 +10,6 @@
 #include <DirectXTex.h>
 
 void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes, const aiMatrix4x4& parentTransform, const char* model_file_path, bool inverse_u, bool inverse_v);
-//std::vector<Vertex> FetchVertices(const aiMesh* src, bool inverseU, bool inverseV);
 std::vector<Vertex> FetchVertices(const aiMesh* src, const aiMatrix4x4& transform, bool inverseU, bool inverseV);
 std::vector<uint32_t> FetchIndices(const aiMesh* src);
 Material FetchMaterial(const char* filename, const aiScene* scene, const aiMaterial* src);
@@ -23,41 +22,25 @@ std::vector<Mesh> AssimpLoader::Load(const char* model_file_path, bool inverse_u
         throw std::exception("AssimpLoader::Loader model_file_path is empty");
     }
 
-    //インポーター作成
+    //sceneを読み込む
+    int flag = 0;
+    flag |= aiProcess_Triangulate;
+    flag |= aiProcess_SortByPType;
+    flag |= aiProcess_GenUVCoords;
+    flag |= aiProcess_OptimizeMeshes;
+    flag |= aiProcess_ValidateDataStructure;
+    flag |= aiProcess_GenNormals;
+    flag |= aiProcess_CalcTangentSpace;
+    flag |= aiProcess_LimitBoneWeights;
+    flag |= aiProcess_JoinIdenticalVertices;
+    flag |= aiProcess_FlipWindingOrder;
     Assimp::Importer importer = {};
-    int flag = aiProcess_Triangulate |
-        aiProcess_SortByPType |
-        aiProcess_GenUVCoords |
-        aiProcess_OptimizeMeshes |
-        aiProcess_ValidateDataStructure |
-        aiProcess_GenNormals |
-        aiProcess_CalcTangentSpace |
-        aiProcess_LimitBoneWeights |
-        aiProcess_JoinIdenticalVertices |
-        aiProcess_FlipWindingOrder;
-
     const aiScene* scene = importer.ReadFile(model_file_path, flag);
     if (scene == nullptr) {
         throw std::exception("AssimpLoader::Loader Failed ReadFile");
     }
 
     //メッシュを読み込む
-    /*
-    std::vector<Mesh> meshes(scene->mNumMeshes);
-    for (size_t i = 0; i < meshes.size(); i++) {
-        const auto mesh = scene->mMeshes[i];
-        //meshes[i].vertices = FetchVertices(mesh, inverse_u, inverse_v);
-
-        meshes[i].indices = FetchIndices(mesh);
-
-        //const auto material = scene->mMaterials[i];
-        const auto material_i = mesh->mMaterialIndex; // メッシュに関連するマテリアルのインデックスを取得
-        const auto material = scene->mMaterials[material_i];
-        meshes[i].material = FetchMaterial(model_file_path, scene, material);
-    }
-    */
-
-
     std::vector<Mesh> meshes;
     ProcessNode(scene->mRootNode, scene, meshes, aiMatrix4x4(), model_file_path, inverse_u, inverse_v);
 
@@ -77,6 +60,7 @@ void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes, 
         const auto material_i = mesh->mMaterialIndex;
         const auto material = scene->mMaterials[material_i];
         newMesh.material = FetchMaterial(model_file_path, scene, material);
+
         meshes.push_back(newMesh);
     }
 
@@ -181,8 +165,8 @@ void CreateTextureFile(const char* file_path, const aiScene* scene, const aiMate
 
             //すでにファイルが存在する場合はスキップ
             /*
-            * モデルのディレクトリ + .material/ + テクスチャのファイル名
-            * hoge/hoge.fbx -> hoge/hoge.material/texture.png
+            * モデルのディレクトリ + .mat/ + テクスチャのファイル名
+            * hoge/hoge.fbx -> hoge/hoge.matl/texture.png
             */
             const std::string after_file_path = file_path + ".mat/" + GetFileNameFromPath(std::string(texture_path.C_Str()));
             if (DoesPathExist(after_file_path)) continue;

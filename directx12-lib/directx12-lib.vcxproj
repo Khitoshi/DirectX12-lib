@@ -117,6 +117,7 @@
     <ClInclude Include="src\InputManager.h" />
     <ClInclude Include="src\FBXModel.h" />
     <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\ModelMeshCacheManager.h" />
     <ClInclude Include="src\MouseInputListener.h" />
     <ClInclude Include="src\OffScreenRenderTargetCacheManager.h" />
     <ClInclude Include="src\OffScreenRenderTargetFactory.h" />

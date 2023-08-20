@@ -2,6 +2,7 @@
 //#include "FBXModelData.h"
 //#include "FBXModelDataFactory.h"
 #include "Mesh.h"
+#include "ModelMeshCacheManager.h"
 #include "AssimpLoader.h"
 #include "RootSignatureCacheManager.h"
 #include "DescriptorHeapFactory.h"
@@ -123,8 +124,10 @@ void FBXModel::initDescriptorHeap(ID3D12Device* device)
 /// <param name="model_file_path">モデルのファイルパス</param>
 void FBXModel::loadModel(ID3D12Device* device, const char* model_file_path)
 {
+
     //model_data_ = FBXModelDataFactory::create(device, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
-    meshes_ = AssimpLoader::Load(model_file_path, false, true);
+    //meshes_ = AssimpLoader::Load(model_file_path, false, true);
+    this->meshes_ = ModelMeshCacheManager::getInstance().getMeshes(model_file_path, false, true);
     num_descriptors_ = 1 + (meshes_.size() * 2);
 
 }
