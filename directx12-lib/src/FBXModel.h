@@ -43,7 +43,8 @@ public:
         num_indices_(0),
         depth_stencil_(),
         off_screen_render_target_(),
-        device_(0)
+        device_(0),
+        num_descriptors_(0)
     {};
     ~FBXModel() {};
 
@@ -88,4 +89,6 @@ private:
     std::vector<std::shared_ptr<ConstantBuffer>> mesh_color_constant_buffers_;
 
     ID3D12Device* device_;
+
+    UINT num_descriptors_;
 };

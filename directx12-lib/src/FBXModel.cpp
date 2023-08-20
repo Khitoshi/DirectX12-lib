@@ -22,10 +22,10 @@ void FBXModel::init(ID3D12Device* device, const char* model_file_path)
 {
     this->device_ = device;
     this->initRootSignature(device);
-    this->initDescriptorHeap(device);
     this->loadShader();
     this->initPipelineStateObject(device);
     this->loadModel(device, model_file_path);
+    this->initDescriptorHeap(device);
     this->initConstantBuffer(device);
     this->initTexture(device);
     this->initVertexBuffer(device);
@@ -113,7 +113,7 @@ void FBXModel::initRootSignature(ID3D12Device* device)
 /// <param name="device"></param>
 void FBXModel::initDescriptorHeap(ID3D12Device* device)
 {
-    this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 16);
+    this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, num_descriptors_);
 }
 
 /// <summary>
@@ -125,6 +125,8 @@ void FBXModel::loadModel(ID3D12Device* device, const char* model_file_path)
 {
     //model_data_ = FBXModelDataFactory::create(device, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
     meshes_ = AssimpLoader::Load(model_file_path, false, false);
+    num_descriptors_ = 1 + (meshes_.size() * 2);
+
 }
 
 /// <summary>
