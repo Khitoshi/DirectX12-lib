@@ -12,8 +12,9 @@
 //std::string SceneFBXModel::file_path_("asset/models/RKonstantinov.fbx");
 //std::string SceneFBXModel::file_path_("asset/models/box.fbx");
 //std::string SceneFBXModel::file_path_("asset/models/CornellBox-Emptysquashed.fbx");
-std::string SceneFBXModel::file_path_("asset/models/.test/cube.003.0.fbx");
+//std::string SceneFBXModel::file_path_("asset/models/.test/cube.002.1.fbx");
 //std::string SceneFBXModel::file_path_("asset/models/.test/cube.004.fbx");
+std::string SceneFBXModel::file_path_("asset/models/.test/nico.fbx");
 //std::string SceneFBXModel::file_path_("asset/models/.test/cube.000.fbx");
 
 /// <summary>

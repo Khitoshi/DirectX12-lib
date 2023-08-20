@@ -124,7 +124,7 @@ void FBXModel::initDescriptorHeap(ID3D12Device* device)
 void FBXModel::loadModel(ID3D12Device* device, const char* model_file_path)
 {
     //model_data_ = FBXModelDataFactory::create(device, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
-    meshes_ = AssimpLoader::Load(model_file_path, false, false);
+    meshes_ = AssimpLoader::Load(model_file_path, false, true);
     num_descriptors_ = 1 + (meshes_.size() * 2);
 
 }

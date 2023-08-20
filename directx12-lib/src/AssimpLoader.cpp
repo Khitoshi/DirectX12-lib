@@ -137,16 +137,14 @@ std::vector<uint32_t> FetchIndices(const aiMesh* src)
 
 Material FetchMaterial(const char* filename, const aiScene* scene, const aiMaterial* src)
 {
-    Material material = {};
-    auto dir = GetDirFromPath(filename);
 
     CreateTextureFile(filename, scene, src);
 
+    Material material = {};
     aiString path;
     if (src->Get(AI_MATKEY_TEXTURE_DIFFUSE(0), path) == AI_SUCCESS) {
-        auto file = std::string(path.C_Str());
-        const std::string::size_type pos = file.find('/');
-        material.diffuse_map_name = dir + file;
+        auto file = GetFileNameFromPath(std::string(path.C_Str()));
+        material.diffuse_map_name = std::string(filename) + ".mat/" + file;
     }
     else {
         material.diffuse_map_name = "asset/models/dummy/dummy.DDS";
@@ -164,7 +162,7 @@ Material FetchMaterial(const char* filename, const aiScene* scene, const aiMater
     return material;
 }
 
-void CreateTextureFile(const char* filename, const aiScene* scene, const aiMaterial* src)
+void CreateTextureFile(const char* file_path, const aiScene* scene, const aiMaterial* src)
 {
 
     /*
@@ -174,7 +172,7 @@ void CreateTextureFile(const char* filename, const aiScene* scene, const aiMater
     * また既にその名前のファイルやディレクトリが存在する場合はスキップする
     *
     */
-    auto fn = [](const aiTextureType type, const aiMaterial* src, const aiScene* scene, const std::string& dir) {
+    auto fn = [](const aiTextureType type, const aiMaterial* src, const aiScene* scene, const std::string& file_path) {
         aiString texture_path;
         for (UINT i = 0; src->GetTexture(type, i, &texture_path) == AI_SUCCESS; i++) {
             // テクスチャが存在しない場合はスキップ
@@ -182,8 +180,12 @@ void CreateTextureFile(const char* filename, const aiScene* scene, const aiMater
             if (!embedded_texture)continue;
 
             //すでにファイルが存在する場合はスキップ
-            const std::string filepath = dir + std::string(texture_path.C_Str());
-            if (DoesPathExist(filepath)) continue;
+            /*
+            * モデルのディレクトリ + .material/ + テクスチャのファイル名
+            * hoge/hoge.fbx -> hoge/hoge.material/texture.png
+            */
+            const std::string after_file_path = file_path + ".mat/" + GetFileNameFromPath(std::string(texture_path.C_Str()));
+            if (DoesPathExist(after_file_path)) continue;
 
             // DirectXTexで画像をロード
             const unsigned char* texture_data = reinterpret_cast<const unsigned char*>(embedded_texture->pcData);
@@ -194,22 +196,21 @@ void CreateTextureFile(const char* filename, const aiScene* scene, const aiMater
             }
 
             // ディレクトリが存在しない場合は作成
-            if (!CreateDirectoryIfNotExists(GetDirFromPath(filepath))) {
+            if (!CreateDirectoryIfNotExists(GetDirFromPath(after_file_path))) {
                 throw std::exception("AssimpLoader::Loader Failed CreateDirectoryIfNotExists");
             }
 
             // DirectXTexで画像を保存
             const DirectX::Image* img = scratchImg.GetImage(0, 0, 0);
-            if (DirectX::SaveToWICFile(*img, DirectX::WIC_FLAGS_NONE, DirectX::GetWICCodec(DirectX::WIC_CODEC_PNG), ToWideString(filepath).c_str())) {
+            if (DirectX::SaveToWICFile(*img, DirectX::WIC_FLAGS_NONE, DirectX::GetWICCodec(DirectX::WIC_CODEC_PNG), ToWideString(after_file_path).c_str())) {
                 throw std::exception("AssimpLoader::Loader Failed SaveToWICFile");
             }
         }
     };
 
     //すべてのテクスチャタイプに対して実行
-    const std::string dir = GetDirFromPath(filename);
     for (int type = aiTextureType_NONE; type != AI_TEXTURE_TYPE_MAX; type++) {
-        fn(static_cast<const aiTextureType>(type), src, scene, dir);
+        fn(static_cast<const aiTextureType>(type), src, scene, file_path);
     }
 
 }
