@@ -1,7 +1,7 @@
 #include "SceneSprite.h"
 #include "Camera.h"
-#include "imgui/imgui.h"
-#include "imgui/imfilebrowser.h"
+#include <imgui/imgui.h>
+#include <imgui/imfilebrowser.h>
 
 std::string SceneSprite::file_path_("asset/img/Lena.png");
 
