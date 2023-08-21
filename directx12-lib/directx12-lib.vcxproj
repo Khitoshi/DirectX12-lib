@@ -45,13 +45,13 @@
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\InputManager.cpp" />
-    <ClCompile Include="src\FBXModel.cpp" />
+    <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\OffScreenRenderTarget.cpp" />
     <ClCompile Include="src\PipelineStateObject.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\RootSignature.cpp" />
     <ClCompile Include="src\Scene3dCube.cpp" />
-    <ClCompile Include="src\SceneFBXModel.cpp" />
+    <ClCompile Include="src\SceneModel.cpp" />
     <ClCompile Include="src\SceneTexture3dCube.cpp" />
     <ClCompile Include="src\SceneTriangle.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -115,7 +115,7 @@
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\IndexBufferFactory.h" />
     <ClInclude Include="src\InputManager.h" />
-    <ClInclude Include="src\FBXModel.h" />
+    <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\ModelMeshCacheManager.h" />
     <ClInclude Include="src\MouseInputListener.h" />
@@ -135,7 +135,7 @@
     <ClInclude Include="src\RootSignatureFactory.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Scene3dCube.h" />
-    <ClInclude Include="src\SceneFBXModel.h" />
+    <ClInclude Include="src\SceneModel.h" />
     <ClInclude Include="src\SceneDefault.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\SceneTexture3dCube.h" />

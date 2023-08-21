@@ -177,10 +177,10 @@
     <ClCompile Include="src\DescriptorHeap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\FBXModel.cpp">
+    <ClCompile Include="src\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SceneFBXModel.cpp">
+    <ClCompile Include="src\SceneModel.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene3dCube.cpp">
@@ -446,10 +446,10 @@
     <ClInclude Include="src\DescriptorHeapFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\FBXModel.h">
+    <ClInclude Include="src\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\SceneFBXModel.h">
+    <ClInclude Include="src\SceneModel.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="src\AssimpLoader.h">
