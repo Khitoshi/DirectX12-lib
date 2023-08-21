@@ -68,8 +68,10 @@ void TextureCubeModel::draw(RenderContext* rc)
     rc->setIndexBuffer(this->index_buffer_.get());
     //ディスクリプタヒープを設定
     rc->setDescriptorHeap(this->srv_cbv_uav_descriptor_heap_.get());
-    rc->setGraphicsRootDescriptorTable(0, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
-    rc->setGraphicsRootDescriptorTable(1, this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+    auto handle = this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+    rc->setGraphicsRootDescriptorTable(0, handle);
+    handle.ptr += texture_descriptor_index_;
+    rc->setGraphicsRootDescriptorTable(1, handle);
 
     //ドローコール
     rc->drawIndexed(this->num_indices_);
@@ -91,7 +93,7 @@ void TextureCubeModel::initRootSignature(ID3D12Device* device)
     rootSignatureConf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rootSignatureConf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rootSignatureConf.num_cbv = 1;
-    rootSignatureConf.num_srv = 1;;
+    rootSignatureConf.num_srv = 1;
     rootSignatureConf.num_sampler = 1;
     rootSignatureConf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
     rootSignatureConf.visibility_cbv = D3D12_SHADER_VISIBILITY_VERTEX;
@@ -263,6 +265,7 @@ void TextureCubeModel::initTexture(ID3D12Device* device, const char* texture_fil
     this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
     //ディスクリプタヒープに登録
     this->texture_->CreateShaderResourceView(device, this->srv_cbv_uav_descriptor_heap_.get(), 1);
+    texture_descriptor_index_ = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 1;
 }
 
 /// <summary>

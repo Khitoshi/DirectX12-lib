@@ -70,17 +70,18 @@ private:
         DirectX::XMFLOAT2 uv;
     };
     TextureCubeModelConf conf_;
-    std::shared_ptr<RootSignature> root_signature_;                     //ルートシグニチャ
-    std::shared_ptr<DescriptorHeap> srv_cbv_uav_descriptor_heap_;                  //ディスクリプタヒープ
-    std::shared_ptr<Shader> vertex_shader_;                             //頂点シェーダー
-    std::shared_ptr<Shader> pixel_shader_;                              //ピクセルシェーダー
-    std::shared_ptr<PipelineStateObject> pso_;                          //パイプラインステートオブジェクト
-    std::shared_ptr<VertexBuffer> vertex_buffer_;                       //頂点バッファ
-    std::shared_ptr<IndexBuffer> index_buffer_;                         //インデックスバッファ
-    std::shared_ptr<Texture> texture_;                                  //テクスチャ
-    std::shared_ptr<ConstantBuffer> constant_buffer_;                   //定数バッファ
-    std::shared_ptr<DepthStencil> depth_stencil_;                       //深度ステンシル
-    Vertex vertices_[8];										        //頂点データ
-    UINT num_indices_;                                                  //インデックス数
-    std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;   //オフスクリーンレンダーターゲット
+    std::shared_ptr<RootSignature> root_signature_;
+    std::shared_ptr<DescriptorHeap> srv_cbv_uav_descriptor_heap_;
+    std::shared_ptr<Shader> vertex_shader_;
+    std::shared_ptr<Shader> pixel_shader_;
+    std::shared_ptr<PipelineStateObject> pso_;
+    std::shared_ptr<VertexBuffer> vertex_buffer_;
+    std::shared_ptr<IndexBuffer> index_buffer_;
+    std::shared_ptr<Texture> texture_;
+    UINT texture_descriptor_index_;
+    std::shared_ptr<ConstantBuffer> constant_buffer_;
+    std::shared_ptr<DepthStencil> depth_stencil_;
+    Vertex vertices_[8];
+    UINT num_indices_;
+    std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;
 };
