@@ -3,6 +3,9 @@
 #include "d3dx12.h"
 #include <dxgi1_4.h>
 #include <vector>
+
+class DescriptorHeap;
+
 using namespace Microsoft::WRL;
 
 /// <summary>
@@ -48,13 +51,14 @@ private:
 
 public:
     //ディスクリプタヒープの取得
-    ID3D12DescriptorHeap* getDescriptorHeap() const { return descriptor_heap_.Get(); }
+    ID3D12DescriptorHeap* getDescriptorHeap() const;
 
     //リソースの取得
     ID3D12Resource* getResource() const { return resource_.Get(); }
 
 private:
     DepthStencilConf conf_;                             //深度ステンシルバッファ生成時に使用する設定
-    ComPtr<ID3D12DescriptorHeap>    descriptor_heap_;   //ディスクリプタヒープ
+    //ComPtr<ID3D12DescriptorHeap>    descriptor_heap_;   //ディスクリプタヒープ
+    std::shared_ptr<DescriptorHeap>    descriptor_heap_;   //ディスクリプタヒープ
     ComPtr<ID3D12Resource>          resource_;          //リソース
 };

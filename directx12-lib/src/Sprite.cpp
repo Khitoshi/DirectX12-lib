@@ -11,7 +11,7 @@
 #include "PSOCacheManager.h"
 #include "ShaderCacheManager.h"
 #include "RootSignatureCacheManager.h"
-
+#include "DescriptorHeapFactory.h"
 #include "TextureCacheManager.h"
 
 /// <summary>
@@ -21,6 +21,7 @@
 void Sprite::init(ID3D12Device* device, const char* texture_file_path)
 {
     initRootSignature(device);
+    initDescriptorHeap(device);
     initShader();
     initPipelineStateObject(device);
     initVertexBuffer(device);
@@ -46,18 +47,19 @@ void Sprite::draw(RenderContext* rc)
         rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depth_stencil);
     }
 
-    //ルートシグネチャを設定。
+    //ルートシグネチャを設定
     rc->setRootSignature(this->root_signature_.get());
-    //パイプラインステートを設定。
+    //パイプラインステートを設定
     rc->setPipelineState(this->pso_.get());
-    //プリミティブのトポロジーを設定。
+    //プリミティブのトポロジーを設定
     rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //頂点バッファを設定。
+    //頂点バッファを設定
     rc->setVertexBuffer(this->vertex_buffer_.get());
-    //インデックスバッファを設定。
+    //インデックスバッファを設定
     rc->setIndexBuffer(this->index_buffer_.get());
-    //テクスチャを設定。
-    rc->setTexture(this->texture_.get());
+    //ディスクリプタヒープを設定
+    rc->setDescriptorHeap(this->descriptor_heap_.get());
+    rc->setGraphicsRootDescriptorTable(0, this->descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 
     //ドローコール
     rc->drawIndexed(this->num_indices_);
@@ -80,11 +82,20 @@ void Sprite::initRootSignature(ID3D12Device* device)
     rootSignatureConf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rootSignatureConf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rootSignatureConf.num_sampler = 1;
-    rootSignatureConf.max_srv_descriptor = 1;
-    rootSignatureConf.offset_in_descriptors_from_table_start_srv = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+    rootSignatureConf.num_srv = 1;
+    //rootSignatureConf.offset_in_descriptors_from_table_start_srv = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
     rootSignatureConf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
+}
+
+/// <summary>
+/// ディスクリプタヒープの作成
+/// </summary>
+/// <param name="device"></param>
+void Sprite::initDescriptorHeap(ID3D12Device* device)
+{
+    this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
 }
 
 /// <summary>
@@ -205,6 +216,8 @@ void Sprite::initTexture(ID3D12Device* device, const char* texture_file_path)
 {
     //テクスチャの初期化
     this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
+    //ディスクリプタヒープに登録
+    this->texture_->CreateShaderResourceView(device, this->descriptor_heap_.get(), 0);
 }
 
 /// <summary>
@@ -276,5 +289,8 @@ void Sprite::setVertices(Vertex vertices[4])
 /// <param name="texture_file_path">テクスチャのファイルパス</param>
 void Sprite::setTexture(ID3D12Device* device, const char* texture_file_path)
 {
+    //テクスチャの初期化
     this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
+    //ディスクリプタヒープに登録
+    this->texture_->CreateShaderResourceView(device, this->descriptor_heap_.get(), 0);
 }

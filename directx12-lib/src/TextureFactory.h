@@ -23,4 +23,5 @@ public:
         texture->Load(device, texture_file_path);
         return texture;
     }
+
 };

@@ -1,21 +1,14 @@
 #include "Texture.h"
-
+#include "DescriptorHeap.h"
 #include <stdexcept>
+#include <assimp/texture.h>
 
 /// <summary>
 /// テクスチャ読み込み
 /// </summary>
+/// <param name="device">GPUデバイス</param>
+/// <param name="texture_file_path">テスクチャのファイルパス</param>
 void Texture::Load(ID3D12Device* device, const char* texture_file_path)
-{
-    CreateTextureResource(device, texture_file_path);
-    CreateTextureDescriptorHeap(device);
-    CreateShaderResourceView(device);
-}
-
-/// <summary>
-/// テクスチャリソースの作成
-/// </summary>
-void Texture::CreateTextureResource(ID3D12Device* device, const char* texture_file_path)
 {
     //ファイルパスをワイド文字に変換
     wchar_t w_file_Path[256];
@@ -73,29 +66,16 @@ void Texture::CreateTextureResource(ID3D12Device* device, const char* texture_fi
         static_cast<UINT>(img->slicePitch)))) {
         throw std::runtime_error("failed to write texture");
     }
-}
 
-/// <summary>
-/// ディスクリプタヒープの作成
-/// </summary>
-void Texture::CreateTextureDescriptorHeap(ID3D12Device* device)
-{
-    //ディスクリプタヒープの設定
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    desc.NodeMask = 0;
-    desc.NumDescriptors = 1;
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    //ディスクリプタヒープの作成
-    if (FAILED(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->descriptor_heap_)))) {
-        throw std::runtime_error("failed to create descriptor heap");
-    }
 }
 
 /// <summary>
 /// シェーダーリソースビューの作成
 /// </summary>
-void Texture::CreateShaderResourceView(ID3D12Device* device)
+/// <param name="device">GPUデバイス</param>
+/// <param name="descriptor_heap">リソースを格納したいディスクリプタヒープ</param>
+/// <param name="slot">リソースを格納したいポインタの位置</param>
+void Texture::CreateShaderResourceView(ID3D12Device* device, DescriptorHeap* descriptor_heap, const UINT slot)
 {
     //通常テクスチャビュー作成
     D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
@@ -103,6 +83,7 @@ void Texture::CreateShaderResourceView(ID3D12Device* device)
     srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
     srv_desc.Texture2D.MipLevels = 1;
-
-    device->CreateShaderResourceView(this->resource_.Get(), &srv_desc, this->descriptor_heap_->GetCPUDescriptorHandleForHeapStart());
+    auto handle = descriptor_heap->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+    handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * slot;
+    device->CreateShaderResourceView(this->resource_.Get(), &srv_desc, handle);
 }

@@ -7,6 +7,7 @@
 #include <map>
 
 class RootSignature;
+class DescriptorHeap;
 class PipelineStateObject;
 class VertexBuffer;
 class IndexBuffer;
@@ -29,14 +30,15 @@ class Sprite
 public:
     Sprite() :
         root_signature_(nullptr),
+        descriptor_heap_(nullptr),
         pixel_shader_(nullptr),
         vertex_shader_(nullptr),
         pso_(nullptr),
         vertex_buffer_(nullptr),
         index_buffer_(nullptr),
+        texture_(nullptr),
         num_indices_(0),
         vertices_(),
-        texture_(nullptr),
         off_screen_render_target_(nullptr)
     {};
     ~Sprite() {};
@@ -50,6 +52,8 @@ private:
 
     //ルートシグネチャの作成
     void initRootSignature(ID3D12Device* device);
+    //ディスクリプタヒープの作成
+    void initDescriptorHeap(ID3D12Device* device);
     //シェーダーのロード
     void initShader();
     //パイプラインステートオブジェクトの作成
@@ -101,14 +105,15 @@ public://取得系
 
 private:
     std::shared_ptr<RootSignature> root_signature_;                     //ルートシグニチャ
+    std::shared_ptr<DescriptorHeap> descriptor_heap_;                   //ディスクリプタヒープ
     std::shared_ptr<Shader> pixel_shader_;                              //ピクセルシェーダー
     std::shared_ptr<Shader> vertex_shader_;                             //頂点シェーダー
     std::shared_ptr<PipelineStateObject> pso_;                          //パイプラインステートオブジェクト
     std::shared_ptr<VertexBuffer> vertex_buffer_;                       //頂点バッファ
     std::shared_ptr<IndexBuffer> index_buffer_;                         //インデックスバッファ
+    std::shared_ptr<Texture> texture_;                                  //テクスチャ
     Vertex vertices_[4];										        //頂点データ
     unsigned int num_indices_;                                          //インデックス数
-    std::shared_ptr<Texture> texture_;									//テクスチャ
     std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;   //オフスクリーンレンダーターゲット
     std::shared_ptr< DepthStencil> depth_stencil_;                      //深度ステンシル
 };

@@ -23,12 +23,9 @@ public:
             hash_combine(seed, k.texture_address_modeV);
             hash_combine(seed, k.texture_address_modeW);
             hash_combine(seed, k.num_sampler);
-            hash_combine(seed, k.max_cbv_descriptor);
-            hash_combine(seed, k.max_srv_descriptor);
-            hash_combine(seed, k.max_uav_descriptor);
-            hash_combine(seed, k.offset_in_descriptors_from_table_start_cb);
-            hash_combine(seed, k.offset_in_descriptors_from_table_start_srv);
-            hash_combine(seed, k.offset_in_descriptors_from_table_start_uav);
+            hash_combine(seed, k.num_cbv);
+            hash_combine(seed, k.num_srv);
+            hash_combine(seed, k.num_uav);
             hash_combine(seed, k.root_signature_flags);
             return seed;
         }

@@ -4,11 +4,15 @@
 #include <memory>
 #include <concepts>
 #include "Scene.h"
-#include "imgui/imgui.h"
+#include <imgui/imgui.h>
 //#include "SceneDefault.h"
 #include "SceneTriangle.h"
 #include "SceneSprite.h"
+#include "Scene3dCube.h"
+#include "SceneTexture3dCube.h"
+#include "SceneModel.h"
 #include <functional>
+#include "InputManager.h"
 
 /// <summary>
 /// シーン管理クラス
@@ -16,7 +20,7 @@
 class SceneManager
 {
 private:
-    SceneManager() :currentScene(std::make_shared<SceneTriangle>()) {};
+    SceneManager() :currentScene() {};
     ~SceneManager() {};
 public:
     /// <summary>
@@ -84,6 +88,7 @@ public:
         }
 
         //シーン変更
+        InputManager::Instance().clearMouseInputListener();
         clear();
         currentScene = std::move(this->nextScene);
         currentScene->init(device);
@@ -120,6 +125,9 @@ public:
             //{"Default",     []() { return std::make_shared<SceneDefault>(); }},
             {"Triangle",    []() { return std::make_shared<SceneTriangle>(); }},
             {"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
+            {"Cube",      []() { return std::make_shared<Scene3dCube>(); }},
+            {"TextureCube",      []() { return std::make_shared<SceneTexture3dCube>(); }},
+            {"Model",      []() { return std::make_shared<SceneModel>(); }},
         };
     }
 

@@ -19,31 +19,40 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="lib\imgui\include\imgui\imgui.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\AssimpLoader.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\CameraController.cpp" />
     <ClCompile Include="src\CommandAllocator.cpp" />
     <ClCompile Include="src\CommandQueue.cpp" />
     <ClCompile Include="src\CompositeRenderTarget.cpp" />
     <ClCompile Include="src\ConstantBuffer.cpp" />
+    <ClCompile Include="src\CubeModel.cpp" />
     <ClCompile Include="src\DepthStencil.cpp" />
+    <ClCompile Include="src\DescriptorHeap.cpp" />
     <ClCompile Include="src\DeviceContext.cpp" />
     <ClCompile Include="src\DX12Resources.cpp" />
     <ClCompile Include="src\Fence.cpp" />
     <ClCompile Include="src\Framework.cpp" />
     <ClCompile Include="src\FullScreenQuad.cpp" />
     <ClCompile Include="src\GraphicsCommandList.cpp" />
-    <ClCompile Include="src\imgui\imgui.cpp" />
-    <ClCompile Include="src\imgui\ImGuiManager.cpp" />
-    <ClCompile Include="src\imgui\imgui_demo.cpp" />
-    <ClCompile Include="src\imgui\imgui_draw.cpp" />
-    <ClCompile Include="src\imgui\imgui_impl_dx12.cpp" />
-    <ClCompile Include="src\imgui\imgui_impl_win32.cpp" />
-    <ClCompile Include="src\imgui\imgui_tables.cpp" />
-    <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\ImGuiManager.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
+    <ClCompile Include="src\InputManager.cpp" />
+    <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\OffScreenRenderTarget.cpp" />
     <ClCompile Include="src\PipelineStateObject.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\RootSignature.cpp" />
+    <ClCompile Include="src\Scene3dCube.cpp" />
+    <ClCompile Include="src\SceneModel.cpp" />
+    <ClCompile Include="src\SceneTexture3dCube.cpp" />
     <ClCompile Include="src\SceneTriangle.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderCacheManager.cpp" />
@@ -51,12 +60,105 @@
     <ClCompile Include="src\SceneSprite.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\TextureCubeModel.cpp" />
     <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="lib\assimp\include\assimp\aabb.h" />
+    <ClInclude Include="lib\assimp\include\assimp\ai_assert.h" />
+    <ClInclude Include="lib\assimp\include\assimp\anim.h" />
+    <ClInclude Include="lib\assimp\include\assimp\AssertHandler.h" />
+    <ClInclude Include="lib\assimp\include\assimp\Base64.hpp" />
+    <ClInclude Include="lib\assimp\include\assimp\BaseImporter.h" />
+    <ClInclude Include="lib\assimp\include\assimp\Bitmap.h" />
+    <ClInclude Include="lib\assimp\include\assimp\BlobIOSystem.h" />
+    <ClInclude Include="lib\assimp\include\assimp\ByteSwapper.h" />
+    <ClInclude Include="lib\assimp\include\assimp\camera.h" />
+    <ClInclude Include="lib\assimp\include\assimp\cexport.h" />
+    <ClInclude Include="lib\assimp\include\assimp\cfileio.h" />
+    <ClInclude Include="lib\assimp\include\assimp\cimport.h" />
+    <ClInclude Include="lib\assimp\include\assimp\ColladaMetaData.h" />
+    <ClInclude Include="lib\assimp\include\assimp\color4.h" />
+    <ClInclude Include="lib\assimp\include\assimp\commonMetaData.h" />
+    <ClInclude Include="lib\assimp\include\assimp\config.h" />
+    <ClInclude Include="lib\assimp\include\assimp\CreateAnimMesh.h" />
+    <ClInclude Include="lib\assimp\include\assimp\DefaultIOStream.h" />
+    <ClInclude Include="lib\assimp\include\assimp\DefaultIOSystem.h" />
+    <ClInclude Include="lib\assimp\include\assimp\DefaultLogger.hpp" />
+    <ClInclude Include="lib\assimp\include\assimp\defs.h" />
+    <ClInclude Include="lib\assimp\include\assimp\Exceptional.h" />
+    <ClInclude Include="lib\assimp\include\assimp\Exporter.hpp" />
+    <ClInclude Include="lib\assimp\include\assimp\fast_atof.h" />
+    <ClInclude Include="lib\assimp\include\assimp\GenericProperty.h" />
+    <ClInclude Include="lib\assimp\include\assimp\GltfMaterial.h" />
+    <ClInclude Include="lib\assimp\include\assimp\Hash.h" />
+    <ClInclude Include="lib\assimp\include\assimp\Importer.hpp" />
+    <ClInclude Include="lib\assimp\include\assimp\importerdesc.h" />
+    <ClInclude Include="lib\assimp\include\assimp\IOStream.hpp" />
+    <ClInclude Include="lib\assimp\include\assimp\IOStreamBuffer.h" />
+    <ClInclude Include="lib\assimp\include\assimp\IOSystem.hpp" />
+    <ClInclude Include="lib\assimp\include\assimp\light.h" />
+    <ClInclude Include="lib\assimp\include\assimp\LineSplitter.h" />
+    <ClInclude Include="lib\assimp\include\assimp\LogAux.h" />
+    <ClInclude Include="lib\assimp\include\assimp\Logger.hpp" />
+    <ClInclude Include="lib\assimp\include\assimp\LogStream.hpp" />
+    <ClInclude Include="lib\assimp\include\assimp\material.h" />
+    <ClInclude Include="lib\assimp\include\assimp\MathFunctions.h" />
+    <ClInclude Include="lib\assimp\include\assimp\matrix3x3.h" />
+    <ClInclude Include="lib\assimp\include\assimp\matrix4x4.h" />
+    <ClInclude Include="lib\assimp\include\assimp\MemoryIOWrapper.h" />
+    <ClInclude Include="lib\assimp\include\assimp\mesh.h" />
+    <ClInclude Include="lib\assimp\include\assimp\metadata.h" />
+    <ClInclude Include="lib\assimp\include\assimp\NullLogger.hpp" />
+    <ClInclude Include="lib\assimp\include\assimp\ObjMaterial.h" />
+    <ClInclude Include="lib\assimp\include\assimp\ParsingUtils.h" />
+    <ClInclude Include="lib\assimp\include\assimp\pbrmaterial.h" />
+    <ClInclude Include="lib\assimp\include\assimp\postprocess.h" />
+    <ClInclude Include="lib\assimp\include\assimp\Profiler.h" />
+    <ClInclude Include="lib\assimp\include\assimp\ProgressHandler.hpp" />
+    <ClInclude Include="lib\assimp\include\assimp\qnan.h" />
+    <ClInclude Include="lib\assimp\include\assimp\quaternion.h" />
+    <ClInclude Include="lib\assimp\include\assimp\RemoveComments.h" />
+    <ClInclude Include="lib\assimp\include\assimp\scene.h" />
+    <ClInclude Include="lib\assimp\include\assimp\SceneCombiner.h" />
+    <ClInclude Include="lib\assimp\include\assimp\SGSpatialSort.h" />
+    <ClInclude Include="lib\assimp\include\assimp\SkeletonMeshBuilder.h" />
+    <ClInclude Include="lib\assimp\include\assimp\SmallVector.h" />
+    <ClInclude Include="lib\assimp\include\assimp\SmoothingGroups.h" />
+    <ClInclude Include="lib\assimp\include\assimp\SpatialSort.h" />
+    <ClInclude Include="lib\assimp\include\assimp\StandardShapes.h" />
+    <ClInclude Include="lib\assimp\include\assimp\StreamReader.h" />
+    <ClInclude Include="lib\assimp\include\assimp\StreamWriter.h" />
+    <ClInclude Include="lib\assimp\include\assimp\StringComparison.h" />
+    <ClInclude Include="lib\assimp\include\assimp\StringUtils.h" />
+    <ClInclude Include="lib\assimp\include\assimp\Subdivision.h" />
+    <ClInclude Include="lib\assimp\include\assimp\texture.h" />
+    <ClInclude Include="lib\assimp\include\assimp\TinyFormatter.h" />
+    <ClInclude Include="lib\assimp\include\assimp\types.h" />
+    <ClInclude Include="lib\assimp\include\assimp\vector2.h" />
+    <ClInclude Include="lib\assimp\include\assimp\vector3.h" />
+    <ClInclude Include="lib\assimp\include\assimp\version.h" />
+    <ClInclude Include="lib\assimp\include\assimp\Vertex.h" />
+    <ClInclude Include="lib\assimp\include\assimp\XmlParser.h" />
+    <ClInclude Include="lib\assimp\include\assimp\XMLTools.h" />
+    <ClInclude Include="lib\assimp\include\assimp\ZipArchiveIOSystem.h" />
+    <ClInclude Include="lib\imgui\include\imgui\imconfig.h" />
+    <ClInclude Include="lib\imgui\include\imgui\imfilebrowser.h" />
+    <ClInclude Include="lib\imgui\include\imgui\imgui.h" />
+    <ClInclude Include="lib\imgui\include\imgui\ImGuiManager.h" />
+    <ClInclude Include="lib\imgui\include\imgui\imgui_impl_dx12.h" />
+    <ClInclude Include="lib\imgui\include\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="lib\imgui\include\imgui\imgui_internal.h" />
+    <ClInclude Include="lib\imgui\include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="lib\imgui\include\imgui\imstb_textedit.h" />
+    <ClInclude Include="lib\imgui\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\AssimpLoader.h" />
+    <ClInclude Include="src\CameraController.h" />
+    <ClInclude Include="src\ConstantBufferFactory.h" />
+    <ClInclude Include="src\CubeModel.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\CommandAllocator.h" />
     <ClInclude Include="src\CommandAllocatorFactory.h" />
@@ -70,12 +172,15 @@
     <ClInclude Include="src\DepthStencil.h" />
     <ClInclude Include="src\DepthStencilCacheManager.h" />
     <ClInclude Include="src\DepthStencilFactory.h" />
-    <ClInclude Include="src\DescriptorHeapCache.h" />
+    <ClInclude Include="src\DescriptorCache.h" />
+    <ClInclude Include="src\DescriptorHeap.h" />
+    <ClInclude Include="src\DescriptorHeapFactory.h" />
     <ClInclude Include="src\DeviceContext.h" />
     <ClInclude Include="src\DeviceContextFactory.h" />
     <ClInclude Include="src\DX12Resources.h" />
     <ClInclude Include="src\Fence.h" />
     <ClInclude Include="src\FenceFactory.h" />
+    <ClInclude Include="src\FileUtil.h" />
     <ClInclude Include="src\Framework.h" />
     <ClInclude Include="src\FrameworkFactory.h" />
     <ClInclude Include="src\FullScreenQuad.h" />
@@ -85,6 +190,7 @@
     <ClInclude Include="src\HashCombine.h" />
     <ClInclude Include="src\Hashes.h" />
     <ClInclude Include="src\HighResolutionTimer.h" />
+    <ClInclude Include="src\ImGuiManager.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imfilebrowser.h" />
     <ClInclude Include="src\imgui\imgui.h" />
@@ -97,6 +203,11 @@
     <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\IndexBufferFactory.h" />
+    <ClInclude Include="src\InputManager.h" />
+    <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\ModelMeshCacheManager.h" />
+    <ClInclude Include="src\MouseInputListener.h" />
     <ClInclude Include="src\OffScreenRenderTargetCacheManager.h" />
     <ClInclude Include="src\OffScreenRenderTargetFactory.h" />
     <ClInclude Include="src\PipelineStateObject.h" />
@@ -112,8 +223,11 @@
     <ClInclude Include="src\RootSignatureCacheManager.h" />
     <ClInclude Include="src\RootSignatureFactory.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Scene3dCube.h" />
+    <ClInclude Include="src\SceneModel.h" />
     <ClInclude Include="src\SceneDefault.h" />
     <ClInclude Include="src\SceneManager.h" />
+    <ClInclude Include="src\SceneTexture3dCube.h" />
     <ClInclude Include="src\SceneTriangle.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderCacheManager.h" />
@@ -121,11 +235,13 @@
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\SceneSprite.h" />
     <ClInclude Include="src\SpriteModifier.h" />
+    <ClInclude Include="src\StringUtil.h" />
     <ClInclude Include="src\SwapChain.h" />
     <ClInclude Include="src\OffScreenRenderTarget.h" />
     <ClInclude Include="src\SwapChainFactory.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\TextureCacheManager.h" />
+    <ClInclude Include="src\TextureCubeModel.h" />
     <ClInclude Include="src\TextureFactory.h" />
     <ClInclude Include="src\Triangle.h" />
     <ClInclude Include="src\VertexBuffer.h" />
@@ -133,6 +249,46 @@
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="src\shaders\3dModelPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\3dModelVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\CubePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\CubeVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+    </FxCompile>
     <FxCompile Include="src\shaders\FullScreenQuadPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -213,6 +369,26 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="src\shaders\TextureCubePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\TextureCubeVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+    </FxCompile>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
@@ -231,11 +407,24 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="lib\assimp\include\assimp\.editorconfig" />
+    <None Include="lib\assimp\include\assimp\color4.inl" />
+    <None Include="lib\assimp\include\assimp\config.h.in" />
+    <None Include="lib\assimp\include\assimp\material.inl" />
+    <None Include="lib\assimp\include\assimp\matrix3x3.inl" />
+    <None Include="lib\assimp\include\assimp\matrix4x4.inl" />
+    <None Include="lib\assimp\include\assimp\quaternion.inl" />
+    <None Include="lib\assimp\include\assimp\SmoothingGroups.inl" />
+    <None Include="lib\assimp\include\assimp\vector2.inl" />
+    <None Include="lib\assimp\include\assimp\vector3.inl" />
     <None Include="packages.config" />
+    <None Include="src\shaders\3dModel.hlsli" />
+    <None Include="src\shaders\Cube.hlsli" />
     <None Include="src\shaders\FullScreenQuad.hlsli" />
     <None Include="src\shaders\MultiPathCompositing.hlsli" />
     <None Include="src\shaders\Rotation.hlsli" />
     <None Include="src\shaders\Sprite.hlsli" />
+    <None Include="src\shaders\TextureCube.hlsli" />
     <None Include="src\shaders\Triangle.hlsli" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -325,10 +514,14 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>./lib/assimp/include;./lib/imgui/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);./lib\assimp\build\lib/$(Configuration)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>assimp-vc142-mtd.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalDependencies>assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -339,12 +532,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>./lib/assimp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);./lib\assimp\build\lib/$(Configuration)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>assimp-vc142-mt.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalDependencies>libfbxsdk-mt.lib;libxml2-mt.lib;zlib-mt.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

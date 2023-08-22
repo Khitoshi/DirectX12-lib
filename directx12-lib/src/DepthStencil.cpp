@@ -1,4 +1,5 @@
 #include "DepthStencil.h"
+#include "DescriptorHeapFactory.h"
 #include <stdexcept>
 
 /// <summary>
@@ -19,16 +20,7 @@ void DepthStencil::init(ID3D12Device* device)
 void DepthStencil::createDescriptorHeap(ID3D12Device* device)
 {
     //ディスクリプタヒープの設定
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-    desc.NodeMask = 0;
-    desc.NumDescriptors = this->conf_.frame_buffer_count;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-
-    //ディスクリプタヒープの生成
-    if (FAILED(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&this->descriptor_heap_)))) {
-        throw std::runtime_error("failed to create depth stencil descriptor heap");
-    }
+    this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, this->conf_.frame_buffer_count);
 }
 
 /// <summary>
@@ -76,6 +68,12 @@ void DepthStencil::createDSV(ID3D12Device* device)
     dsv_desc.Texture2D.MipSlice = 0;
 
     //深度ステンシルビューの生成
-    CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(this->descriptor_heap_->GetCPUDescriptorHandleForHeapStart());
+    CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(this->descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
     device->CreateDepthStencilView(this->resource_.Get(), &dsv_desc, dsvHandle);
+
+}
+
+ID3D12DescriptorHeap* DepthStencil::getDescriptorHeap() const
+{
+    return this->descriptor_heap_->getDescriptorHeap();
 }

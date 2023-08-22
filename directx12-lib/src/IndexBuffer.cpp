@@ -32,12 +32,12 @@ void IndexBuffer::init(ID3D12Device* device)
 /// リソースにインデックスデータをコピーする。
 /// </summary>
 /// <param name="srcIndices">インデックスデータの配列</param>
-void IndexBuffer::copy(uint16_t* srcIndices)
+void IndexBuffer::copy(uint16_t* src_indices)
 {
     uint32_t* pData = nullptr;
     if (SUCCEEDED(this->index_buffer_->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
         for (int i = 0; i < count_; i++) {
-            pData[i] = static_cast<uint32_t>(srcIndices[i]);
+            pData[i] = static_cast<uint32_t>(src_indices[i]);
         }
     }
     this->index_buffer_->Unmap(0, nullptr);
@@ -47,13 +47,22 @@ void IndexBuffer::copy(uint16_t* srcIndices)
 /// リソースにインデックスデータをコピーする。
 /// </summary>
 /// <param name="srcIndices">インデックスデータの配列</param>
-void IndexBuffer::copy(uint32_t* srcIndices)
+void IndexBuffer::copy(uint32_t* src_indices)
 {
     uint32_t* pData = nullptr;
     if (SUCCEEDED(this->index_buffer_->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
         for (int i = 0; i < this->count_; i++) {
-            pData[i] = srcIndices[i];
+            pData[i] = src_indices[i];
         }
+    }
+    this->index_buffer_->Unmap(0, nullptr);
+}
+
+void IndexBuffer::copy(void* src_indices)
+{
+    uint8_t* pData = nullptr;
+    if (SUCCEEDED(this->index_buffer_->Map(0, nullptr, reinterpret_cast<void**>(&pData)))) {
+        memcpy(pData, src_indices, this->index_buffer_view_.SizeInBytes);
     }
     this->index_buffer_->Unmap(0, nullptr);
 }

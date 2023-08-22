@@ -2,11 +2,11 @@
 
 #include "Window.h"
 #include "CommonGraphicsConfig.h"
-
+#include "InputManager.h"
+#include "HighResolutionTimer.h"
 #include <stdexcept>
-
 #ifdef _DEBUG
-#include "imgui/imgui.h"
+#include <imgui/imgui.h>
 //imguiのウィンドウプロシージャを呼び出すための宣言
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif
@@ -32,10 +32,43 @@ LRESULT windowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 #endif // _DEBUG
 
     // ウィンドウが破棄された場合アプリケーションを終了
-    if (msg == WM_DESTROY) {
-        //OSに終了を伝える
+    switch (msg)
+    {
+    case WM_MOUSEMOVE://マウスの移動
+        POINT currentMousePos;
+        GetCursorPos(&currentMousePos);
+        ScreenToClient(hwnd, &currentMousePos);
+        InputManager::Instance().OnMouseMove(currentMousePos.x, currentMousePos.y);
+        break;
+    case WM_LBUTTONDOWN://マウスの左ボタンが押された
+        InputManager::Instance().onMouseLeftButtonDown();
+        break;
+    case WM_LBUTTONUP://マウスの左ボタンが離された
+        InputManager::Instance().onMouseLeftButtonUp();
+        break;
+    case WM_RBUTTONDOWN://マウスの右ボタンが押された
+        InputManager::Instance().onMouseRightButtonDown();
+        break;
+    case WM_RBUTTONUP://マウスの右ボタンが離された
+        InputManager::Instance().onMouseLeftButtonUp();
+        break;
+
+    case WM_ENTERSIZEMOVE://ウィンドウのサイズ変更開始
+        HighResolutionTimer::getInstance().Stop();
+        break;
+    case WM_EXITSIZEMOVE://ウィンドウのサイズ変更終了
+        HighResolutionTimer::getInstance().Start();
+        break;
+    case WM_KEYDOWN:
+        break;
+    case WM_DESTROY:   //OSに終了を伝える
         PostQuitMessage(0);
         return 0;
+    case WM_CLOSE:     //OSに終了を伝える
+        PostQuitMessage(0);
+        return 0;
+    default:
+        break;
     }
 
     //規定の処理を行う
@@ -75,7 +108,6 @@ bool Window::processMessages() {
 /// </summary>
 void Window::init() {
     create();
-
     show();
 }
 

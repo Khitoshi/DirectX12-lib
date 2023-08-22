@@ -6,11 +6,13 @@
 class VertexBuffer;
 class IndexBuffer;
 class RootSignature;
+class DescriptorHeap;
 class PipelineStateObject;
 class Shader;
 class RenderContext;
 class Texture;
 class CompositeRenderTarget;
+
 
 using namespace Microsoft::WRL;
 
@@ -38,7 +40,7 @@ private:
         vertex_shader_(),
         texture_(),
         num_indices_(0),
-        srv_heap_()
+        cbv_srv_descriptor_heap_()
     {};
 
 public:
@@ -71,5 +73,5 @@ private:
     std::shared_ptr<Shader> vertex_shader_;			//バーテックスシェーダー
     std::shared_ptr<Texture> texture_;				//テクスチャ
     UINT num_indices_;								//インデックスの数
-    ComPtr<ID3D12DescriptorHeap> srv_heap_;         //シェーダーリソースビューディスクリプタヒープ
+    std::shared_ptr<DescriptorHeap> cbv_srv_descriptor_heap_;  //シェーダーリソースビューディスクリプタヒープ
 };

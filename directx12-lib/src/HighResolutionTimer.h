@@ -4,7 +4,7 @@
 
 class HighResolutionTimer
 {
-public:
+private:
     HighResolutionTimer() :
         seconds_per_count(0.0),
         delta_time(-1.0),
@@ -21,6 +21,12 @@ public:
         QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&this_time));
         base_time = this_time;
         last_time = this_time;
+    }
+public:
+
+    static HighResolutionTimer& getInstance() {
+        static HighResolutionTimer instance;
+        return instance;
     }
 
     // Returns the total time elapsed since Reset() was called, NOT counting any

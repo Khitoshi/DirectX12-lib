@@ -1,7 +1,8 @@
 #include "CompositeRenderTarget.h"
-#include "DescriptorHeapCache.h"
+#include "DescriptorCache.h"
 #include "OffScreenRenderTargetCacheManager.h"
 #include "RootSignatureCacheManager.h"
+#include "DescriptorHeapFactory.h"
 #include "PSOCacheManager.h"
 #include "ShaderCacheManager.h"
 #include "CommonGraphicsConfig.h"
@@ -38,7 +39,7 @@ void CompositeRenderTarget::beginRender(RenderContext* rc, D3D12_CPU_DESCRIPTOR_
     //リソースの状態を遷移
     rc->transitionOffScreenRenderTargetBegin(this->resource_.Get());
     //描画開始処理
-    rc->simpleStart(this->rtv_heap_->GetCPUDescriptorHandleForHeapStart(), depthStencil_view_handle);
+    rc->simpleStart(this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(), depthStencil_view_handle);
 }
 
 /// <summary>
@@ -62,17 +63,21 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
     for (auto& rt : OffScreenRenderTargetCacheManager::getInstance().getRenderTargetList())
     {
         //ディスクリプタの生成
-        DescriptorHeapCache::DescriptorHeapCacheConf dhcConf = {};
+        DescriptorCache::DescriptorCacheConf dhcConf = {};
         dhcConf.resource = rt->getResource();
         dhcConf.slot = slot;
-        this->descriptor_heap_cache_->getOrCreate(device, dhcConf, this->srv_heap_.Get(), srv_desc_);
+        this->descriptor_cache_->getOrCreate(device, dhcConf, this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap(), srv_desc_);
         slot++;
     }
     //ディスクリプタヒープを設定
-    rc->setDescriptorHeap(this->srv_heap_.Get());
+    rc->setDescriptorHeap(this->cbv_srv_uav_descriptor_heap_.get());
+
     //GPUハンドルをcommandlistに設定
-    D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle = this->srv_heap_->GetGPUDescriptorHandleForHeapStart();
+    D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle = this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
     rc->setGraphicsRootDescriptorTable(0, gpu_handle);
+
+    gpu_handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 1;
+    rc->setGraphicsRootDescriptorTable(1, gpu_handle);
 
     //ドローコール
     rc->drawInstanced(4);
@@ -119,14 +124,7 @@ void CompositeRenderTarget::createResource(ID3D12Device* device)
 /// <param name="device">GPUデバイス</param>
 void CompositeRenderTarget::createSRVHeap(ID3D12Device* device)
 {
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc = this->conf_.descriptor_heap_desc;
-    desc.NumDescriptors = 2;
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    if (FAILED(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(this->srv_heap_.ReleaseAndGetAddressOf())))) {
-        throw std::runtime_error("failed to create offscreen render target descriptor heap");
-    }
+    this->cbv_srv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2);
 }
 
 /// <summary>
@@ -149,12 +147,7 @@ void CompositeRenderTarget::createSRVDesc(ID3D12Device* device)
 /// <param name="device">GPUデバイス</param>
 void CompositeRenderTarget::createRTVHeap(ID3D12Device* device)
 {
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc = this->conf_.descriptor_heap_desc;
-    desc.NumDescriptors = 1;
-    if (FAILED(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(this->rtv_heap_.ReleaseAndGetAddressOf())))) {
-        throw std::runtime_error("failed to create offscreen render target descriptor heap");
-    }
+    this->rtv_descriptor_heap_ = DescriptorHeapFactory::create(device, this->conf_.descriptor_heap_desc.Type, 1);
 }
 
 /// <summary>
@@ -166,7 +159,7 @@ void CompositeRenderTarget::createRTV(ID3D12Device* device)
     D3D12_RENDER_TARGET_VIEW_DESC desc = {};
     desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
     desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    device->CreateRenderTargetView(this->resource_.Get(), &desc, this->rtv_heap_->GetCPUDescriptorHandleForHeapStart());
+    device->CreateRenderTargetView(this->resource_.Get(), &desc, this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 }
 
 /// <summary>
@@ -181,8 +174,7 @@ void CompositeRenderTarget::initRootSignature(ID3D12Device* device)
     rs_conf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rs_conf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     rs_conf.num_sampler = 1;
-    rs_conf.max_srv_descriptor = 2;
-    rs_conf.offset_in_descriptors_from_table_start_srv = 0;
+    rs_conf.num_srv = 2;
     rs_conf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
     this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rs_conf);
 }
@@ -193,6 +185,8 @@ void CompositeRenderTarget::initRootSignature(ID3D12Device* device)
 /// <param name="device">GPUデバイス</param>
 void CompositeRenderTarget::initShader(ID3D12Device* device)
 {
+    //TODO :動的にシェーダーを作成するようにする
+    //作成したシェーダーはキャッシュする
     {//頂点シェーダーロード
         Shader::ShaderConf conf = {};
         conf.file_path = "./src/shaders/MultiPathCompositingVS.hlsl";
@@ -284,5 +278,10 @@ void CompositeRenderTarget::initVertexBuffer(ID3D12Device* device)
 /// </summary>
 void CompositeRenderTarget::initDescriptorHeapCache()
 {
-    this->descriptor_heap_cache_ = std::make_unique<DescriptorHeapCache>();
+    this->descriptor_cache_ = std::make_unique<DescriptorCache>();
+}
+
+ID3D12DescriptorHeap* CompositeRenderTarget::getRTVHeap() const
+{
+    return rtv_descriptor_heap_->getDescriptorHeap();
 }

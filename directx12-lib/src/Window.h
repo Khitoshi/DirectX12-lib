@@ -36,11 +36,9 @@ public:
     void init();
     //終了
     void deinit();
-
 public:
     //ウィンドウハンドルの取得
     HWND getHWND() const { return hwnd_; };
-
 private:
     //ウィンドウ 生成
     void create();

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "TextureFactory.h"
+class DescriptorHeap;
+
+struct aiMaterial;
 
 /// <summary>
 /// テクスチャのキャッシュを管理するクラス
@@ -34,11 +37,13 @@ public:
         // すでにあるならそれを返す
         auto it = this->texture_caches_.find(path);
         if (it != this->texture_caches_.end()) {
+            //it->second->CreateShaderResourceView(device, descriptor_heap, slot);
             return it->second;
         }
 
         // ないなら作って返す
         auto texture = TextureFactory::create(device, path);
+        //texture->CreateShaderResourceView(device, descriptor_heap, slot);
         this->texture_caches_[path] = texture;
         return texture;
     }

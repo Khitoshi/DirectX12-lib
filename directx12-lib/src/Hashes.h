@@ -114,4 +114,27 @@ namespace std {
             return seed;
         }
     };
+
+    template<>
+    struct hash<DirectX::XMFLOAT3>
+    {
+        std::size_t operator()(const DirectX::XMFLOAT3& obj) const {
+            std::size_t seed = 0;
+            hash_combine(seed, obj.x);
+            hash_combine(seed, obj.y);
+            hash_combine(seed, obj.z);
+            return seed;
+        };
+    };
+
+    template<>
+    struct hash<DirectX::XMFLOAT2>
+    {
+        std::size_t operator()(const DirectX::XMFLOAT2& obj) const {
+            std::size_t seed = 0;
+            hash_combine(seed, obj.x);
+            hash_combine(seed, obj.y);
+            return seed;
+        };
+    };
 }

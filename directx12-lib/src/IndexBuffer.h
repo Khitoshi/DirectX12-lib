@@ -40,7 +40,7 @@ public:
     //リソースにコピー
     void copy(uint16_t* src_indices);
     void copy(uint32_t* src_indices);
-
+    void copy(void* src_indices);
 public://取得系
     //インデックスバッファビューの取得
     const D3D12_INDEX_BUFFER_VIEW& getIndexBufferView() const { return this->index_buffer_view_; }

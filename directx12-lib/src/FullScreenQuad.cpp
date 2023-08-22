@@ -5,6 +5,7 @@
 #include "RenderContext.h"
 #include "ShaderCacheManager.h"
 #include "RootSignatureCacheManager.h"
+#include "DescriptorHeapFactory.h"
 #include "PSOCacheManager.h"
 #include "CompositeRenderTarget.h"
 
@@ -40,9 +41,9 @@ void FullScreenQuad::draw(RenderContext* rc, ID3D12Device* device, CompositeRend
     //ディスクリプタ作成
     this->createSRV(device, crt);
     //SRVヒープを設定
-    rc->setDescriptorHeap(this->srv_heap_.Get());
+    rc->setDescriptorHeap(this->cbv_srv_descriptor_heap_.get());
     //GPUハンドルをcommandlistに設定
-    D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = this->srv_heap_->GetGPUDescriptorHandleForHeapStart();
+    D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = this->cbv_srv_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
     rc->setGraphicsRootDescriptorTable(0, gpuHandle);
 
     //ドローコール
@@ -106,8 +107,7 @@ void FullScreenQuad::createRootSignature(ID3D12Device* device)
     conf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     conf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     conf.num_sampler = 1;
-    conf.max_srv_descriptor = 1;
-    conf.offset_in_descriptors_from_table_start_srv = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+    conf.num_srv = 1;
 
     this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, conf);
 }
@@ -150,16 +150,13 @@ void FullScreenQuad::createPipelineState(ID3D12Device* device)
     this->pso_ = PSOCacheManager::getInstance().getOrCreate(device, conf);
 }
 
+/// <summary>
+/// ディスクリプタヒープの作成
+/// </summary>
+/// <param name="device"></param>
 void FullScreenQuad::createSRVHeap(ID3D12Device* device)
 {
-    //SRV用のディスクリプタヒープを作成
-    D3D12_DESCRIPTOR_HEAP_DESC srv_heap_desc = {};
-    srv_heap_desc.NumDescriptors = 1;
-    srv_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    srv_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    if (FAILED(device->CreateDescriptorHeap(&srv_heap_desc, IID_PPV_ARGS(&this->srv_heap_)))) {
-        throw new std::exception("failed to create SRV heap");
-    }
+    this->cbv_srv_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
 }
 
 void FullScreenQuad::createSRV(ID3D12Device* device, CompositeRenderTarget* osrt)
@@ -171,5 +168,5 @@ void FullScreenQuad::createSRV(ID3D12Device* device, CompositeRenderTarget* osrt
     srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srv_desc.Texture2D.MipLevels = 1;
 
-    device->CreateShaderResourceView(osrt->getResource(), &srv_desc, this->srv_heap_->GetCPUDescriptorHandleForHeapStart());
+    device->CreateShaderResourceView(osrt->getResource(), &srv_desc, this->cbv_srv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 }

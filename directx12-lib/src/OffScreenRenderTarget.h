@@ -3,6 +3,7 @@
 
 class RenderContext;
 class DepthStencil;
+class DescriptorHeap;
 
 using namespace Microsoft::WRL;
 
@@ -42,8 +43,8 @@ private:
     OffScreenRenderTarget(OffScreenRenderTargetConf c) :
         conf_(c),
         resource_(),
-        srv_heap_(),
-        rtv_heap_(),
+        cbv_srv_uav_descriptor_heap_(),
+        rtv_descriptor_heap_(),
         depth_stencil_view_handle_(),
         viewport_()
     {};
@@ -80,16 +81,17 @@ public://取得系
     //リソースの取得
     ID3D12Resource* getResource()       const { return this->resource_.Get(); }
     //シェーダーリソースビューディスクリプタヒープの取得
-    ID3D12DescriptorHeap* getSRVHeap()  const { return this->srv_heap_.Get(); }
+    ID3D12DescriptorHeap* getSRVHeap()  const;
     //レンダーターゲットビューディスクリプタヒープの取得
-    ID3D12DescriptorHeap* getRTVHeap()  const { return this->rtv_heap_.Get(); }
+    ID3D12DescriptorHeap* getRTVHeap()  const;
 
 private:
     OffScreenRenderTargetConf conf_;			            //設定
     ComPtr<ID3D12Resource> resource_;		                //リソース
-    ComPtr<ID3D12DescriptorHeap> srv_heap_;                 //シェーダーリソースビューディスクリプタヒープ
-    ComPtr<ID3D12DescriptorHeap> rtv_heap_;                 //レンダーターゲットビューディスクリプタヒープ
 
-    D3D12_CPU_DESCRIPTOR_HANDLE depth_stencil_view_handle_; //深度ステンシルビューハンドル
-    D3D12_VIEWPORT viewport_;                               //ビューポート
+    std::shared_ptr<DescriptorHeap> cbv_srv_uav_descriptor_heap_;   //シェーダーリソースビューディスクリプタヒープ
+    std::shared_ptr<DescriptorHeap> rtv_descriptor_heap_;           //レンダーターゲットビューディスクリプタヒープ
+
+    D3D12_CPU_DESCRIPTOR_HANDLE depth_stencil_view_handle_;         //深度ステンシルビューハンドル
+    D3D12_VIEWPORT viewport_;                                       //ビューポート
 };

@@ -3,6 +3,9 @@
 #include "d3dx12.h"
 #include <dxgi1_4.h>
 #include <vector>
+
+class DescriptorHeap;
+
 using namespace Microsoft::WRL;
 
 /// <summary>
@@ -43,7 +46,7 @@ private:
 
 public:
     //ディスクリプタヒープの取得
-    ID3D12DescriptorHeap* getDescriptorHeap() const { return this->descriptor_heap_.Get(); }
+    ID3D12DescriptorHeap* getDescriptorHeap() const;
     //ディスクリプタヒープのサイズの取得
     int getDescriptorHeapSize() const { return this->descriptor_heap_size_; }
     //リソースの取得
@@ -52,7 +55,9 @@ public:
 private:
     RenderTargetConf conf_;                         //設定
 
-    ComPtr<ID3D12DescriptorHeap> descriptor_heap_;  //ディスクリプタヒープ
+    //ComPtr<ID3D12DescriptorHeap> descriptor_heap_;  //ディスクリプタヒープ
+    std::shared_ptr<DescriptorHeap> descriptor_heap_;  //ディスクリプタヒープ
+
     int descriptor_heap_size_;                      //ディスクリプタヒープのサイズ
     std::vector<ComPtr<ID3D12Resource>> resource_;  //リソース
 };
