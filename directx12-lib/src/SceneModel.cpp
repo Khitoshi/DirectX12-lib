@@ -39,6 +39,9 @@ void SceneModel::update()
         is_change_model_ = false;
     }
 
+    //ƒJƒƒ‰‚ÌXV
+    //this->camera_->update();
+
     Model::ModelConf conf = {};
     DirectX::XMStoreFloat4x4(&conf.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f)));
     DirectX::XMStoreFloat4x4(&conf.view, DirectX::XMMatrixTranspose(this->camera_->getViewMatrix()));

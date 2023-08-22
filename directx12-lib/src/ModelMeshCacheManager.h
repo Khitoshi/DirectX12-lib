@@ -13,6 +13,12 @@ private:
     struct MeshConf
     {
         std::string model_file_path = "";
+
+        /*
+        * UV座標の設定
+        * inverse_u = falseの場合:左
+        * inverse_v = falseの場合:上
+        */
         bool inverse_u = false;
         bool inverse_v = false;
 
@@ -39,13 +45,11 @@ private:
 
 public:
 
-    //シングルトンなインスタンスを取得
     static ModelMeshCacheManager& getInstance()
     {
         static ModelMeshCacheManager instance;
         return instance;
     }
-
 
     std::vector<Mesh> getMeshes(const std::string model_file_path, bool inverse_u = false, bool inverse_v = false)
     {
