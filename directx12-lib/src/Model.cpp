@@ -1,6 +1,4 @@
 #include "Model.h"
-//#include "FBXModelData.h"
-//#include "FBXModelDataFactory.h"
 #include "Mesh.h"
 #include "ModelMeshCacheManager.h"
 #include "AssimpLoader.h"
@@ -54,44 +52,27 @@ void Model::draw(RenderContext* rc)
 
     for (size_t i = 0; i < this->meshes_.size(); i++)
     {
-        //ルートシグネチャを設定。
         rc->setRootSignature(this->root_signature_.get());
-        //パイプラインステートを設定。
         rc->setPipelineState(this->pso_.get());
-        //プリミティブのトポロジーを設定。
         rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        //頂点バッファを設定。
         rc->setVertexBuffer(this->vertex_buffers_[i].get());
-        //インデックスバッファを設定
         rc->setIndexBuffer(this->index_buffers_[i].get());
 
-        //ディスクリプタヒープを設定
         rc->setDescriptorHeap(this->srv_cbv_uav_descriptor_heap_.get());
-
         auto handle = this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
-        rc->setGraphicsRootDescriptorTable(0, handle);
-
+        rc->setGraphicsRootDescriptorTable(0, handle);//model行列等
         handle.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (1 + i);
-        rc->setGraphicsRootDescriptorTable(1, handle);
+        rc->setGraphicsRootDescriptorTable(1, handle);//メッシュの色
+        rc->setGraphicsRootDescriptorTable(2, this->meshes_[i].material.handle_gpu);//テクスチャ
 
-        //handle = this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
-        //handle.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (2 + i);
-        rc->setGraphicsRootDescriptorTable(2, this->meshes_[i].material.handle_gPU);
-        //rc->setGraphicsRootDescriptorTable(2, handle);
 
-        //ドローコール
         rc->drawIndexed(this->num_indices_[i]);
     }
 
-    //オフスクリーンレンダーターゲットの書き込みを終了する。
     this->off_screen_render_target_->endRender(rc);
     OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(off_screen_render_target_.get());
 }
 
-/// <summary>
-/// ルートシグネチャの初期化
-/// </summary>
-/// <param name="device"></param>
 void Model::initRootSignature(ID3D12Device* device)
 {
     RootSignature::RootSignatureConf rootSignatureConf = {};
@@ -108,33 +89,18 @@ void Model::initRootSignature(ID3D12Device* device)
     this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
 }
 
-/// <summary>
-/// ディスクリプタヒープの初期化
-/// </summary>
-/// <param name="device"></param>
 void Model::initDescriptorHeap(ID3D12Device* device)
 {
     this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, num_descriptors_);
 }
 
-/// <summary>
-/// モデルの読み込み
-/// </summary>
-/// <param name="device">GPUデバイス</param>
-/// <param name="model_file_path">モデルのファイルパス</param>
 void Model::loadModel(ID3D12Device* device, const char* model_file_path)
 {
-
-    //model_data_ = FBXModelDataFactory::create(device, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
-    //meshes_ = AssimpLoader::Load(model_file_path, false, true);
     this->meshes_ = ModelMeshCacheManager::getInstance().getMeshes(model_file_path, false, true);
-    num_descriptors_ = 1 + (meshes_.size() * 2);
+    num_descriptors_ = static_cast<UINT>(1 + (meshes_.size() * 2));
 
 }
 
-/// <summary>
-/// シェーダーの読み込み
-/// </summary>
 void Model::loadShader()
 {
     {
@@ -153,10 +119,6 @@ void Model::loadShader()
     }
 }
 
-/// <summary>
-/// パイプラインステートオブジェクトの初期化
-/// </summary>
-/// <param name="device"></param>
 void Model::initPipelineStateObject(ID3D12Device* device)
 {
     D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
@@ -225,10 +187,6 @@ void Model::initPipelineStateObject(ID3D12Device* device)
     this->pso_ = PSOCacheManager::getInstance().getOrCreate(device, conf);
 }
 
-/// <summary>
-/// 頂点バッファの初期化
-/// </summary>
-/// <param name="device"></param>
 void Model::initVertexBuffer(ID3D12Device* device)
 {
     //初期化
@@ -239,7 +197,7 @@ void Model::initVertexBuffer(ID3D12Device* device)
         auto& vertices = this->meshes_[i].vertices;
 
         VertexBuffer::VertexBufferConf conf = {};
-        conf.size = sizeof(Vertex) * vertices.size();
+        conf.size = static_cast<UINT>(sizeof(Vertex) * vertices.size());
         conf.stride = sizeof(Vertex);
         auto vb = VertexBufferFactory::create(conf, device);
         vb->copy(vertices.data());
@@ -248,10 +206,6 @@ void Model::initVertexBuffer(ID3D12Device* device)
     }
 }
 
-/// <summary>
-/// インデックスバッファの初期化
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void Model::initIndexBuffer(ID3D12Device* device)
 {
     const size_t mesh_size = this->meshes_.size();
@@ -276,10 +230,6 @@ void Model::initIndexBuffer(ID3D12Device* device)
     }
 }
 
-/// <summary>
-/// 定数バッファの初期化
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void Model::initConstantBuffer(ID3D12Device* device)
 {
     {
@@ -297,22 +247,21 @@ void Model::initConstantBuffer(ID3D12Device* device)
         struct MaterialConf
         {
             DirectX::XMFLOAT4 diffuse_color; // 拡散色
-            // 他のマテリアルプロパティもここに追加できます
+
         };
 
         mesh_color_constant_buffers_.resize(this->meshes_.size());
         for (size_t i = 0; i < this->meshes_.size(); i++) {
             MaterialConf materialConf = {};
-            materialConf.diffuse_color = this->meshes_[i].material.diffuse_color; // ここでXMFLOAT4に適切な値を設定する
+            materialConf.diffuse_color = this->meshes_[i].material.diffuse_color;
 
             ConstantBuffer::ConstantBufferConf conf = {};
             conf.size = sizeof(MaterialConf);
             conf.descriptor_heap = this->srv_cbv_uav_descriptor_heap_.get();
-            conf.slot = 1 + i;
+            conf.slot = static_cast<UINT>(1 + i);
             mesh_color_constant_buffers_[i] = ConstantBufferFactory::create(device, conf);
             mesh_color_constant_buffers_[i]->copy(&materialConf);
         }
-
     }
 
 }
@@ -321,18 +270,13 @@ void Model::initTexture(ID3D12Device* device)
 {
     for (size_t i = 0; i < meshes_.size(); i++) {
         auto tex = TextureCacheManager::getInstance().getOrCreate(device, meshes_[i].material.diffuse_map_name.c_str());
-        tex->CreateShaderResourceView(device, this->srv_cbv_uav_descriptor_heap_.get(), this->meshes_.size() + 1 + i);
+        tex->CreateShaderResourceView(device, this->srv_cbv_uav_descriptor_heap_.get(), static_cast<UINT>(meshes_.size() + 1 + i));
         auto handle = this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
         handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (this->meshes_.size() + 1 + i);
-        this->meshes_[i].material.handle_gPU = handle;
+        this->meshes_[i].material.handle_gpu = handle;
     }
 }
 
-
-/// <summary>
-/// オフスクリーンレンダーターゲットの初期化
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void Model::initOffScreenRenderTarget(ID3D12Device* device)
 {
     OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
@@ -365,10 +309,6 @@ void Model::initOffScreenRenderTarget(ID3D12Device* device)
     this->off_screen_render_target_ = OffScreenRenderTargetFactory::create(osrtConf, device);
 }
 
-/// <summary>
-/// 深度ステンシルの初期化
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void Model::initDepthStencil(ID3D12Device* device)
 {
     DepthStencil::DepthStencilConf ds_conf = {};
@@ -378,14 +318,7 @@ void Model::initDepthStencil(ID3D12Device* device)
     this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, device);
 }
 
-/// <summary>
-/// モデルの設定
-/// </summary>
-/// <param name="model_file_path">モデルのファイルパス</param>
 void Model::setModel(const char* model_file_path)
 {
-    //this->model_data_ = FBXModelDataFactory::create(this->device_, this->srv_cbv_uav_descriptor_heap_.get(), model_file_path);
-    //this->initIndexBuffer(this->device_);
-    //this->initVertexBuffer(device_);
     this->init(this->device_, model_file_path);
 }

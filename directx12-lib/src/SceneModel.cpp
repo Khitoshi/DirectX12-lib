@@ -10,12 +10,8 @@
 #include <string>
 
 
-std::string SceneModel::file_path_("asset/models/box.fbx");
+std::string SceneModel::file_path_("asset/models/cube.004.fbx");
 
-/// <summary>
-/// 初期化処理
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void SceneModel::init(ID3D12Device* device)
 {
     this->camera_ = std::make_shared<Camera>();
@@ -31,16 +27,10 @@ void SceneModel::init(ID3D12Device* device)
     model->init(device, file_path_.c_str());
 }
 
-/// <summary>
-/// 終了化処理
-/// </summary>
 void SceneModel::finalize()
 {
 }
 
-/// <summary>
-/// 更新処理
-/// </summary>
 void SceneModel::update()
 {
     //モデルの切り替え
@@ -57,30 +47,21 @@ void SceneModel::update()
     this->model->update();
 }
 
-/// <summary>
-/// 描画処理
-/// </summary>
-/// <param name="rc"></param>
 void SceneModel::render(RenderContext* rc)
 {
     model->draw(rc);
 }
 
-/// <summary>
-/// デバッグ用のメニューを表示する
-/// </summary>
 void SceneModel::updateImguiMenu()
 {
     ImGui::Begin("3dModel");
 
-    //テクスチャの動的選択
+    //モデルの動的選択
     bool static isFileBrowser = true;
     static ImGui::FileBrowser fileDialog;
     if (isFileBrowser) {
         fileDialog.SetTitle("file brower");
-        //HAX:ここでobjを追加するとなぜかクラッシュする確率が高くなる
-        fileDialog.SetTypeFilters({ ".fbx" });
-        //fileDialog.SetTypeFilters({ ".fbx",".obj" });
+        fileDialog.SetTypeFilters({ ".fbx",".obj" });
         if (!fileDialog.SetPwd("./asset/models")) {
             throw std::runtime_error("fileDialog.SetPwd");
         }

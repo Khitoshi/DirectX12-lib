@@ -12,9 +12,9 @@ class ModelMeshCacheManager
 private:
     struct MeshConf
     {
-        std::string model_file_path;
-        bool inverse_u;
-        bool inverse_v;
+        std::string model_file_path = "";
+        bool inverse_u = false;
+        bool inverse_v = false;
 
         bool operator==(const MeshConf& rhs) const
         {

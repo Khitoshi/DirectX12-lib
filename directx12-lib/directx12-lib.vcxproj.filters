@@ -52,6 +52,12 @@
     <Filter Include="lib">
       <UniqueIdentifier>{76b5136d-8877-4d40-bc09-27e6fdb3633d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lib\imgui">
+      <UniqueIdentifier>{6705f21f-6819-43c8-8c58-816b08cfdf3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\assimp">
+      <UniqueIdentifier>{cf73d989-dbed-47bf-b029-57252af25bea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Window.cpp">
@@ -172,25 +178,25 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lib\imgui\include\imgui\imgui.cpp">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClCompile>
     <ClCompile Include="lib\imgui\include\imgui\imgui_demo.cpp">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClCompile>
     <ClCompile Include="lib\imgui\include\imgui\imgui_draw.cpp">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClCompile>
     <ClCompile Include="lib\imgui\include\imgui\imgui_impl_dx12.cpp">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClCompile>
     <ClCompile Include="lib\imgui\include\imgui\imgui_impl_win32.cpp">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClCompile>
     <ClCompile Include="lib\imgui\include\imgui\imgui_tables.cpp">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClCompile>
     <ClCompile Include="lib\imgui\include\imgui\imgui_widgets.cpp">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -471,34 +477,268 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lib\imgui\include\imgui\imconfig.h">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClInclude>
     <ClInclude Include="lib\imgui\include\imgui\imfilebrowser.h">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClInclude>
     <ClInclude Include="lib\imgui\include\imgui\imgui.h">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClInclude>
     <ClInclude Include="lib\imgui\include\imgui\imgui_impl_dx12.h">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClInclude>
     <ClInclude Include="lib\imgui\include\imgui\imgui_impl_win32.h">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClInclude>
     <ClInclude Include="lib\imgui\include\imgui\imgui_internal.h">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClInclude>
     <ClInclude Include="lib\imgui\include\imgui\ImGuiManager.h">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClInclude>
     <ClInclude Include="lib\imgui\include\imgui\imstb_rectpack.h">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClInclude>
     <ClInclude Include="lib\imgui\include\imgui\imstb_textedit.h">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
     </ClInclude>
     <ClInclude Include="lib\imgui\include\imgui\imstb_truetype.h">
-      <Filter>lib</Filter>
+      <Filter>lib\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\aabb.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\ai_assert.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\anim.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\AssertHandler.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\Base64.hpp">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\BaseImporter.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\Bitmap.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\BlobIOSystem.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\ByteSwapper.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\camera.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\cexport.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\cfileio.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\cimport.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\ColladaMetaData.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\color4.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\commonMetaData.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\config.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\CreateAnimMesh.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\DefaultIOStream.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\DefaultIOSystem.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\DefaultLogger.hpp">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\defs.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\Exceptional.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\Exporter.hpp">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\fast_atof.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\GenericProperty.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\GltfMaterial.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\Hash.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\Importer.hpp">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\importerdesc.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\IOStream.hpp">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\IOStreamBuffer.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\IOSystem.hpp">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\light.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\LineSplitter.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\LogAux.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\Logger.hpp">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\LogStream.hpp">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\material.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\MathFunctions.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\matrix3x3.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\matrix4x4.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\MemoryIOWrapper.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\mesh.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\metadata.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\NullLogger.hpp">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\ObjMaterial.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\ParsingUtils.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\pbrmaterial.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\postprocess.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\Profiler.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\ProgressHandler.hpp">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\qnan.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\quaternion.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\RemoveComments.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\scene.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\SceneCombiner.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\SGSpatialSort.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\SkeletonMeshBuilder.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\SmallVector.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\SmoothingGroups.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\SpatialSort.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\StandardShapes.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\StreamReader.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\StreamWriter.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\StringComparison.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\StringUtils.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\Subdivision.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\texture.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\TinyFormatter.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\types.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\vector2.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\vector3.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\version.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\Vertex.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\XmlParser.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\XMLTools.h">
+      <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\assimp\include\assimp\ZipArchiveIOSystem.h">
+      <Filter>lib\assimp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -576,6 +816,36 @@
     </None>
     <None Include="src\shaders\3dModel.hlsli">
       <Filter>Shaders\3dModel</Filter>
+    </None>
+    <None Include="lib\assimp\include\assimp\.editorconfig">
+      <Filter>lib\assimp</Filter>
+    </None>
+    <None Include="lib\assimp\include\assimp\color4.inl">
+      <Filter>lib\assimp</Filter>
+    </None>
+    <None Include="lib\assimp\include\assimp\config.h.in">
+      <Filter>lib\assimp</Filter>
+    </None>
+    <None Include="lib\assimp\include\assimp\material.inl">
+      <Filter>lib\assimp</Filter>
+    </None>
+    <None Include="lib\assimp\include\assimp\matrix3x3.inl">
+      <Filter>lib\assimp</Filter>
+    </None>
+    <None Include="lib\assimp\include\assimp\matrix4x4.inl">
+      <Filter>lib\assimp</Filter>
+    </None>
+    <None Include="lib\assimp\include\assimp\quaternion.inl">
+      <Filter>lib\assimp</Filter>
+    </None>
+    <None Include="lib\assimp\include\assimp\SmoothingGroups.inl">
+      <Filter>lib\assimp</Filter>
+    </None>
+    <None Include="lib\assimp\include\assimp\vector2.inl">
+      <Filter>lib\assimp</Filter>
+    </None>
+    <None Include="lib\assimp\include\assimp\vector3.inl">
+      <Filter>lib\assimp</Filter>
     </None>
   </ItemGroup>
 </Project>

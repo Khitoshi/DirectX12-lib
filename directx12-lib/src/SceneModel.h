@@ -7,7 +7,7 @@ class Model;
 class Camera;
 class CameraController;
 
-// FBXモデルを読み込んで表示するscene
+// assimpに対応するモデルを読み込んで表示するscene
 class SceneModel final : public Scene
 {
 public:

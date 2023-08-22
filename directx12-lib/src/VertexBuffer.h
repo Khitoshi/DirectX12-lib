@@ -14,8 +14,8 @@ public:
     /// 頂点バッファ生成時に使用する設定
     /// </summary>
     struct VertexBufferConf {
-        int size;               //頂点バッファのサイズ
-        int stride;             //1頂点のサイズ
+        UINT size;               //頂点バッファのサイズ
+        UINT stride;             //1頂点のサイズ
     };
 
 private:

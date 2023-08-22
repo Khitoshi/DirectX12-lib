@@ -20,7 +20,7 @@
 class SceneManager
 {
 private:
-    SceneManager() :currentScene(std::make_shared<SceneTriangle>()) {};
+    SceneManager() :currentScene() {};
     ~SceneManager() {};
 public:
     /// <summary>

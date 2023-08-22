@@ -10,6 +10,7 @@
 #include <DirectXTex.h>
 
 void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes, const aiMatrix4x4& parentTransform, const char* model_file_path, bool inverse_u, bool inverse_v);
+void ProcessMesh(aiMesh* mesh, const aiScene* scene, Mesh& newMesh, const aiMatrix4x4& globalTransform, const char* model_file_path, bool inverse_u, bool inverse_v);
 std::vector<Vertex> FetchVertices(const aiMesh* src, const aiMatrix4x4& transform, bool inverseU, bool inverseV);
 std::vector<uint32_t> FetchIndices(const aiMesh* src);
 Material FetchMaterial(const char* filename, const aiScene* scene, const aiMaterial* src);
@@ -42,7 +43,7 @@ std::vector<Mesh> AssimpLoader::Load(const char* model_file_path, bool inverse_u
 
     //メッシュを読み込む
     std::vector<Mesh> meshes;
-    ProcessNode(scene->mRootNode, scene, meshes, aiMatrix4x4(), model_file_path, inverse_u, inverse_v);
+    ProcessNode(/*node*/scene->mRootNode, scene, meshes, aiMatrix4x4(), model_file_path, inverse_u, inverse_v);
 
     return meshes;
 }
@@ -55,11 +56,7 @@ void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes, 
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         Mesh newMesh;
-        newMesh.vertices = FetchVertices(mesh, globalTransform, inverse_u, inverse_v);
-        newMesh.indices = FetchIndices(mesh);
-        const auto material_i = mesh->mMaterialIndex;
-        const auto material = scene->mMaterials[material_i];
-        newMesh.material = FetchMaterial(model_file_path, scene, material);
+        ProcessMesh(mesh, scene, newMesh, globalTransform, model_file_path, inverse_u, inverse_v);
 
         meshes.push_back(newMesh);
     }
@@ -68,6 +65,25 @@ void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes, 
     {
         ProcessNode(node->mChildren[i], scene, meshes, globalTransform, model_file_path, inverse_u, inverse_v);
     }
+}
+
+void ProcessMesh(aiMesh* mesh, const aiScene* scene, Mesh& newMesh, const aiMatrix4x4& globalTransform, const char* model_file_path, bool inverse_u, bool inverse_v) {
+    newMesh.vertices = FetchVertices(mesh, globalTransform, inverse_u, inverse_v);
+    newMesh.indices = FetchIndices(mesh);
+    const auto material_i = mesh->mMaterialIndex;
+    const auto material = scene->mMaterials[material_i];
+    newMesh.material = FetchMaterial(model_file_path, scene, material);
+
+    // ボーン情報の処理
+    /*
+    for (unsigned int i = 0; i < mesh->mNumBones; i++) {
+        const aiBone* ai_bone = mesh->mBones[i];
+        Bone bone;
+        bone.name = ai_bone->mName.C_Str();
+        bone.transform = ai_bone->mOffsetMatrix;
+        newMesh.bones.push_back(bone);
+    }
+    */
 }
 
 std::vector<Vertex> FetchVertices(const aiMesh* src, const aiMatrix4x4& transform, bool inverseU, bool inverseV)

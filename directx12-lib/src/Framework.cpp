@@ -3,8 +3,6 @@
 #include "DX12Resources.h"
 #include "ImGuiManager.h"
 
-
-
 #include "DeviceContext.h"
 
 #include "HighResolutionTimer.h"
@@ -99,7 +97,7 @@ void Framework::init()
 
     //ƒV[ƒ““o˜^ˆ—
     //SceneManager::getInstance().registerScene();
-    SceneManager::getInstance().init(this->dx12_resources_->getDeviceContext()->getDevice(), std::make_shared<SceneTriangle>());
+    SceneManager::getInstance().init(this->dx12_resources_->getDeviceContext()->getDevice(), std::make_shared<SceneModel>());
 }
 
 /// <summary>
