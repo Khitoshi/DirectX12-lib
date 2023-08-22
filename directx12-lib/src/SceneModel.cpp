@@ -9,7 +9,6 @@
 #include <imgui/imfilebrowser.h>
 #include <string>
 
-
 std::string SceneModel::file_path_("asset/models/cube.004.fbx");
 
 void SceneModel::init(ID3D12Device* device)
