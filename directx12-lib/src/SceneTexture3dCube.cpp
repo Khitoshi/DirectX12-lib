@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "CameraController.h"
 #include "TextureCubeModel.h"
-#include "CommonGraphicsConfig.h"
+#include "GraphicsConfigurator.h"
 #include <imgui/imgui.h>
 #include "InputManager.h"
 /// <summary>
@@ -13,7 +13,7 @@
 void SceneTexture3dCube::init(ID3D12Device* device)
 {
     this->camera_ = std::make_shared<Camera>();
-    this->camera_->init(windowWidth, windowHeight);
+    this->camera_->init(GraphicsConfigurator::getWindowWidth(), GraphicsConfigurator::getWindowHeight());
     this->camera_controller_ = std::make_shared<CameraController>(this->camera_.get());
     InputManager::Instance().addMouseInputListener(this->camera_controller_.get());
 

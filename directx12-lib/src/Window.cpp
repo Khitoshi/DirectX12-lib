@@ -1,10 +1,11 @@
 #include <Windows.h>
 
 #include "Window.h"
-#include "CommonGraphicsConfig.h"
+//#include "GraphicsConfigurator.h"
 #include "InputManager.h"
 #include "HighResolutionTimer.h"
 #include <stdexcept>
+#include "DX12Resources.h"
 #ifdef _DEBUG
 #include <imgui/imgui.h>
 //imguiのウィンドウプロシージャを呼び出すための宣言
@@ -31,15 +32,17 @@ LRESULT windowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))return true;
 #endif // _DEBUG
 
+    DX12Resources* resouce = reinterpret_cast<DX12Resources*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+
     // ウィンドウが破棄された場合アプリケーションを終了
-    switch (msg)
-    {
+    switch (msg) {
     case WM_MOUSEMOVE://マウスの移動
         POINT currentMousePos;
         GetCursorPos(&currentMousePos);
         ScreenToClient(hwnd, &currentMousePos);
         InputManager::Instance().OnMouseMove(currentMousePos.x, currentMousePos.y);
         break;
+
     case WM_LBUTTONDOWN://マウスの左ボタンが押された
         InputManager::Instance().onMouseLeftButtonDown();
         break;
@@ -59,6 +62,23 @@ LRESULT windowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     case WM_EXITSIZEMOVE://ウィンドウのサイズ変更終了
         HighResolutionTimer::getInstance().Start();
         break;
+    case WM_SIZE://ウィンドウのサイズ変更
+        //if (wparam == SIZE_MINIMIZED)/*最小化された*/ HighResolutionTimer::getInstance().Stop();
+        //else if (wparam == SIZE_RESTORED)/*最小化から復帰*/HighResolutionTimer::getInstance().Start();
+        //else if (wparam == SIZE_MAXIMIZED)/*最大化された*/HighResolutionTimer::getInstance().Start();
+        //
+        //TODO:まずcommonGraphicsConfigを削除してresouceに移行する
+        //そうするとwindowHight等の設定を使用している箇所がわかるのでそこを修正する
+        //から始める
+
+        //if (resouce) {
+        //    RECT clientRect = {};
+        //    GetClientRect(hwnd, &clientRect);
+        //    resouce->OnSizeChanged(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top, wparam == SIZE_MINIMIZED);
+        //}
+
+        break;
+
     case WM_KEYDOWN:
         break;
     case WM_DESTROY:   //OSに終了を伝える
@@ -67,6 +87,7 @@ LRESULT windowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     case WM_CLOSE:     //OSに終了を伝える
         PostQuitMessage(0);
         return 0;
+
     default:
         break;
     }
@@ -140,19 +161,23 @@ void Window::create() {
     wc.lpszMenuName = NULL;						//既定のメニューのマクロ(NULL = 規定メニュー無し)
     wc.lpszClassName = this->conf_.app_name;	//ウィンドウクラスの名前を指定
     wc.hIconSm = NULL;						//アイコンへのハンドル(NULL = 自動で適切なサイズのアイコンを検索)
-
     //ウィンドウクラスの登録
     RegisterClassEx(&wc);
+
+
+    DWORD dwStyle = WS_OVERLAPPEDWINDOW;
+    //RECT rect = { 0, 0, windowWidth, windowHeight };
+    //AdjustWindowRect(&rect, dwStyle, FALSE);
 
     //window生成 & 新しいウィンドウへのハンドルをreturn
     this->hwnd_ = CreateWindow(
         this->conf_.app_name,	//ウィンドウクラスの名前
         this->conf_.app_name,	//ウィンドウの名前,ウィンドウクラスの名前と別名でok
-        WS_OVERLAPPEDWINDOW,	//ウィンドウスタイル
+        dwStyle,	            //ウィンドウスタイル
         this->conf_.x,		    //ウィンドウ表示位置:x
         this->conf_.y,		    //ウィンドウ表示位置:y
-        windowWidth,	        //ウィンドウのサイズ:幅
-        windowHeight,	        //ウィンドウのサイズ:高さ
+        1280,	        //ウィンドウのサイズ:幅
+        720,	        //ウィンドウのサイズ:高さ
         NULL,					//親ウィンドウのハンドル
         NULL,					//メニューのハンドル
         this->hInstance_,		//インスタンスのハンドル

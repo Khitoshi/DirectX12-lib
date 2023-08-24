@@ -5,7 +5,7 @@
 #include "DescriptorHeapFactory.h"
 #include "PSOCacheManager.h"
 #include "ShaderCacheManager.h"
-#include "CommonGraphicsConfig.h"
+#include "GraphicsConfigurator.h"
 #include "VertexBufferFactory.h"
 #include "RenderContext.h"
 #include <stdexcept>
@@ -105,7 +105,7 @@ void CompositeRenderTarget::createResource(ID3D12Device* device)
     desc = this->conf_.resource_desc;
     D3D12_HEAP_PROPERTIES heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     D3D12_CLEAR_VALUE clear_value = {};
-    clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, backGroundColor);
+    clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, GraphicsConfigurator::getBackgroundColor());
     if (FAILED(device->CreateCommittedResource(
         &heap_prop,
         D3D12_HEAP_FLAG_NONE,

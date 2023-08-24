@@ -11,9 +11,8 @@
 #include "FenceFactory.h"
 #include "RenderContextFactory.h"
 #include "FullScreenQuadFactory.h"
-#include "CommonGraphicsConfig.h"
+#include "GraphicsConfigurator.h"
 #include <stdexcept>
-
 /// <summary>
 /// 初期化処理
 /// </summary>
@@ -22,6 +21,8 @@
 /// <param name="height">高さ</param>
 void DX12Resources::init(const HWND hWnd)
 {
+    loadGraphicsConf();
+
     //所有権が変わるので解放は合計で1回になる
     ComPtr<IDXGIFactory4> factory = createFactory();
     this->device_context_ = DeviceContextFactory::create(factory.Get());
@@ -37,6 +38,8 @@ void DX12Resources::init(const HWND hWnd)
     initScissorRect();
     initRenderContext();
     initFullScreenQuad();
+
+
 }
 
 /// <summary>
@@ -99,16 +102,18 @@ void DX12Resources::endRender()
     this->swap_chain_->present();
 
     //描画完了を待つ
-    waitEndOfDrawing();
+    waitForGPU();
 }
 
 /// <summary>
 /// 描画の終了を待つ
 /// </summary>
-void DX12Resources::waitEndOfDrawing()
+void DX12Resources::waitForGPU()
 {
     //フェンスのシグナル
-    this->command_queue_->getCommandQueue()->Signal(this->fence_->getFence(), this->fence_->getValue());
+    if (FAILED(this->command_queue_->getCommandQueue()->Signal(this->fence_->getFence(), this->fence_->getValue()))) {
+        throw std::runtime_error("DX12Resources::waitEndOfDrawing failed to signal fence");
+    }
 
     //フェンスの待機
     if (this->fence_->getFence()->GetCompletedValue() < this->fence_->getValue()) {
@@ -118,6 +123,32 @@ void DX12Resources::waitEndOfDrawing()
 
     //フェンスの値を更新
     this->fence_->incrementValue();
+}
+
+void DX12Resources::OnSizeChanged(const UINT width, const UINT height, bool minimized)
+{
+    if (GraphicsConfigurator::getWindowWidth() == width && GraphicsConfigurator::getWindowHeight() == height)return;
+    if (width == 0 || height == 0) return;
+
+    for (int i = 0; i < this->swap_chain_->getCurrentBackBufferIndex(); i++) {
+        this->render_target_->resourceReset(i);
+    }
+
+    waitForGPU();
+
+    DXGI_SWAP_CHAIN_DESC desc = {};
+    this->swap_chain_->getSwapChain()->GetDesc(&desc);
+
+    this->swap_chain_->resizeBuffer(width, height);
+
+    this->swap_chain_->isFullScreen();
+
+    initRenderTarget();
+}
+
+void DX12Resources::loadGraphicsConf()
+{
+    GraphicsConfigurator::init();
 }
 
 /// <summary>
@@ -190,9 +221,9 @@ void DX12Resources::initCommandQueue()
 void DX12Resources::initSwapChain(const HWND hWnd, IDXGIFactory4* factory) {
     SwapChain::SwapChainConf sc_conf = {};
     sc_conf.hWnd = hWnd;
-    sc_conf.width = windowWidth;
-    sc_conf.height = windowHeight;
-    sc_conf.frame_buffer_count = frameBufferCount;
+    sc_conf.width = GraphicsConfigurator::getWindowWidth();
+    sc_conf.height = GraphicsConfigurator::getWindowHeight();
+    sc_conf.frame_buffer_count = GraphicsConfigurator::getFrameBufferCount();
     sc_conf.factory = factory;
     sc_conf.command_queue = this->command_queue_->getCommandQueue();
     this->swap_chain_ = SwapChainFactory::create(sc_conf);
@@ -220,7 +251,7 @@ void DX12Resources::initCommandList()
 void DX12Resources::initRenderTarget()
 {
     RenderTarget::RenderTargetConf rt_conf = {};
-    rt_conf.frame_buffer_count = frameBufferCount;
+    rt_conf.frame_buffer_count = GraphicsConfigurator::getFrameBufferCount();
     rt_conf.swap_chain = this->swap_chain_->getSwapChain();
     this->render_target_ = RenderTargetFactory::create(rt_conf, this->device_context_->getDevice());
 }
@@ -244,9 +275,9 @@ void DX12Resources::initCompositeRenderTarget()
 void DX12Resources::initDepthStencil()
 {
     DepthStencil::DepthStencilConf ds_conf = {};
-    ds_conf.width = windowWidth;
-    ds_conf.height = windowHeight;
-    ds_conf.frame_buffer_count = frameBufferCount;
+    ds_conf.width = GraphicsConfigurator::getWindowWidth();
+    ds_conf.height = GraphicsConfigurator::getWindowHeight();
+    ds_conf.frame_buffer_count = GraphicsConfigurator::getFrameBufferCount();
     this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, this->device_context_->getDevice());
 }
 
@@ -267,8 +298,8 @@ void DX12Resources::initViewport()
 {
     this->viewport_.TopLeftX = 0;
     this->viewport_.TopLeftY = 0;
-    this->viewport_.Width = static_cast<FLOAT>(windowWidth);
-    this->viewport_.Height = static_cast<FLOAT>(windowHeight);
+    this->viewport_.Width = static_cast<FLOAT>(GraphicsConfigurator::getWindowWidth());
+    this->viewport_.Height = static_cast<FLOAT>(GraphicsConfigurator::getWindowHeight());
     this->viewport_.MinDepth = D3D12_MIN_DEPTH;
     this->viewport_.MaxDepth = D3D12_MAX_DEPTH;
 }
@@ -282,8 +313,8 @@ void DX12Resources::initScissorRect()
 {
     this->scissor_rect_.left = 0;
     this->scissor_rect_.top = 0;
-    this->scissor_rect_.right = windowWidth;
-    this->scissor_rect_.bottom = windowHeight;
+    this->scissor_rect_.right = GraphicsConfigurator::getWindowWidth();
+    this->scissor_rect_.bottom = GraphicsConfigurator::getWindowHeight();
 }
 
 /// <summary>

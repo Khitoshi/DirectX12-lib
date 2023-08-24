@@ -24,6 +24,17 @@ void SwapChain::present()
     this->current_back_buffer_index_ = this->swap_chain_->GetCurrentBackBufferIndex();
 }
 
+
+void SwapChain::resizeBuffer(const UINT& width, const UINT& height)
+{
+    DXGI_SWAP_CHAIN_DESC desc = {};
+    this->swap_chain_->GetDesc(&desc);
+    if (FAILED(this->swap_chain_->ResizeBuffers(this->conf_.frame_buffer_count, width, height, desc.BufferDesc.Format, desc.Flags))) {
+        throw std::runtime_error("スワップチェインのリサイズに失敗しました");
+    }
+}
+
+
 /// <summary>
 /// スワップチェイン生成
 /// </summary>

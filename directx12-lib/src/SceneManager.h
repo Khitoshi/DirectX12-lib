@@ -139,13 +139,11 @@ public:
     }
 
 private:
-    std::shared_ptr<Scene> currentScene = nullptr;  //現在のシーン
-    std::shared_ptr<Scene> nextScene = nullptr;     //次のシーン
-    bool isSceneChange = false;                     //シーン変更フラグ
+    std::shared_ptr<Scene> currentScene = nullptr;
+    std::shared_ptr<Scene> nextScene = nullptr;
+    bool isSceneChange = false;
 
-    //シーンのファクトリー
     using SceneFactory = std::function<std::shared_ptr<Scene>()>;
     using SceneEntry = std::pair<std::string, SceneFactory>;
-    //std::map<std::string, SceneFactory> sceneFactories;
     std::vector<SceneEntry> sceneFactories;
 };

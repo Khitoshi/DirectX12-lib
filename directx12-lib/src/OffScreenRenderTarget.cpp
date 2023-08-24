@@ -2,7 +2,7 @@
 #include "OffScreenRenderTarget.h"
 #include "RenderContext.h"
 #include "DepthStencil.h"
-#include "CommonGraphicsConfig.h"
+#include "GraphicsConfigurator.h"
 #include "DescriptorHeapFactory.h"
 /// <summary>
 /// ‰Šú‰»
@@ -46,7 +46,7 @@ void OffScreenRenderTarget::createResource(ID3D12Device* device)
     D3D12_RESOURCE_DESC desc = {};
     desc = this->conf_.resource_desc;
     D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-    D3D12_CLEAR_VALUE clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, backGroundColor);
+    D3D12_CLEAR_VALUE clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, GraphicsConfigurator::getBackgroundColor());
 
     if (FAILED(device->CreateCommittedResource(
         &heapProp,

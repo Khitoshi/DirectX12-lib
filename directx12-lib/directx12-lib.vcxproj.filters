@@ -58,6 +58,9 @@
     <Filter Include="lib\assimp">
       <UniqueIdentifier>{cf73d989-dbed-47bf-b029-57252af25bea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lib\nlohmann">
+      <UniqueIdentifier>{55e9505b-4b67-4b26-8283-c9e8c9115ef8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Window.cpp">
@@ -197,6 +200,12 @@
     </ClCompile>
     <ClCompile Include="lib\imgui\include\imgui\imgui_widgets.cpp">
       <Filter>lib\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FetchJson.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsConfigurator.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -377,7 +386,7 @@
     <ClInclude Include="src\RenderTargetFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\CommonGraphicsConfig.h">
+    <ClInclude Include="src\GraphicsConfigurator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\IndexBufferFactory.h">
@@ -739,6 +748,24 @@
     </ClInclude>
     <ClInclude Include="lib\assimp\include\assimp\ZipArchiveIOSystem.h">
       <Filter>lib\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\nlohmann\include\nlohmann\adl_serializer.hpp">
+      <Filter>lib\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\nlohmann\include\nlohmann\byte_container_with_subtype.hpp">
+      <Filter>lib\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\nlohmann\include\nlohmann\json.hpp">
+      <Filter>lib\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\nlohmann\include\nlohmann\json_fwd.hpp">
+      <Filter>lib\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\nlohmann\include\nlohmann\ordered_map.hpp">
+      <Filter>lib\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Json.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

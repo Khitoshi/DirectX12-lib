@@ -2,7 +2,7 @@
 #include "Model.h"
 #include "Camera.h"
 #include "CameraController.h"
-#include "CommonGraphicsConfig.h"
+#include "GraphicsConfigurator.h"
 #include "InputManager.h"
 #include "RenderContext.h"
 #include <imgui/imgui.h>
@@ -15,7 +15,7 @@ std::string SceneModel::file_path_("asset/models/cube.004.fbx");
 void SceneModel::init(ID3D12Device* device)
 {
     this->camera_ = std::make_shared<Camera>();
-    this->camera_->init(windowWidth, windowHeight);
+    this->camera_->init(GraphicsConfigurator::getWindowWidth(), GraphicsConfigurator::getWindowHeight());
     this->camera_controller_ = std::make_shared<CameraController>(this->camera_.get());
     InputManager::Instance().addMouseInputListener(this->camera_controller_.get());
 

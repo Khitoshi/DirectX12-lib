@@ -57,69 +57,56 @@ public:
     void endRender();
 
     //描画の終了を待機する
-    void waitEndOfDrawing();
+    void waitForGPU();
+
+    void OnSizeChanged(const UINT width, const UINT height, bool minimized);
 
 private://生成系
-    //IDXGIファクトリ生成
+    void loadGraphicsConf();
+
     ComPtr<IDXGIFactory4> createFactory();
     void initCommandQueue();
-    //スワップチェイン生成
     void initSwapChain(const HWND hWnd, IDXGIFactory4* factory);
-    //コマンドアロケータ生成
     void initCommandAllocator();
-    //コマンドリスト生成
     void initCommandList();
-    //Mainレンダーターゲット生成
     void initRenderTarget();
-    //オフスクリーンレンダーターゲット生成
     void initCompositeRenderTarget();
-    //深度ステンシル生成
     void initDepthStencil();
-    //フェンス生成
     void initFence();
-    //ビューポート設定
     void initViewport();
-    //シザリング矩形設定
     void initScissorRect();
-    //レンダーコンテキスト生成
     void initRenderContext();
-    //フルスクリーン四角形生成
     void initFullScreenQuad();
 
-    //レンダーターゲットビューのハンドルを設定
+
+
     void setMainRTVHandle();
-    //オフスクリーンレンダーターゲットビューのハンドルを設定
     void setOffScreenRTVHandle();
-    //深度ステンシルビューのハンドルを設定
     void updateDSVHandle();
 
 public://取得系
-    //デバイス取得
     DeviceContext* getDeviceContext() const { return device_context_.get(); }
-    //レンダーコンテキスト取得
     RenderContext* getRenderContext() const { return render_context_.get(); }
-    //ビューポート取得
     D3D12_VIEWPORT getViewport() const { return viewport_; }
-    //現在書き込み中のフレームバッファの深度ステンシルビューのハンドル取得
     D3D12_CPU_DESCRIPTOR_HANDLE getCurrentFrameBufferDSVHandle() const { return current_frame_buffer_dsv_handle_; }
 
 private:
-    std::shared_ptr<DeviceContext>device_context_;                                   //デバイス
-    std::shared_ptr<CommandQueue>command_queue_;                       //コマンドキュー
-    std::shared_ptr<SwapChain>swap_chain_;                          //スワップチェイン
-    std::shared_ptr<CommandAllocator>command_allocator_;               //コマンドアロケータ
+    std::shared_ptr<DeviceContext>device_context_;
+    std::shared_ptr<CommandQueue>command_queue_;
+    std::shared_ptr<SwapChain>swap_chain_;
+    std::shared_ptr<CommandAllocator>command_allocator_;
     std::shared_ptr<GraphicsCommandList> command_list_;
-    std::shared_ptr<RenderTarget>render_target_;                    //レンダーターゲット
-    std::shared_ptr<CompositeRenderTarget>composite_render_target_; //オフスクリーンレンダーターゲット
-    std::shared_ptr<DepthStencil>depth_stencil_;                    //深度ステンシル
-    std::shared_ptr<Fence> fence_;                                  //フェンス
-    D3D12_VIEWPORT viewport_;                                       //ビューポート
-    D3D12_RECT scissor_rect_;                                       //シザリング矩形
-    std::shared_ptr<RenderContext> render_context_;                 //レンダーコンテキスト
+    std::shared_ptr<RenderTarget>render_target_;
+    std::shared_ptr<CompositeRenderTarget>composite_render_target_;
+    std::shared_ptr<DepthStencil>depth_stencil_;
+    std::shared_ptr<Fence> fence_;
+    D3D12_VIEWPORT viewport_;
+    D3D12_RECT scissor_rect_;
+    std::shared_ptr<RenderContext> render_context_;
 
-    D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_rtv_handle_;	//現在書き込み中のフレームバッファのレンダーターゲットビューのハンドル
-    D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_dsv_handle_;	//現在書き込み中のフレームバッファの深度ステンシルビューのハンドル
+    D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_rtv_handle_;
+    D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_dsv_handle_;
 
-    int frame_index_;                                               //フレームの番号
-    std::shared_ptr<FullScreenQuad> full_screen_quad_;              //フルスクリーン四角形
+    int frame_index_;
+    std::shared_ptr<FullScreenQuad> full_screen_quad_;
 };

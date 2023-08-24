@@ -1,6 +1,6 @@
 #include "ImGuiManager.h"
 #include "OffScreenRenderTargetCacheManager.h"
-#include "CommonGraphicsConfig.h"
+#include "GraphicsConfigurator.h"
 #include "OffScreenRenderTargetFactory.h"
 #include "DepthStencilCacheManager.h"
 #include "RenderContext.h"
@@ -31,7 +31,7 @@ void ImGuiManager::init(ID3D12Device* device, const HWND& hWnd)
     ImGui_ImplWin32_Init(hWnd);
     ImGui_ImplDX12_Init(
         device,
-        frameBufferCount,
+        GraphicsConfigurator::getFrameBufferCount(),
         DXGI_FORMAT_R8G8B8A8_UNORM,
         this->descriptor_heap_->getDescriptorHeap(),
         this->descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(),
@@ -119,8 +119,8 @@ void ImGuiManager::createOffScreenRenderTarget(ID3D12Device* device)
         D3D12_RESOURCE_DESC desc = {};
         desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
         desc.Alignment = 0;
-        desc.Width = windowWidth;
-        desc.Height = windowHeight;
+        desc.Width = GraphicsConfigurator::getWindowWidth();
+        desc.Height = GraphicsConfigurator::getWindowHeight();
         desc.DepthOrArraySize = 1;
         desc.MipLevels = 1;
         desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -137,8 +137,8 @@ void ImGuiManager::createOffScreenRenderTarget(ID3D12Device* device)
 void ImGuiManager::createDepthStencil(ID3D12Device* device)
 {
     DepthStencil::DepthStencilConf ds_conf = {};
-    ds_conf.frame_buffer_count = frameBufferCount;
-    ds_conf.width = windowWidth;
-    ds_conf.height = windowHeight;
+    ds_conf.frame_buffer_count = GraphicsConfigurator::getFrameBufferCount();
+    ds_conf.width = GraphicsConfigurator::getWindowWidth();
+    ds_conf.height = GraphicsConfigurator::getWindowHeight();
     this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, device);
 }

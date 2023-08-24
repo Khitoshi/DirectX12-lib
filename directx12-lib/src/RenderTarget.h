@@ -34,30 +34,23 @@ private:
 public:
     ~RenderTarget() {};
 
+    void resourceReset(const UINT i) { resource_[i].Reset(); }
+
 private:
-    //初期化処理
     void init(ID3D12Device* device);
-    //ディスクリプタヒープの生成
     void createDescriptorHeap(ID3D12Device* device);
-    //ディスクリプタヒープのサイズの取得
     void createDescriptorHeapSize(ID3D12Device* device);
-    //リソースの生成
     void createResource(ID3D12Device* device);
 
-public:
-    //ディスクリプタヒープの取得
+public://取得系
     ID3D12DescriptorHeap* getDescriptorHeap() const;
-    //ディスクリプタヒープのサイズの取得
     int getDescriptorHeapSize() const { return this->descriptor_heap_size_; }
-    //リソースの取得
-    ID3D12Resource* getResource(int index) const { return resource_[index].Get(); }
+    ID3D12Resource* getResource(int i) const { return resource_[i].Get(); }
 
 private:
-    RenderTargetConf conf_;                         //設定
+    RenderTargetConf conf_;
+    std::shared_ptr<DescriptorHeap> descriptor_heap_;
 
-    //ComPtr<ID3D12DescriptorHeap> descriptor_heap_;  //ディスクリプタヒープ
-    std::shared_ptr<DescriptorHeap> descriptor_heap_;  //ディスクリプタヒープ
-
-    int descriptor_heap_size_;                      //ディスクリプタヒープのサイズ
-    std::vector<ComPtr<ID3D12Resource>> resource_;  //リソース
+    int descriptor_heap_size_;
+    std::vector<ComPtr<ID3D12Resource>> resource_;
 };

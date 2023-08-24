@@ -31,6 +31,7 @@
     <ClCompile Include="src\CameraController.cpp" />
     <ClCompile Include="src\CommandAllocator.cpp" />
     <ClCompile Include="src\CommandQueue.cpp" />
+    <ClCompile Include="src\GraphicsConfigurator.cpp" />
     <ClCompile Include="src\CompositeRenderTarget.cpp" />
     <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\CubeModel.cpp" />
@@ -39,6 +40,7 @@
     <ClCompile Include="src\DeviceContext.cpp" />
     <ClCompile Include="src\DX12Resources.cpp" />
     <ClCompile Include="src\Fence.cpp" />
+    <ClCompile Include="src\FetchJson.cpp" />
     <ClCompile Include="src\Framework.cpp" />
     <ClCompile Include="src\FullScreenQuad.cpp" />
     <ClCompile Include="src\GraphicsCommandList.cpp" />
@@ -155,6 +157,11 @@
     <ClInclude Include="lib\imgui\include\imgui\imstb_rectpack.h" />
     <ClInclude Include="lib\imgui\include\imgui\imstb_textedit.h" />
     <ClInclude Include="lib\imgui\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="lib\nlohmann\include\nlohmann\adl_serializer.hpp" />
+    <ClInclude Include="lib\nlohmann\include\nlohmann\byte_container_with_subtype.hpp" />
+    <ClInclude Include="lib\nlohmann\include\nlohmann\json.hpp" />
+    <ClInclude Include="lib\nlohmann\include\nlohmann\json_fwd.hpp" />
+    <ClInclude Include="lib\nlohmann\include\nlohmann\ordered_map.hpp" />
     <ClInclude Include="src\AssimpLoader.h" />
     <ClInclude Include="src\CameraController.h" />
     <ClInclude Include="src\ConstantBufferFactory.h" />
@@ -164,7 +171,7 @@
     <ClInclude Include="src\CommandAllocatorFactory.h" />
     <ClInclude Include="src\CommandQueue.h" />
     <ClInclude Include="src\CommandQueueFactory.h" />
-    <ClInclude Include="src\CommonGraphicsConfig.h" />
+    <ClInclude Include="src\GraphicsConfigurator.h" />
     <ClInclude Include="src\CompositeRenderTarget.h" />
     <ClInclude Include="src\CompositeRenderTargetFactory.h" />
     <ClInclude Include="src\ConstantBuffer.h" />
@@ -180,6 +187,7 @@
     <ClInclude Include="src\DX12Resources.h" />
     <ClInclude Include="src\Fence.h" />
     <ClInclude Include="src\FenceFactory.h" />
+    <ClInclude Include="src\Json.h" />
     <ClInclude Include="src\FileUtil.h" />
     <ClInclude Include="src\Framework.h" />
     <ClInclude Include="src\FrameworkFactory.h" />
@@ -514,7 +522,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./lib/assimp/include;./lib/imgui/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./lib/assimp/include;./lib/imgui/include;./lib/nlohmann/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -532,7 +540,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./lib/assimp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./lib/assimp/include;./lib/nlohmann/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

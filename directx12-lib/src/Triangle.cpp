@@ -12,7 +12,7 @@
 #include "OffScreenRenderTargetFactory.h"
 #include "IndexBufferFactory.h"
 
-#include "CommonGraphicsConfig.h"
+#include "GraphicsConfigurator.h"
 /// <summary>
 /// 三角形に必要なリソースの初期化
 /// </summary>
@@ -216,8 +216,8 @@ void Triangle::initOffScreenRenderTarget(ID3D12Device* device)
         D3D12_RESOURCE_DESC desc = {};
         desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
         desc.Alignment = 0;
-        desc.Width = windowWidth;
-        desc.Height = windowHeight;
+        desc.Width = GraphicsConfigurator::getWindowWidth();
+        desc.Height = GraphicsConfigurator::getWindowHeight();
         desc.DepthOrArraySize = 1;
         desc.MipLevels = 1;
         desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -234,9 +234,9 @@ void Triangle::initOffScreenRenderTarget(ID3D12Device* device)
 void Triangle::initDepthStencil(ID3D12Device* device)
 {
     DepthStencil::DepthStencilConf ds_conf = {};
-    ds_conf.frame_buffer_count = frameBufferCount;
-    ds_conf.width = windowWidth;
-    ds_conf.height = windowHeight;
+    ds_conf.frame_buffer_count = GraphicsConfigurator::getFrameBufferCount();
+    ds_conf.width = GraphicsConfigurator::getWindowWidth();
+    ds_conf.height = GraphicsConfigurator::getWindowHeight();
     this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, device);
 }
 

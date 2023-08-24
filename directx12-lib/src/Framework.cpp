@@ -170,7 +170,7 @@ void Framework::debugRender()
 void Framework::deinit()
 {
     this->imgui_manager_->deinit();
-    this->dx12_resources_->waitEndOfDrawing();
+    this->dx12_resources_->waitForGPU();
 }
 
 

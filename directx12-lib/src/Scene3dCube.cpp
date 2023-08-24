@@ -2,7 +2,7 @@
 #include "Camera.h"
 #include "CameraController.h"
 #include "CubeModel.h"
-#include "CommonGraphicsConfig.h"
+#include "GraphicsConfigurator.h"
 #include <imgui/imgui.h>
 #include "InputManager.h"
 /// <summary>
@@ -12,7 +12,7 @@
 void Scene3dCube::init(ID3D12Device* device)
 {
     this->camera_ = std::make_shared<Camera>();
-    this->camera_->init(windowWidth, windowHeight);
+    this->camera_->init(GraphicsConfigurator::getWindowWidth(), GraphicsConfigurator::getWindowHeight());
     this->camera_controller_ = std::make_shared<CameraController>(this->camera_.get());
     InputManager::Instance().addMouseInputListener(this->camera_controller_.get());
 
@@ -37,7 +37,7 @@ void Scene3dCube::finalize()
 /// </summary>
 void Scene3dCube::update()
 {
-    this->camera_->update(windowWidth, windowHeight);
+    this->camera_->update(GraphicsConfigurator::getWindowWidth(), GraphicsConfigurator::getWindowHeight());
 
     //if (is_change_camera_) {
     CubeModel::CubeModelConf conf = {};

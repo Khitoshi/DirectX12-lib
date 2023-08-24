@@ -7,7 +7,7 @@
 #include "Texture.h"
 #include "RootSignature.h"
 #include "ConstantBuffer.h"
-#include "CommonGraphicsConfig.h"
+#include "GraphicsConfigurator.h"
 #include "DescriptorHeap.h"
 #include <dxgi1_4.h>
 
@@ -317,7 +317,7 @@ public:
         this->setScissorRect(this->current_viewport_);
 
         //レンダーターゲットのクリア
-        this->clearRenderTarget(rtv_handle, backGroundColor);
+        this->clearRenderTarget(rtv_handle, GraphicsConfigurator::getBackgroundColor());
 
         //深度ステンシルのクリア
         this->clearDepthStencil(dsv_handle, 1.0f);
