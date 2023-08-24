@@ -1,0 +1,12 @@
+{
+    "title": "directx12-lib",
+    "width": 1280,
+    "height": 720,
+    "frameBufferCount": 2,
+    "backgroundColor": [
+        0,
+        0,
+        0,
+        0
+    ]
+}
