@@ -44,22 +44,22 @@ public://éÊìæån
     }
 
 private://ê›íËån
-    void setBackgroundColor(float r, float g, float b, float a) {
+    static void setBackgroundColor(float r, float g, float b, float a) {
         conf_data_.backgroundColor[0] = r;
         conf_data_.backgroundColor[1] = g;
         conf_data_.backgroundColor[2] = b;
         conf_data_.backgroundColor[3] = a;
     }
 
-    void setFrameBufferCount(UINT count) {
+    static void setFrameBufferCount(UINT count) {
         conf_data_.frameBufferCount = count;
     }
 
-    void setWindowWidth(UINT width) {
+    static void setWindowWidth(UINT width) {
         conf_data_.windowWidth = width;
     }
 
-    void setWindowHeight(UINT height) {
+    static void setWindowHeight(UINT height) {
         conf_data_.windowHeight = height;
     }
 

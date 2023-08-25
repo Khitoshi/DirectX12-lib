@@ -32,7 +32,7 @@ LRESULT windowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))return true;
 #endif // _DEBUG
 
-    DX12Resources* resouce = reinterpret_cast<DX12Resources*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+    //DX12Resources* resouce = reinterpret_cast<DX12Resources*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
     // ウィンドウが破棄された場合アプリケーションを終了
     switch (msg) {
@@ -66,10 +66,6 @@ LRESULT windowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         //if (wparam == SIZE_MINIMIZED)/*最小化された*/ HighResolutionTimer::getInstance().Stop();
         //else if (wparam == SIZE_RESTORED)/*最小化から復帰*/HighResolutionTimer::getInstance().Start();
         //else if (wparam == SIZE_MAXIMIZED)/*最大化された*/HighResolutionTimer::getInstance().Start();
-        //
-        //TODO:まずcommonGraphicsConfigを削除してresouceに移行する
-        //そうするとwindowHight等の設定を使用している箇所がわかるのでそこを修正する
-        //から始める
 
         //if (resouce) {
         //    RECT clientRect = {};
@@ -168,6 +164,8 @@ void Window::create() {
     DWORD dwStyle = WS_OVERLAPPEDWINDOW;
     //RECT rect = { 0, 0, windowWidth, windowHeight };
     //AdjustWindowRect(&rect, dwStyle, FALSE);
+
+    //TODO:マジックナンバーを使用しているので，GraphicsConfiguratorの情報を使用する方式に変更する
 
     //window生成 & 新しいウィンドウへのハンドルをreturn
     this->hwnd_ = CreateWindow(

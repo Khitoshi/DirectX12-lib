@@ -36,11 +36,11 @@ public:
 
     void resourceReset(const UINT i) { resource_[i].Reset(); }
 
+    void createResource(ID3D12Device* device);
 private:
     void init(ID3D12Device* device);
     void createDescriptorHeap(ID3D12Device* device);
     void createDescriptorHeapSize(ID3D12Device* device);
-    void createResource(ID3D12Device* device);
 
 public://Žæ“¾Œn
     ID3D12DescriptorHeap* getDescriptorHeap() const;

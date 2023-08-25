@@ -2,6 +2,7 @@
 #include "d3dx12.h"
 #include <map>
 
+//TODO: 汚いのでリファクタリングする
 class DescriptorCache
 {
 public:

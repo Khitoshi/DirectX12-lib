@@ -19,15 +19,17 @@
 /// <param name="hWnd">windowハンドル</param>
 /// <param name="width">幅</param>
 /// <param name="height">高さ</param>
-void DX12Resources::init(const HWND hWnd)
+void DX12Resources::init(HWND hWnd)
 {
+    hWnd_ = &hWnd;
+
     loadGraphicsConf();
 
     //所有権が変わるので解放は合計で1回になる
     ComPtr<IDXGIFactory4> factory = createFactory();
     this->device_context_ = DeviceContextFactory::create(factory.Get());
     initCommandQueue();
-    initSwapChain(hWnd, factory.Get());
+    initSwapChain(factory.Get());
     initCommandAllocator();
     initCommandList();
     initRenderTarget();
@@ -105,6 +107,12 @@ void DX12Resources::endRender()
     waitForGPU();
 }
 
+void DX12Resources::deinit()
+{
+    waitForGPU();
+    this->swap_chain_->getSwapChain()->SetFullscreenState(FALSE, nullptr);
+}
+
 /// <summary>
 /// 描画の終了を待つ
 /// </summary>
@@ -125,25 +133,35 @@ void DX12Resources::waitForGPU()
     this->fence_->incrementValue();
 }
 
-void DX12Resources::OnSizeChanged(const UINT width, const UINT height, bool minimized)
+//void DX12Resources::OnSizeChanged(const UINT width, const UINT height, bool minimized)
+void DX12Resources::OnSizeChanged()
 {
-    if (GraphicsConfigurator::getWindowWidth() == width && GraphicsConfigurator::getWindowHeight() == height)return;
-    if (width == 0 || height == 0) return;
+    waitForGPU();
 
     for (int i = 0; i < this->swap_chain_->getCurrentBackBufferIndex(); i++) {
         this->render_target_->resourceReset(i);
     }
 
-    waitForGPU();
+    // フルスクリーン状態の切り替え
+    static BOOL is_fullscreen = FALSE; // グローバルまたはメンバ変数として保持する
+    is_fullscreen != is_fullscreen;
+    this->swap_chain_->getSwapChain()->SetFullscreenState(!is_fullscreen, nullptr);
 
-    DXGI_SWAP_CHAIN_DESC desc = {};
-    this->swap_chain_->getSwapChain()->GetDesc(&desc);
+    // 必要に応じてバッファをリサイズ
+    UINT width = !is_fullscreen ? 1920 : 1280; // サイズを適切に設定
+    UINT height = !is_fullscreen ? 1080 : 720;
+    GraphicsConfigurator::setWindowHeight(width);
+    GraphicsConfigurator::setWindowWidth(height);
 
     this->swap_chain_->resizeBuffer(width, height);
 
-    this->swap_chain_->isFullScreen();
 
+    // 新しいリソースの作成
     initRenderTarget();
+    initDepthStencil();
+    initViewport();
+    initScissorRect();
+
 }
 
 void DX12Resources::loadGraphicsConf()
@@ -218,9 +236,9 @@ void DX12Resources::initCommandQueue()
 /// <param name="width">幅</param>
 /// <param name="height">高さ</param>
 /// <param name="factory">dxgiファクトリ</param>
-void DX12Resources::initSwapChain(const HWND hWnd, IDXGIFactory4* factory) {
+void DX12Resources::initSwapChain(IDXGIFactory4* factory) {
     SwapChain::SwapChainConf sc_conf = {};
-    sc_conf.hWnd = hWnd;
+    sc_conf.hWnd = *hWnd_;
     sc_conf.width = GraphicsConfigurator::getWindowWidth();
     sc_conf.height = GraphicsConfigurator::getWindowHeight();
     sc_conf.frame_buffer_count = GraphicsConfigurator::getFrameBufferCount();

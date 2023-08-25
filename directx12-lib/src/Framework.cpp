@@ -150,6 +150,11 @@ void Framework::debugRender()
     ImGui::Text("Dedicated System Memory: %d", gpu_info.dedicated_system_memory_);
     ImGui::Text("Shared System Memory: %d", gpu_info.shared_system_memory_);
 
+    if (ImGui::Button("FULLSCREEN")) {
+        this->dx12_resources_->OnSizeChanged();
+    }
+
+
     ImGui::End();
 
     //imguiメニュー更新処理
@@ -170,7 +175,7 @@ void Framework::debugRender()
 void Framework::deinit()
 {
     this->imgui_manager_->deinit();
-    this->dx12_resources_->waitForGPU();
+    this->dx12_resources_->deinit();
 }
 
 

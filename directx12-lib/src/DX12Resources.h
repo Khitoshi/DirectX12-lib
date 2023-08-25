@@ -28,6 +28,7 @@ class DX12Resources
 {
 public:
     DX12Resources() :
+        hWnd_(nullptr),
         device_context_(nullptr),
         command_queue_(),
         swap_chain_(),
@@ -48,7 +49,7 @@ public:
     ~DX12Resources() {}
 
     //初期化処理
-    void init(const HWND hWnd);
+    void init(HWND hWnd);
 
     //レンダリング開始処理
     void beginRender();
@@ -57,16 +58,18 @@ public:
     void endRender();
 
     //描画の終了を待機する
+    void deinit();
     void waitForGPU();
 
-    void OnSizeChanged(const UINT width, const UINT height, bool minimized);
+    //void OnSizeChanged(const UINT width, const UINT height, bool minimized);
+    void OnSizeChanged();
 
 private://生成系
     void loadGraphicsConf();
 
     ComPtr<IDXGIFactory4> createFactory();
     void initCommandQueue();
-    void initSwapChain(const HWND hWnd, IDXGIFactory4* factory);
+    void initSwapChain(IDXGIFactory4* factory);
     void initCommandAllocator();
     void initCommandList();
     void initRenderTarget();
@@ -91,6 +94,8 @@ public://取得系
     D3D12_CPU_DESCRIPTOR_HANDLE getCurrentFrameBufferDSVHandle() const { return current_frame_buffer_dsv_handle_; }
 
 private:
+    HWND* hWnd_;
+
     std::shared_ptr<DeviceContext>device_context_;
     std::shared_ptr<CommandQueue>command_queue_;
     std::shared_ptr<SwapChain>swap_chain_;

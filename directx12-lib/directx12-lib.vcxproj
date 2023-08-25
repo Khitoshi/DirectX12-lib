@@ -171,6 +171,7 @@
     <ClInclude Include="src\CommandAllocatorFactory.h" />
     <ClInclude Include="src\CommandQueue.h" />
     <ClInclude Include="src\CommandQueueFactory.h" />
+    <ClInclude Include="src\DescriptorManager.h" />
     <ClInclude Include="src\GraphicsConfigurator.h" />
     <ClInclude Include="src\CompositeRenderTarget.h" />
     <ClInclude Include="src\CompositeRenderTargetFactory.h" />
