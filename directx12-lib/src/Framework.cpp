@@ -72,11 +72,11 @@ void Framework::setDirectoryAndDll()
 {
 #ifdef _DEBUG
     SetDllDirectoryA("lib/assimp/build/lib/Debug");
-    LoadLibraryExA("assimp-vc142-mtd.dll", NULL, NULL);
+    LoadLibraryExA("assimp-vc143-mtd.dll", NULL, NULL);
 
 #else
     SetDllDirectoryA("lib/assimp/build/lib/Release");
-    LoadLibraryExA("assimp-vc142-mt.dll", NULL, NULL);
+    LoadLibraryExA("assimp-vc143-mt.dll", NULL, NULL);
 #endif // _DEBUG
 
 }
@@ -97,7 +97,8 @@ void Framework::init()
 
     //ƒV[ƒ““o˜^ˆ—
     //SceneManager::getInstance().registerScene();
-    SceneManager::getInstance().init(this->dx12_resources_->getDeviceContext()->getDevice(), std::make_shared<SceneModel>());
+    //SceneManager::getInstance().init(this->dx12_resources_->getDeviceContext()->getDevice(), std::make_shared<SceneModel>());
+    SceneManager::getInstance().init(this->dx12_resources_->getDeviceContext()->getDevice(), std::make_shared<SceneTriangle>());
 }
 
 /// <summary>

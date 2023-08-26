@@ -515,6 +515,27 @@
     <ClInclude Include="lib\imgui\include\imgui\imstb_truetype.h">
       <Filter>lib\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="lib\nlohmann\include\nlohmann\adl_serializer.hpp">
+      <Filter>lib\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\nlohmann\include\nlohmann\byte_container_with_subtype.hpp">
+      <Filter>lib\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\nlohmann\include\nlohmann\json.hpp">
+      <Filter>lib\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\nlohmann\include\nlohmann\json_fwd.hpp">
+      <Filter>lib\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\nlohmann\include\nlohmann\ordered_map.hpp">
+      <Filter>lib\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Json.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DescriptorManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="lib\assimp\include\assimp\aabb.h">
       <Filter>lib\assimp</Filter>
     </ClInclude>
@@ -748,27 +769,6 @@
     </ClInclude>
     <ClInclude Include="lib\assimp\include\assimp\ZipArchiveIOSystem.h">
       <Filter>lib\assimp</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\nlohmann\include\nlohmann\adl_serializer.hpp">
-      <Filter>lib\nlohmann</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\nlohmann\include\nlohmann\byte_container_with_subtype.hpp">
-      <Filter>lib\nlohmann</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\nlohmann\include\nlohmann\json.hpp">
-      <Filter>lib\nlohmann</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\nlohmann\include\nlohmann\json_fwd.hpp">
-      <Filter>lib\nlohmann</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\nlohmann\include\nlohmann\ordered_map.hpp">
-      <Filter>lib\nlohmann</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Json.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DescriptorManager.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
