@@ -164,6 +164,7 @@
     <ClInclude Include="lib\nlohmann\include\nlohmann\ordered_map.hpp" />
     <ClInclude Include="src\AssimpLoader.h" />
     <ClInclude Include="src\CameraController.h" />
+    <ClInclude Include="src\CBVManager.h" />
     <ClInclude Include="src\ConstantBufferFactory.h" />
     <ClInclude Include="src\CubeModel.h" />
     <ClInclude Include="src\Camera.h" />
@@ -244,6 +245,7 @@
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\SceneSprite.h" />
     <ClInclude Include="src\SpriteModifier.h" />
+    <ClInclude Include="src\SRVManager.h" />
     <ClInclude Include="src\StringUtil.h" />
     <ClInclude Include="src\SwapChain.h" />
     <ClInclude Include="src\OffScreenRenderTarget.h" />

@@ -10,8 +10,8 @@
 #include <string>
 
 
-//std::string SceneModel::file_path_("asset/models/cube.004.fbx");
-std::string SceneModel::file_path_("D:/Study/C++/directx12-lib/directx12-lib/asset/models/CornellBox-Sphere.mtl");
+std::string SceneModel::file_path_("asset/models/cube.004.fbx");
+//std::string SceneModel::file_path_("D:/Study/C++/directx12-lib/directx12-lib/asset/models/CornellBox-Sphere.mtl");
 
 void SceneModel::init(ID3D12Device* device)
 {

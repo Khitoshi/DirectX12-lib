@@ -770,6 +770,12 @@
     <ClInclude Include="lib\assimp\include\assimp\ZipArchiveIOSystem.h">
       <Filter>lib\assimp</Filter>
     </ClInclude>
+    <ClInclude Include="src\SRVManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CBVManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">

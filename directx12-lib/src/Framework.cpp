@@ -71,11 +71,11 @@ int Framework::run(std::function<bool()> processMessages)
 void Framework::setDirectoryAndDll()
 {
 #ifdef _DEBUG
-    SetDllDirectoryA("lib/assimp/build/lib/Debug");
+    SetDllDirectoryA("lib/assimp/lib/Debug");
     LoadLibraryExA("assimp-vc143-mtd.dll", NULL, NULL);
 
 #else
-    SetDllDirectoryA("lib/assimp/build/lib/Release");
+    SetDllDirectoryA("lib/assimp/lib/Release");
     LoadLibraryExA("assimp-vc143-mt.dll", NULL, NULL);
 #endif // _DEBUG
 

@@ -35,7 +35,7 @@ std::vector<Mesh> AssimpLoader::Load(const char* model_file_path, bool inverse_u
     flag |= aiProcess_LimitBoneWeights;
     flag |= aiProcess_JoinIdenticalVertices;
     flag |= aiProcess_FlipWindingOrder;
-    Assimp::Importer importer = {};
+    Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(model_file_path, flag);
     if (scene == nullptr) {
         throw std::exception("AssimpLoader::Loader Failed ReadFile");
@@ -43,7 +43,7 @@ std::vector<Mesh> AssimpLoader::Load(const char* model_file_path, bool inverse_u
 
     //ÉÅÉbÉVÉÖÇì«Ç›çûÇﬁ
     std::vector<Mesh> meshes;
-    ProcessNode(/*node*/scene->mRootNode, scene, meshes, aiMatrix4x4(), model_file_path, inverse_u, inverse_v);
+    ProcessNode(scene->mRootNode, scene, meshes, aiMatrix4x4(), model_file_path, inverse_u, inverse_v);
 
     return meshes;
 }
