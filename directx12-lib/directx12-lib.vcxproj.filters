@@ -1,29 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Shaders">
       <UniqueIdentifier>{038f9361-8139-40ef-86ef-f741640186dc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\imgui">
-      <UniqueIdentifier>{4ea64c6e-f1b0-4857-b927-b2ffa3b15866}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Scenes">
-      <UniqueIdentifier>{ef66b174-b877-4f5f-864a-4b95d8f590a2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Scenes">
-      <UniqueIdentifier>{c2a3e602-2b66-40ab-97c6-2b5b382a6978}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Triangle">
       <UniqueIdentifier>{c55ca0c7-94d0-4fdd-80de-eeac018621cd}</UniqueIdentifier>
@@ -61,125 +40,101 @@
     <Filter Include="lib\nlohmann">
       <UniqueIdentifier>{55e9505b-4b67-4b26-8283-c9e8c9115ef8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{7c75a525-0288-4853-9af7-6bbd3c5f7426}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics">
+      <UniqueIdentifier>{2fb9c904-1735-4175-849f-480af730cf5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\System">
+      <UniqueIdentifier>{726e318a-14b7-47f8-beb0-5709cff76005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Util">
+      <UniqueIdentifier>{ad5a0593-ec6d-4b12-ae64-91a38718b1d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\imgui">
+      <UniqueIdentifier>{4ea64c6e-f1b0-4857-b927-b2ffa3b15866}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Scenes">
+      <UniqueIdentifier>{ef66b174-b877-4f5f-864a-4b95d8f590a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\Texture">
+      <UniqueIdentifier>{c81e847e-7cde-4c6d-b19f-e06ae3456baf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\Model">
+      <UniqueIdentifier>{eea2069b-e0ab-433f-a09d-3ec35ca113dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\OffScreen">
+      <UniqueIdentifier>{f08d3928-9016-4a83-88a0-bff91ddcd364}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\CmdAllocator">
+      <UniqueIdentifier>{8f7986d8-b90d-49e4-baed-a0c156b43064}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\CmdQueue">
+      <UniqueIdentifier>{b80738cd-b893-47ad-9a4c-9172cf38758a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\CompositeRenderTarget">
+      <UniqueIdentifier>{f0f08a36-7aab-49eb-a5b3-29c46c6b7172}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\CBV">
+      <UniqueIdentifier>{354def39-4e22-40a6-af4e-bbdd05dbe6a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\SRV">
+      <UniqueIdentifier>{88c5df0f-731a-4a73-8dc9-5bcc980e0684}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\VBV">
+      <UniqueIdentifier>{f4943e8a-89e9-4173-961c-f9d882361858}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\DepthStencil">
+      <UniqueIdentifier>{24cfb99a-022d-4fd9-8347-e0cddc05138c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\Descriptor">
+      <UniqueIdentifier>{84e96700-e3bf-40a5-b1a2-0c3f6d651677}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\Device">
+      <UniqueIdentifier>{71388bfc-8eac-43d3-9334-a4d3d63193d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\Fence">
+      <UniqueIdentifier>{30c53e27-4554-4510-888d-7f8f7b3dd954}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\CmdList">
+      <UniqueIdentifier>{7225aa8e-7d7c-4885-a033-57b67ad93844}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\Hash">
+      <UniqueIdentifier>{7cd7b59a-7cc1-4047-a8c8-815bdd386b48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\Config">
+      <UniqueIdentifier>{79367611-ab34-483f-a7d4-e6798d19d5d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\ViewObject">
+      <UniqueIdentifier>{aa7287e3-423e-4b8d-85f9-1678b88f5cef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\PSO">
+      <UniqueIdentifier>{41a30ad5-927e-4705-9cee-94925facad01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\RootSignature">
+      <UniqueIdentifier>{5d03f6c1-f55d-47d0-9036-3a88fa384e6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\RenderMode">
+      <UniqueIdentifier>{39f771fe-28c0-4b27-be56-d796c76eccd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\Shader">
+      <UniqueIdentifier>{3d799d53-fa59-4003-a004-6078ca29a635}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\RenderContext">
+      <UniqueIdentifier>{51747564-00a7-4a49-a417-b7a80b324a6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\IBV">
+      <UniqueIdentifier>{57328614-70eb-4681-9a29-7145e72bcc04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\RTV">
+      <UniqueIdentifier>{bcb49cc0-6860-426d-baaa-30b404cb9030}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\SwapChain">
+      <UniqueIdentifier>{d7cc85f5-ad65-405e-abb4-3bb64a779456}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DX12Resources.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SwapChain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PipelineStateObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Triangle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RootSignature.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DepthStencil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VertexBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\IndexBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneTriangle.cpp">
-      <Filter>Source Files\Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Sprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ShaderCacheManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ConstantBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OffScreenRenderTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FullScreenQuad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneSprite.cpp">
-      <Filter>Source Files\Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CompositeRenderTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DeviceContext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CommandQueue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CommandAllocator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GraphicsCommandList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Fence.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WinMain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Framework.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CubeModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\InputManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CameraController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TextureCubeModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DescriptorHeap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneModel.cpp">
-      <Filter>Source Files\Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene3dCube.cpp">
-      <Filter>Source Files\Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneTexture3dCube.cpp">
-      <Filter>Source Files\Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AssimpLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ImGuiManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lib\imgui\include\imgui\imgui.cpp">
       <Filter>lib\imgui</Filter>
     </ClCompile>
@@ -201,289 +156,163 @@
     <ClCompile Include="lib\imgui\include\imgui\imgui_widgets.cpp">
       <Filter>lib\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="src\AssimpLoader.cpp">
+      <Filter>src\Graphics\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CameraController.cpp">
+      <Filter>src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandAllocator.cpp">
+      <Filter>src\Graphics\CmdAllocator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandQueue.cpp">
+      <Filter>src\Graphics\CmdQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CompositeRenderTarget.cpp">
+      <Filter>src\Graphics\CompositeRenderTarget</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConstantBuffer.cpp">
+      <Filter>src\Graphics\CBV</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CubeModel.cpp">
+      <Filter>src\Graphics\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DepthStencil.cpp">
+      <Filter>src\Graphics\DepthStencil</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Descriptor.cpp">
+      <Filter>src\Graphics\Descriptor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DescriptorHeap.cpp">
+      <Filter>src\Graphics\Descriptor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DescriptorHeapManager.cpp">
+      <Filter>src\Graphics\Descriptor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DeviceContext.cpp">
+      <Filter>src\Graphics\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Fence.cpp">
+      <Filter>src\Graphics\Fence</Filter>
+    </ClCompile>
     <ClCompile Include="src\FetchJson.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework.cpp">
+      <Filter>src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FullScreenQuad.cpp">
+      <Filter>src\Graphics\OffScreen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsCommandList.cpp">
+      <Filter>src\Graphics\CmdList</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsConfigurator.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src\Graphics\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ImGuiManager.cpp">
+      <Filter>src\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DX12Resources.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IndexBuffer.cpp">
+      <Filter>src\Graphics\IBV</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InputManager.cpp">
+      <Filter>src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model.cpp">
+      <Filter>src\Graphics\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OffScreenRenderTarget.cpp">
+      <Filter>src\Graphics\OffScreen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PipelineStateObject.cpp">
+      <Filter>src\Graphics\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderTarget.cpp">
+      <Filter>src\Graphics\RTV</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RootSignature.cpp">
+      <Filter>src\Graphics\RootSignature</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>src\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderCacheManager.cpp">
+      <Filter>src\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sprite.cpp">
+      <Filter>src\Graphics\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SwapChain.cpp">
+      <Filter>src\Graphics\SwapChain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
+      <Filter>src\Graphics\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Triangle.cpp">
+      <Filter>src\Graphics\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureCubeModel.cpp">
+      <Filter>src\Graphics\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VertexBuffer.cpp">
+      <Filter>src\Graphics\VBV</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window.cpp">
+      <Filter>src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinMain.cpp">
+      <Filter>src\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene3dCube.cpp">
+      <Filter>src\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneModel.cpp">
+      <Filter>src\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneSprite.cpp">
+      <Filter>src\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneTexture3dCube.cpp">
+      <Filter>src\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneTriangle.cpp">
+      <Filter>src\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SRV.cpp">
+      <Filter>src\Graphics\SRV</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ResourceManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DX12Resources.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\d3dx12.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SwapChain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Fence.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Triangle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PipelineStateObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RootSignature.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DepthStencil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VertexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IndexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imgui\imstb_truetype.h">
-      <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imgui\imconfig.h">
-      <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imgui\imgui.h">
-      <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imgui\imgui_impl_dx12.h">
-      <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imgui\imgui_impl_win32.h">
-      <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imgui\imgui_internal.h">
-      <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imgui\ImGuiManager.h">
-      <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imgui\imstb_rectpack.h">
-      <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imgui\imstb_textedit.h">
-      <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ConstantBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\SceneTriangle.h">
-      <Filter>Header Files\Scenes</Filter>
+      <Filter>src\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene.h">
-      <Filter>Header Files\Scenes</Filter>
+      <Filter>src\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="src\SceneManager.h">
-      <Filter>Header Files\Scenes</Filter>
+      <Filter>src\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="src\SceneDefault.h">
-      <Filter>Header Files\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderMode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PSOCacheManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RootSignatureCacheManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HashCombine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ShaderCacheManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SpriteModifier.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OffScreenRenderTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FullScreenQuad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OffScreenRenderTargetCacheManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CompositeRenderTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Hashes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DescriptorCache.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DeviceContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DeviceContextFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CommandQueue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CommandQueueFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SwapChainFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CommandAllocator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CommandAllocatorFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GraphicsCommandList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GraphicsCommandListFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CompositeRenderTargetFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DepthStencilFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderContextFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FullScreenQuadFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FenceFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderTargetFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GraphicsConfigurator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\IndexBufferFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OffScreenRenderTargetFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RootSignatureFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VertexBufferFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PipelineStateObjectFactory.h">
-      <Filter>Header Files</Filter>
+      <Filter>src\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="src\SceneSprite.h">
-      <Filter>Header Files\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TextureFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TextureCacheManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ShaderFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DepthStencilCacheManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imgui\imfilebrowser.h">
-      <Filter>Header Files\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FrameworkFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HighResolutionTimer.h">
-      <Filter>Header Files</Filter>
+      <Filter>src\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene3dCube.h">
-      <Filter>Header Files\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CubeModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ConstantBufferFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MouseInputListener.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\InputManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CameraController.h">
-      <Filter>Header Files</Filter>
+      <Filter>src\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="src\SceneTexture3dCube.h">
-      <Filter>Header Files\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TextureCubeModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DescriptorHeap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DescriptorHeapFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Model.h">
-      <Filter>Header Files</Filter>
+      <Filter>src\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="src\SceneModel.h">
-      <Filter>Header Files\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AssimpLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\StringUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FileUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ModelMeshCacheManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ImGuiManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>src\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="lib\imgui\include\imgui\imconfig.h">
       <Filter>lib\imgui</Filter>
@@ -529,12 +358,6 @@
     </ClInclude>
     <ClInclude Include="lib\nlohmann\include\nlohmann\ordered_map.hpp">
       <Filter>lib\nlohmann</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Json.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DescriptorManager.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lib\assimp\include\assimp\aabb.h">
       <Filter>lib\assimp</Filter>
@@ -770,11 +593,245 @@
     <ClInclude Include="lib\assimp\include\assimp\ZipArchiveIOSystem.h">
       <Filter>lib\assimp</Filter>
     </ClInclude>
-    <ClInclude Include="src\SRVManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\DX12Resources.h">
+      <Filter>src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ResourceManager.h">
+      <Filter>src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera.h">
+      <Filter>src\System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CameraController.h">
+      <Filter>src\System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window.h">
+      <Filter>src\System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandAllocator.h">
+      <Filter>src\Graphics\CmdAllocator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandAllocatorFactory.h">
+      <Filter>src\Graphics\CmdAllocator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandQueue.h">
+      <Filter>src\Graphics\CmdQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandQueueFactory.h">
+      <Filter>src\Graphics\CmdQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CompositeRenderTarget.h">
+      <Filter>src\Graphics\CompositeRenderTarget</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CompositeRenderTargetFactory.h">
+      <Filter>src\Graphics\CompositeRenderTarget</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConstantBufferFactory.h">
+      <Filter>src\Graphics\CBV</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConstantBuffer.h">
+      <Filter>src\Graphics\CBV</Filter>
     </ClInclude>
     <ClInclude Include="src\CBVManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>src\Graphics\CBV</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DepthStencil.h">
+      <Filter>src\Graphics\DepthStencil</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DepthStencilCacheManager.h">
+      <Filter>src\Graphics\DepthStencil</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DepthStencilFactory.h">
+      <Filter>src\Graphics\DepthStencil</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Descriptor.h">
+      <Filter>src\Graphics\Descriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DescriptorCache.h">
+      <Filter>src\Graphics\Descriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DescriptorHeap.h">
+      <Filter>src\Graphics\Descriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DescriptorHeapFactory.h">
+      <Filter>src\Graphics\Descriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DescriptorHeapManager.h">
+      <Filter>src\Graphics\Descriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CubeModel.h">
+      <Filter>src\Graphics\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssimpLoader.h">
+      <Filter>src\Graphics\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d3dx12.h">
+      <Filter>src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DeviceContext.h">
+      <Filter>src\Graphics\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DeviceContextFactory.h">
+      <Filter>src\Graphics\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Fence.h">
+      <Filter>src\Graphics\Fence</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FenceFactory.h">
+      <Filter>src\Graphics\Fence</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FrameworkFactory.h">
+      <Filter>src\System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework.h">
+      <Filter>src\System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FileUtil.h">
+      <Filter>src\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>src\Graphics\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureCacheManager.h">
+      <Filter>src\Graphics\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureCubeModel.h">
+      <Filter>src\Graphics\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureFactory.h">
+      <Filter>src\Graphics\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FullScreenQuad.h">
+      <Filter>src\Graphics\OffScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FullScreenQuadFactory.h">
+      <Filter>src\Graphics\OffScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsCommandList.h">
+      <Filter>src\Graphics\CmdList</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsCommandListFactory.h">
+      <Filter>src\Graphics\CmdList</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HashCombine.h">
+      <Filter>src\Graphics\Hash</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Hashes.h">
+      <Filter>src\Graphics\Hash</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsConfigurator.h">
+      <Filter>src\Graphics\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HighResolutionTimer.h">
+      <Filter>src\System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ImGuiManager.h">
+      <Filter>src\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VertexBufferFactory.h">
+      <Filter>src\Graphics\VBV</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VertexBuffer.h">
+      <Filter>src\Graphics\VBV</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OffScreenRenderTarget.h">
+      <Filter>src\Graphics\OffScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OffScreenRenderTargetCacheManager.h">
+      <Filter>src\Graphics\OffScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OffScreenRenderTargetFactory.h">
+      <Filter>src\Graphics\OffScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model.h">
+      <Filter>src\Graphics\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ModelMeshCacheManager.h">
+      <Filter>src\Graphics\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>src\Graphics\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PSOCacheManager.h">
+      <Filter>src\Graphics\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PipelineStateObject.h">
+      <Filter>src\Graphics\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PipelineStateObjectFactory.h">
+      <Filter>src\Graphics\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Triangle.h">
+      <Filter>src\Graphics\ViewObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sprite.h">
+      <Filter>src\Graphics\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StringUtil.h">
+      <Filter>src\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RootSignature.h">
+      <Filter>src\Graphics\RootSignature</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RootSignatureCacheManager.h">
+      <Filter>src\Graphics\RootSignature</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RootSignatureFactory.h">
+      <Filter>src\Graphics\RootSignature</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderFactory.h">
+      <Filter>src\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderCacheManager.h">
+      <Filter>src\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader.h">
+      <Filter>src\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderContext.h">
+      <Filter>src\Graphics\RenderContext</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderContextFactory.h">
+      <Filter>src\Graphics\RenderContext</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IndexBuffer.h">
+      <Filter>src\Graphics\IBV</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IndexBufferFactory.h">
+      <Filter>src\Graphics\IBV</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderMode.h">
+      <Filter>src\Graphics\RenderMode</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderTarget.h">
+      <Filter>src\Graphics\RTV</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderTargetFactory.h">
+      <Filter>src\Graphics\RTV</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MouseInputListener.h">
+      <Filter>src\System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SwapChain.h">
+      <Filter>src\Graphics\SwapChain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SwapChainFactory.h">
+      <Filter>src\Graphics\SwapChain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SpriteModifier.h">
+      <Filter>src\Graphics\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InputManager.h">
+      <Filter>src\System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Json.h">
+      <Filter>src\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SRV.h">
+      <Filter>src\Graphics\SRV</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SRVFactory.h">
+      <Filter>src\Graphics\SRV</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

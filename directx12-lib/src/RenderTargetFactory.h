@@ -8,18 +8,27 @@
 class RenderTargetFactory
 {
 public:
-    /// <summary>
-    /// レンダーターゲットを生成する
-    /// </summary>
-    /// <param name="conf">生成に必要な情報</param>
-    /// <param name="device">GPUデバイス</param>
-    /// <returns>
-    /// 生成&初期化したレンダーターゲット
-    /// </returns>
-    static std::shared_ptr<RenderTarget> create(const RenderTarget::RenderTargetConf& conf, ID3D12Device* device)
-    {
-        std::shared_ptr<RenderTarget> render_target(new RenderTarget(conf));
-        render_target->init(device);
-        return render_target;
-    }
+	//メインで使用するレンダーターゲットを作成
+	static std::shared_ptr<RenderTarget> create(
+		ID3D12Device* device,
+		IDXGISwapChain3* swap_chain,
+		const UINT& buffer,
+		const D3D12_CPU_DESCRIPTOR_HANDLE& handle)
+	{
+		std::shared_ptr<RenderTarget> render_target(new RenderTarget());
+		render_target->init(device, swap_chain, buffer, handle);
+		return render_target;
+	}
+
+	//オフスクリーン用等のレンダーターゲットを作成
+	static std::shared_ptr<RenderTarget> create(
+		ID3D12Device* device,
+		const D3D12_RESOURCE_STATES& initial_state,
+		const D3D12_CPU_DESCRIPTOR_HANDLE& handle)
+	{
+		std::shared_ptr<RenderTarget> render_target(new RenderTarget());
+		render_target->init(device, initial_state, handle);
+		return render_target;
+	}
+
 };

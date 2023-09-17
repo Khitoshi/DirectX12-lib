@@ -1,71 +1,86 @@
 #include "RenderTarget.h"
 #include "DescriptorHeapFactory.h"
+#include "Descriptor.h"
+#include "GraphicsConfigurator.h"
 #include <stdexcept>
 
-/// <summary>
-/// 初期化処理
-/// </summary>
-/// <param name="renderTargetConf">RTV生成用設定</param>
-void RenderTarget::init(ID3D12Device* device)
+void RenderTarget::init(ID3D12Device* device, IDXGISwapChain3* swap_chain, const UINT& buffer, const D3D12_CPU_DESCRIPTOR_HANDLE& handle)
 {
-    createDescriptorHeap(device);
-    createDescriptorHeapSize(device);
-    createResource(device);
+
+	//resource_->createCommittedResource(swap_chain, buffer);
+	if (FAILED(swap_chain->GetBuffer(buffer, IID_PPV_ARGS(&this->resource_)))) {
+		throw std::runtime_error("FAILED Descriptor::createCommittedResource GetBuffer");
+	}
+	//descriptor_->createRTV(device, nullptr, handle);
+	device->CreateRenderTargetView(this->resource_.Get(), nullptr, handle);
+	setName(L"RenderTarget");
 }
 
-/// <summary>
-/// ディスクリプタヒープの生成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
-void RenderTarget::createDescriptorHeap(ID3D12Device* device)
+void RenderTarget::init(ID3D12Device* device, const D3D12_RESOURCE_STATES& initial_state, const D3D12_CPU_DESCRIPTOR_HANDLE& handle)
 {
-    this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, this->conf_.frame_buffer_count);
+	//レンダリングターゲットビューの作成
+	D3D12_RESOURCE_DESC desc = {};
+	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	desc.Alignment = 0;
+	desc.Height = GraphicsConfigurator::getWindowHeight();
+	desc.Width = GraphicsConfigurator::getWindowWidth();
+	desc.DepthOrArraySize = 1;
+	desc.MipLevels = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	D3D12_HEAP_PROPERTIES prop = {};
+	prop.Type = D3D12_HEAP_TYPE_DEFAULT;
+	prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	prop.CreationNodeMask = 1;
+	prop.VisibleNodeMask = 1;
+
+	D3D12_CLEAR_VALUE clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, GraphicsConfigurator::getBackgroundColor());
+
+	createCommittedResource(device, prop, D3D12_HEAP_FLAG_NONE, desc, initial_state, &clear_value);
+	device->CreateRenderTargetView(this->resource_.Get(), nullptr, handle);
+	setName(L"RenderTarget");
 }
 
-/// <summary>
-/// ディスクリプタヒープのサイズを設定
-/// </summary>
-/// <param name="device">GPUデバイス</param>
-void RenderTarget::createDescriptorHeapSize(ID3D12Device* device)
+CD3DX12_RESOURCE_BARRIER RenderTarget::begin()
 {
-    this->descriptor_heap_size_ = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	return CD3DX12_RESOURCE_BARRIER::Transition(
+		resource_.Get(),
+		D3D12_RESOURCE_STATE_PRESENT,
+		D3D12_RESOURCE_STATE_RENDER_TARGET
+	);
 }
 
-/// <summary>
-/// リソースの生成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
-void RenderTarget::createResource(ID3D12Device* device)
+CD3DX12_RESOURCE_BARRIER RenderTarget::end()
 {
-    //レンダリングターゲットビューのディスクリプタヒープの先頭のハンドルを取得
-    D3D12_CPU_DESCRIPTOR_HANDLE  rtv_handle = this->descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-
-    //レンダリングターゲットビューの作成loop
-    for (UINT n = 0; n < this->conf_.frame_buffer_count; n++) {
-        ComPtr<ID3D12Resource> r = {};
-        //スワップチェインからバックバッファを取得
-        if (FAILED(this->conf_.swap_chain->GetBuffer(n, IID_PPV_ARGS(&r)))) {
-            throw std::runtime_error("failed to get swap chain buffer");
-        }
-
-        //レンダリングターゲットビューの作成
-        device->CreateRenderTargetView(
-            r.Get(), nullptr, rtv_handle
-        );
-
-        //リソースを格納
-        this->resource_.push_back(r);
-
-        //ハンドルをずらす
-        rtv_handle.ptr += this->descriptor_heap_size_;
-    }
+	return CD3DX12_RESOURCE_BARRIER::Transition(
+		resource_.Get(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_PRESENT
+	);
 }
 
-/// <summary>
-/// ディスクリプタヒープを取得
-/// </summary>
-/// <returns></returns>
-ID3D12DescriptorHeap* RenderTarget::getDescriptorHeap() const
+CD3DX12_RESOURCE_BARRIER RenderTarget::testbegin()
 {
-    return this->descriptor_heap_->getDescriptorHeap();
+	return CD3DX12_RESOURCE_BARRIER::Transition(
+		resource_.Get(),
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+		D3D12_RESOURCE_STATE_RENDER_TARGET);
+}
+
+CD3DX12_RESOURCE_BARRIER RenderTarget::testend()
+{
+	return CD3DX12_RESOURCE_BARRIER::Transition(
+		resource_.Get(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+}
+
+D3D12_RESOURCE_DESC RenderTarget::getDesc()
+{
+	return resource_->GetDesc();
 }

@@ -11,6 +11,7 @@ class CommandQueue;
 class SwapChain;
 class CommandAllocator;
 class GraphicsCommandList;
+class DescriptorHeap;
 class RenderTarget;
 
 class CompositeRenderTarget;
@@ -27,91 +28,93 @@ using namespace Microsoft::WRL;
 class DX12Resources
 {
 public:
-    DX12Resources() :
-        hWnd_(nullptr),
-        device_context_(nullptr),
-        command_queue_(),
-        swap_chain_(),
-        command_allocator_(),
-        command_list_(),
-        render_target_(),
-        composite_render_target_(),
-        depth_stencil_(),
-        fence_(),
-        viewport_(),
-        scissor_rect_(),
-        render_context_(),
-        current_frame_buffer_rtv_handle_(),
-        current_frame_buffer_dsv_handle_(),
-        frame_index_(0),
-        full_screen_quad_()
-    {}
-    ~DX12Resources() {}
+	DX12Resources() :
+		hWnd_(nullptr),
+		device_context_(nullptr),
+		command_queue_(),
+		swap_chain_(),
+		command_allocator_(),
+		command_list_(),
+		render_target_(),
+		composite_render_target_(),
+		depth_stencil_(),
+		fence_(),
+		viewport_(),
+		scissor_rect_(),
+		render_context_(),
+		current_frame_buffer_rtv_handle_(),
+		current_frame_buffer_dsv_handle_(),
+		frame_index_(0),
+		full_screen_quad_()
+	{}
+	~DX12Resources() {}
 
-    //初期化処理
-    void init(HWND hWnd);
+	//初期化処理
+	void init(HWND hWnd);
 
-    //レンダリング開始処理
-    void beginRender();
+	//レンダリング開始処理
+	void beginRender();
 
-    //レンダリング終了処理
-    void endRender();
+	//レンダリング終了処理
+	void endRender();
 
-    //描画の終了を待機する
-    void deinit();
-    void waitForGPU();
+	//描画の終了を待機する
+	void deinit();
+	void waitForGPU();
 
-    //void OnSizeChanged(const UINT width, const UINT height, bool minimized);
-    void OnSizeChanged();
+	//void OnSizeChanged(const UINT width, const UINT height, bool minimized);
+	void OnSizeChanged();
 
 private://生成系
-    void loadGraphicsConf();
+	void loadGraphicsConf();
 
-    ComPtr<IDXGIFactory4> createFactory();
-    void initCommandQueue();
-    void initSwapChain(IDXGIFactory4* factory);
-    void initCommandAllocator();
-    void initCommandList();
-    void initRenderTarget();
-    void initCompositeRenderTarget();
-    void initDepthStencil();
-    void initFence();
-    void initViewport();
-    void initScissorRect();
-    void initRenderContext();
-    void initFullScreenQuad();
+	ComPtr<IDXGIFactory4> createFactory();
+	void initCommandQueue();
+	void initSwapChain(IDXGIFactory4* factory);
+	void initCommandAllocator();
+	void initCommandList();
+	void initDescriptorHeap();
+	void initRenderTarget();
+	void initCompositeRenderTarget();
+	void initDepthStencil();
+	void initFence();
+	void initViewport();
+	void initScissorRect();
+	void initRenderContext();
+	void initFullScreenQuad();
 
 
 
-    void setMainRTVHandle();
-    void setOffScreenRTVHandle();
-    void updateDSVHandle();
+	void setMainRTVHandle();
+	void setOffScreenRTVHandle();
+	void updateDSVHandle();
 
 public://取得系
-    DeviceContext* getDeviceContext() const { return device_context_.get(); }
-    RenderContext* getRenderContext() const { return render_context_.get(); }
-    D3D12_VIEWPORT getViewport() const { return viewport_; }
-    D3D12_CPU_DESCRIPTOR_HANDLE getCurrentFrameBufferDSVHandle() const { return current_frame_buffer_dsv_handle_; }
+	DeviceContext* getDeviceContext() const { return device_context_.get(); }
+	RenderContext* getRenderContext() const { return render_context_.get(); }
+	D3D12_VIEWPORT getViewport() const { return viewport_; }
+	D3D12_CPU_DESCRIPTOR_HANDLE getCurrentFrameBufferDSVHandle() const { return current_frame_buffer_dsv_handle_; }
 
 private:
-    HWND* hWnd_;
+	HWND* hWnd_;
 
-    std::shared_ptr<DeviceContext>device_context_;
-    std::shared_ptr<CommandQueue>command_queue_;
-    std::shared_ptr<SwapChain>swap_chain_;
-    std::shared_ptr<CommandAllocator>command_allocator_;
-    std::shared_ptr<GraphicsCommandList> command_list_;
-    std::shared_ptr<RenderTarget>render_target_;
-    std::shared_ptr<CompositeRenderTarget>composite_render_target_;
-    std::shared_ptr<DepthStencil>depth_stencil_;
-    std::shared_ptr<Fence> fence_;
-    D3D12_VIEWPORT viewport_;
-    D3D12_RECT scissor_rect_;
-    std::shared_ptr<RenderContext> render_context_;
+	std::shared_ptr<DeviceContext>device_context_;
+	std::shared_ptr<CommandQueue>command_queue_;
+	std::shared_ptr<SwapChain>swap_chain_;
+	std::shared_ptr<CommandAllocator>command_allocator_;
+	std::shared_ptr<GraphicsCommandList> command_list_;
+	std::shared_ptr<DescriptorHeap> rtv_descriptor_heap_;
+	std::vector<std::shared_ptr<RenderTarget>>render_target_;
+	std::shared_ptr<CompositeRenderTarget>composite_render_target_;
+	std::shared_ptr<DepthStencil>depth_stencil_;
+	std::shared_ptr<Fence> fence_;
+	D3D12_VIEWPORT viewport_;
+	D3D12_RECT scissor_rect_;
+	std::shared_ptr<RenderContext> render_context_;
 
-    D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_rtv_handle_;
-    D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_dsv_handle_;
+	D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_rtv_handle_;
+	D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_dsv_handle_;
 
-    int frame_index_;
-    std::shared_ptr<FullScreenQuad> full_screen_quad_;
+	int frame_index_;
+	std::shared_ptr<FullScreenQuad> full_screen_quad_;
 };

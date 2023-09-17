@@ -1,47 +1,40 @@
 #pragma once
 #include "d3dx12.h"
+#include "Descriptor.h"
 
 using namespace Microsoft::WRL;
 
 /// <summary>
 /// 頂点バッファ生成用&copyするクラス
 /// </summary>
-class VertexBuffer
+class VertexBuffer :public Descriptor
 {
-    friend class VertexBufferFactory;
+	friend class VertexBufferFactory;
 public:
-    /// <summary>
-    /// 頂点バッファ生成時に使用する設定
-    /// </summary>
-    struct VertexBufferConf {
-        UINT size;               //頂点バッファのサイズ
-        UINT stride;             //1頂点のサイズ
-    };
+	/// <summary>
+	/// 頂点バッファ生成時に使用する設定
+	/// </summary>
+	struct VertexBufferConf {
+		UINT size;               //頂点バッファのサイズ
+		UINT stride;             //1頂点のサイズ
+	};
 
 private:
-    VertexBuffer(const VertexBufferConf c) :
-        conf_(c),
-        vertex_buffer_(),
-        vertex_buffer_view_()
-    {};
+	VertexBuffer(const VertexBufferConf c) :
+		conf_(c),
+		vertex_buffer_view_()
+	{};
 
 public:
-    ~VertexBuffer() {};
+	~VertexBuffer() {};
 
 private:
-    //初期化処理
-    void init(ID3D12Device* device);
+	void init(ID3D12Device* device);
 
 public:
-    //リソースにコピー
-    void copy(void* srcVertices);
-
-public:
-    //頂点バッファビューの取得
-    const D3D12_VERTEX_BUFFER_VIEW& getVertexBufferView() const { return this->vertex_buffer_view_; }
-
+	const D3D12_VERTEX_BUFFER_VIEW& getVertexBufferView() const { return this->vertex_buffer_view_; }
+	VertexBufferConf getConf() const { return this->conf_; }
 private:
-    VertexBufferConf conf_;
-    ComPtr<ID3D12Resource>      vertex_buffer_;	        //頂点バッファ。
-    D3D12_VERTEX_BUFFER_VIEW    vertex_buffer_view_;	//頂点バッファビュー。
+	VertexBufferConf conf_;
+	D3D12_VERTEX_BUFFER_VIEW    vertex_buffer_view_;
 };

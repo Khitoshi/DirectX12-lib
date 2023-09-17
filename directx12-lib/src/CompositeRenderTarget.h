@@ -5,6 +5,7 @@
 
 #include "d3dx12.h"
 
+class   RenderTarget;
 class   RootSignature;
 class   DescriptorHeap;
 class   RenderContext;
@@ -20,92 +21,72 @@ using Microsoft::WRL::ComPtr;
 /// </summary>
 class CompositeRenderTarget
 {
-    friend class CompositeRenderTargetFactory;
+	friend class CompositeRenderTargetFactory;
 public:
-    //初期化時に必要な情報
-    struct CompositeRenderTargetConf {
-        D3D12_RESOURCE_DESC resource_desc; 		            //バックバッファの設定
-        D3D12_DESCRIPTOR_HEAP_DESC descriptor_heap_desc;    //バックバッファで使用しているディスクリプタヒープの設定
-    };
+	//初期化時に必要な情報
+	struct CompositeRenderTargetConf {
+		D3D12_RESOURCE_DESC resource_desc;
+		D3D12_DESCRIPTOR_HEAP_DESC descriptor_heap_desc;
+	};
 
 private:
-    CompositeRenderTarget(CompositeRenderTargetConf c) :
-        conf_(c),
-        resource_(),
-        cbv_srv_uav_descriptor_heap_(),
-        rtv_descriptor_heap_(),
-        pso_(),
-        vertex_buffer_(),
-        root_signature_(),
-        pixel_shader_(),
-        vertex_shader_(),
-        srv_desc_(),
-        descriptor_cache_()
-    {};
+	CompositeRenderTarget(CompositeRenderTargetConf c) :
+		conf_(c),
+		render_target_(),
+		cbv_srv_uav_descriptor_heap_(),
+		rtv_descriptor_heap_(),
+		pso_(),
+		vertex_buffer_(),
+		root_signature_(),
+		pixel_shader_(),
+		vertex_shader_(),
+		srv_desc_(),
+		descriptor_cache_()
+	{};
 public:
-    ~CompositeRenderTarget() {};
+	~CompositeRenderTarget() {};
 
-    //描画初期処理
-    void beginRender(RenderContext* rc, D3D12_CPU_DESCRIPTOR_HANDLE depthStencil_view_handle);
-    //描画処理
-    void render(RenderContext* rc, ID3D12Device* device);
-    //描画終了処理
-    void endRender(RenderContext* rc);
+	void beginRender(RenderContext* rc, D3D12_CPU_DESCRIPTOR_HANDLE depthStencil_view_handle);
+	void render(RenderContext* rc, ID3D12Device* device);
+	void endRender(RenderContext* rc);
 
 private:
-    //初期化
-    void init(ID3D12Device* device);
-    //リソースを作成
-    void createResource(ID3D12Device* device);
-    //シェーダーリソースビューのディスクリプタヒープを作成
-    void createSRVHeap(ID3D12Device* device);
-    //シェーダーリソースビューを作成
-    void createSRVDesc(ID3D12Device* device);
-    //レンダーターゲットビューのディスクリプタヒープを作成
-    void createRTVHeap(ID3D12Device* device);
-    //レンダーターゲットビューを作成
-    void createRTV(ID3D12Device* device);
+	void init(ID3D12Device* device);
 
-    //ルートシグネチャの作成
-    void initRootSignature(ID3D12Device* device);
-    //シェーダーのロード
-    void initShader(ID3D12Device* device);
-    //パイプラインステートオブジェクトの作成
-    void initPipelineStateObject(ID3D12Device* device);
-    //頂点バッファの作成
-    void initVertexBuffer(ID3D12Device* device);
-    //ディスクリプタヒープキャッシュマネージャーの作成
-    void initDescriptorHeapCache();
+	void createSRVHeap(ID3D12Device* device);
+	void createSRVDesc(ID3D12Device* device);
+	void createRTVHeap(ID3D12Device* device);
+	void createRenderTarget(ID3D12Device* device);
 
-public://取得系
-    //リソースの取得
-    ID3D12Resource* getResource() const { return resource_.Get(); }
+	void initRootSignature(ID3D12Device* device);
+	void initShader(ID3D12Device* device);
+	void initPipelineStateObject(ID3D12Device* device);
+	void initVertexBuffer(ID3D12Device* device);
+	void initDescriptorHeapCache();
 
-    //シェーダーリソースビューディスクリプタヒープの取得
-    //ID3D12DescriptorHeap* getSRVHeap() const { return cbv_srv_uav_descriptor_heap_->getDescriptorHeap(); }
-
-    //レンダーターゲットビューディスクリプタヒープの取得
-    ID3D12DescriptorHeap* getRTVHeap() const;
+public:
+	ID3D12DescriptorHeap* getRTVHeap() const;
+	RenderTarget* getRenderTarget() const;
 private:
-    //頂点データ
-    struct Vertex
-    {
-        DirectX::XMFLOAT3 position;	//座標
-        DirectX::XMFLOAT2 uv;		//テクスチャ座標
-    };
+	struct Vertex
+	{
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT2 uv;
+	};
 
-    CompositeRenderTargetConf conf_;			                    //クラスの設定
+	CompositeRenderTargetConf conf_;
 
-    ComPtr<ID3D12Resource> resource_;		                        //リソース
-    std::shared_ptr<DescriptorHeap> cbv_srv_uav_descriptor_heap_;   //シェーダーリソースビューディスクリプタヒープ
-    std::shared_ptr<DescriptorHeap> rtv_descriptor_heap_;           //レンダーターゲットビューディスクリプタヒープ
+	std::shared_ptr<RenderTarget> render_target_;
 
-    std::shared_ptr<PipelineStateObject> pso_;                      //パイプラインステートオブジェクト
-    std::shared_ptr<VertexBuffer> vertex_buffer_;                   //頂点バッファ
-    std::shared_ptr<RootSignature> root_signature_;                 //ルートシグニチャ
-    std::shared_ptr<Shader> pixel_shader_;                          //ピクセルシェーダー
-    std::shared_ptr<Shader> vertex_shader_;                         //頂点シェーダー
-    D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc_;                      //シェーダーリソースビューの設定
+	std::shared_ptr<DescriptorHeap> cbv_srv_uav_descriptor_heap_;
+	std::shared_ptr<DescriptorHeap> rtv_descriptor_heap_;
 
-    std::shared_ptr<DescriptorCache> descriptor_cache_;             //ディスクリプタキャッシュ
+	std::shared_ptr<PipelineStateObject> pso_;
+	std::shared_ptr<VertexBuffer> vertex_buffer_;
+	std::shared_ptr<RootSignature> root_signature_;
+	std::shared_ptr<Shader> pixel_shader_;
+	std::shared_ptr<Shader> vertex_shader_;
+	D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc_;
+
+	std::shared_ptr<DescriptorCache> descriptor_cache_;
 };

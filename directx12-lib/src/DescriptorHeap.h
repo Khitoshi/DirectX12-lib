@@ -3,9 +3,12 @@
 
 using namespace Microsoft::WRL;
 
+
+
 class DescriptorHeap
 {
 	friend class DescriptorHeapFactory;
+
 private:
 
 	DescriptorHeap() :
@@ -20,12 +23,13 @@ private:
 
 public:
 	void clear() { this->descriptor_heap_->Release(); }
-	void reInit(ID3D12Device* device);
+	void reinit(ID3D12Device* device);
 
 public:
 	ID3D12DescriptorHeap* getDescriptorHeap() { return descriptor_heap_.Get(); }
 
 private:
+
 	ComPtr<ID3D12DescriptorHeap> descriptor_heap_;
 
 	D3D12_DESCRIPTOR_HEAP_TYPE type_;
