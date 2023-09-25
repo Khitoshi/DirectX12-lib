@@ -17,7 +17,6 @@ public:
 	~Descriptor() {}
 
 protected:
-
 	void createCommittedResource(
 		ID3D12Device* device,
 		const D3D12_HEAP_PROPERTIES& heap,
@@ -28,31 +27,29 @@ protected:
 	);
 
 	void setName(const LPCWSTR& name);
+
 public:
-	void map(void* src, const UINT size);
+	template<typename T>
+	void map(T* src, const UINT array_length)
+	{
+		void* pData = nullptr;
+		if (FAILED(this->resource_->Map(0, nullptr, (void**)&pData))) {
+			throw std::runtime_error("FAILED Descriptor::map Map");
+		}
 
-private:
-	void createCBV(
-		ID3D12Device* device,
-		const D3D12_CONSTANT_BUFFER_VIEW_DESC& desc,
-		const D3D12_CPU_DESCRIPTOR_HANDLE& handle
-	);
+		/*
+		T* typedData = static_cast<T*>(pData);
+		for (UINT i = 0; i < array_length; i++) {
+			typedData[i] = src[i];
+		}
+		*/
 
-	void createSRV(
-		ID3D12Device* device,
-		const D3D12_SHADER_RESOURCE_VIEW_DESC& srv_desc,
-		const D3D12_CPU_DESCRIPTOR_HANDLE& handle);
+		const UINT size = sizeof(T) * array_length;
 
-	void writeToSubresource(
-		const UINT& DstSubresource,
-		const void* src,
-		const UINT& SrcRowPitch,
-		const UINT& SrcDepthPitch);
+		memcpy(pData, src, size);
 
-	void createRTV(
-		ID3D12Device* device,
-		const D3D12_RENDER_TARGET_VIEW_DESC* desc,
-		const D3D12_CPU_DESCRIPTOR_HANDLE& handle);
+		this->resource_->Unmap(0, nullptr);
+	}
 
 public:
 	D3D12_GPU_VIRTUAL_ADDRESS getGPUVirtualAddress()
@@ -65,8 +62,12 @@ public:
 		return this->resource_.Get();
 	}
 
-protected:
-	//TODO:private‚É‚·‚é
-	ComPtr<ID3D12Resource> resource_;
+	ID3D12Resource** getResourceAddress()
+	{
+		return this->resource_.GetAddressOf();
+	}
 
+
+private:
+	ComPtr<ID3D12Resource> resource_;
 };

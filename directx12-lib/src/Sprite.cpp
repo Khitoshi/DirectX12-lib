@@ -184,7 +184,7 @@ void Sprite::initVertexBuffer(ID3D12Device* device)
 	//初期化
 	this->vertex_buffer_ = VertexBufferFactory::create(conf, device);
 	//コピー
-	this->vertex_buffer_->map(this->vertices_, conf.size);
+	this->vertex_buffer_->map(this->vertices_, 4);
 }
 
 /// <summary>
@@ -208,7 +208,7 @@ void Sprite::initIndexBuffer(ID3D12Device* device)
 	//初期化
 	this->index_buffer_ = IndexBufferFactory::create(indexBufferConf, device);
 	//コピー
-	this->index_buffer_->copy(static_cast<uint16_t*>(indices));
+	this->index_buffer_->map(static_cast<uint16_t*>(indices), 6);
 }
 
 /// <summary>
@@ -282,7 +282,7 @@ void Sprite::setVertices(Vertex vertices[4])
 	this->vertices_[1] = vertices[1];
 	this->vertices_[2] = vertices[2];
 	this->vertices_[3] = vertices[3];
-	this->vertex_buffer_->map(this->vertices_, this->vertex_buffer_->getConf().size);
+	this->vertex_buffer_->map(this->vertices_, 4);
 }
 
 /// <summary>

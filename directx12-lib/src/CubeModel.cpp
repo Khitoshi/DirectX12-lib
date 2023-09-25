@@ -33,7 +33,7 @@ void CubeModel::init(ID3D12Device* device)
 /// </summary>
 void CubeModel::update()
 {
-	this->constant_buffer_->map(&this->conf_, this->constant_buffer_->getConf().size);
+	this->constant_buffer_->map<CubeModelConf>(&this->conf_, 1);
 }
 
 /// <summary>
@@ -213,7 +213,7 @@ void CubeModel::initVertexBuffer(ID3D12Device* device)
 	//初期化
 	this->vertex_buffer_ = VertexBufferFactory::create(conf, device);
 	//コピー
-	this->vertex_buffer_->map(this->vertices_, this->vertex_buffer_->getConf().size);
+	this->vertex_buffer_->map<Vertex>(this->vertices_, 8);
 }
 
 /// <summary>
@@ -242,7 +242,8 @@ void CubeModel::initIndexBuffer(ID3D12Device* device)
 	//初期化
 	this->index_buffer_ = IndexBufferFactory::create(indexBufferConf, device);
 	//コピー
-	this->index_buffer_->copy(static_cast<uint16_t*>(indices));
+	//this->index_buffer_->copy(static_cast<uint16_t*>(indices));
+	this->index_buffer_->map(indices, this->num_indices_);
 }
 
 /// <summary>
@@ -256,7 +257,7 @@ void CubeModel::initConstantBuffer(ID3D12Device* device)
 	conf.descriptor_heap = this->descriptor_heap_.get();
 	conf.slot = 0;
 	this->constant_buffer_ = ConstantBufferFactory::create(device, conf);
-	constant_buffer_->map(&this->conf_, conf.size);
+	constant_buffer_->map<CubeModelConf>(&this->conf_, 1);
 }
 
 /// <summary>

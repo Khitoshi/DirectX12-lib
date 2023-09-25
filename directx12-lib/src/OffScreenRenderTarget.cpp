@@ -25,7 +25,7 @@ void OffScreenRenderTarget::init(ID3D12Device* device)
 void OffScreenRenderTarget::beginRender(RenderContext* rc, D3D12_CPU_DESCRIPTOR_HANDLE dsv_handle)
 {
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-		resource_.Get(),
+		getResource(),
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 		D3D12_RESOURCE_STATE_RENDER_TARGET);
 
@@ -41,7 +41,7 @@ void OffScreenRenderTarget::endRender(RenderContext* rc)
 {
 	//レンダーターゲットのRESOURCE_BARRIER設定
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-		resource_.Get(),
+		getResource(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
@@ -82,9 +82,7 @@ void OffScreenRenderTarget::createResource(ID3D12Device* device)
 /// <param name="device">GPUデバイス</param>
 void OffScreenRenderTarget::createSRVHeap(ID3D12Device* device)
 {
-	//SRVディスクリプタヒープ作成
-	//TODO: 2つのヒープを作成するのは無駄なので、1つにまとめる
-	this->cbv_srv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2);
+	this->cbv_srv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
 }
 
 /// <summary>
@@ -99,7 +97,7 @@ void OffScreenRenderTarget::createShaderResourceView(ID3D12Device* device)
 	srv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	srv_desc.Texture2D.MipLevels = 1;
 	srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	device->CreateShaderResourceView(this->resource_.Get(), &srv_desc, this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+	device->CreateShaderResourceView(getResource(), &srv_desc, this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 }
 
 /// <summary>
@@ -122,7 +120,7 @@ void OffScreenRenderTarget::createRenderTargetView(ID3D12Device* device)
 	D3D12_RENDER_TARGET_VIEW_DESC rtv_desc = {};
 	rtv_desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	device->CreateRenderTargetView(this->resource_.Get(), &rtv_desc, this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+	device->CreateRenderTargetView(getResource(), &rtv_desc, this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 }
 
 ID3D12DescriptorHeap* OffScreenRenderTarget::getSRVHeap() const

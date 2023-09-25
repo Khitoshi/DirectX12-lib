@@ -4,8 +4,8 @@
 #include <wrl.h>
 
 #include "d3dx12.h"
+#include "Descriptor.h"
 
-class   RenderTarget;
 class   RootSignature;
 class   DescriptorHeap;
 class   RenderContext;
@@ -14,16 +14,13 @@ class   PipelineStateObject;
 class   DescriptorCache;
 class   Shader;
 
-using Microsoft::WRL::ComPtr;
-
 /// <summary>
 /// オフスクリーンを1枚のテクスチャに合成するクラス
 /// </summary>
-class CompositeRenderTarget
+class CompositeRenderTarget :public Descriptor
 {
 	friend class CompositeRenderTargetFactory;
 public:
-	//初期化時に必要な情報
 	struct CompositeRenderTargetConf {
 		D3D12_RESOURCE_DESC resource_desc;
 		D3D12_DESCRIPTOR_HEAP_DESC descriptor_heap_desc;
@@ -31,8 +28,8 @@ public:
 
 private:
 	CompositeRenderTarget(CompositeRenderTargetConf c) :
+
 		conf_(c),
-		render_target_(),
 		cbv_srv_uav_descriptor_heap_(),
 		rtv_descriptor_heap_(),
 		pso_(),
@@ -66,7 +63,7 @@ private:
 
 public:
 	ID3D12DescriptorHeap* getRTVHeap() const;
-	RenderTarget* getRenderTarget() const;
+
 private:
 	struct Vertex
 	{
@@ -75,8 +72,6 @@ private:
 	};
 
 	CompositeRenderTargetConf conf_;
-
-	std::shared_ptr<RenderTarget> render_target_;
 
 	std::shared_ptr<DescriptorHeap> cbv_srv_uav_descriptor_heap_;
 	std::shared_ptr<DescriptorHeap> rtv_descriptor_heap_;

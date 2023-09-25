@@ -176,7 +176,7 @@ void Triangle::initVertexBuffer(ID3D12Device* device)
 	this->vertex_buffer_ = VertexBufferFactory::create(vb_conf, device);
 
 	//コピー
-	this->vertex_buffer_->map(this->vertices_, vb_conf.size);
+	this->vertex_buffer_->map(this->vertices_, 3);
 }
 
 /// <summary>
@@ -192,14 +192,13 @@ void Triangle::initIndexBuffer(ID3D12Device* device)
 	//インデックスバッファの設定
 	const int numIndices = sizeof(indices) / sizeof(unsigned short);
 	IndexBuffer::IndexBufferConf indexBufferConf = {};
-	indexBufferConf.size = sizeof(indices) * numIndices;// 4 bytes * 要素数 indices
+	//indexBufferConf.size = sizeof(indices) * numIndices;// 4 bytes * 要素数 indices
+	indexBufferConf.size = sizeof(unsigned short) * numIndices;// 4 bytes * 要素数 indices
 	indexBufferConf.stride = sizeof(unsigned short);
 	indexBufferConf.count = numIndices;
 
-	//生成
 	this->index_buffer_ = IndexBufferFactory::create(indexBufferConf, device);
-	//コピー
-	this->index_buffer_->copy(static_cast<uint16_t*>(indices));
+	this->index_buffer_->map(indices, numIndices);
 }
 
 void Triangle::initOffScreenRenderTarget(ID3D12Device* device)
@@ -248,5 +247,5 @@ void Triangle::setVertices(Vertex vertices[3])
 	this->vertices_[0] = vertices[0];
 	this->vertices_[1] = vertices[1];
 	this->vertices_[2] = vertices[2];
-	this->vertex_buffer_->map(this->vertices_, this->vertex_buffer_->getConf().size);
+	this->vertex_buffer_->map(this->vertices_, 3);
 }

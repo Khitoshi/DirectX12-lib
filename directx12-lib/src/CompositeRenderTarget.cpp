@@ -27,7 +27,13 @@ void CompositeRenderTarget::init(ID3D12Device* device)
 
 void CompositeRenderTarget::beginRender(RenderContext* rc, D3D12_CPU_DESCRIPTOR_HANDLE depthStencil_view_handle)
 {
-	rc->registerResouceBarrier(this->render_target_->testbegin());
+
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		getResource(),
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+		D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+	rc->registerResouceBarrier(barrier);
 	rc->simpleStart(this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(), depthStencil_view_handle);
 }
 
@@ -70,8 +76,12 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
 void CompositeRenderTarget::endRender(RenderContext* rc)
 {
 	OffScreenRenderTargetCacheManager::getInstance().clearRenderTargetList();
-	//rc->transitionOffScreenRenderTargetEnd(this->resource_.Get());
-	rc->registerResouceBarrier(this->render_target_->testend());
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		getResource(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	rc->registerResouceBarrier(barrier);
 }
 
 
@@ -97,8 +107,38 @@ void CompositeRenderTarget::createRTVHeap(ID3D12Device* device)
 
 void CompositeRenderTarget::createRenderTarget(ID3D12Device* device)
 {
-	auto handle = this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-	this->render_target_ = RenderTargetFactory::create(device, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, handle);
+	//auto handle = this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+	//this->render_target_ = RenderTargetFactory::create(device, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, handle);
+
+	//createCommittedResource(device, this->conf_.heap_prop, D3D12_HEAP_FLAG_NONE, this->conf_.resource_desc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &this->conf_.clear_value);
+
+	//レンダリングターゲットビューの作成
+	D3D12_RESOURCE_DESC desc = {};
+	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	desc.Alignment = 0;
+	desc.Height = GraphicsConfigurator::getWindowHeight();
+	desc.Width = GraphicsConfigurator::getWindowWidth();
+	desc.DepthOrArraySize = 1;
+	desc.MipLevels = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	D3D12_HEAP_PROPERTIES prop = {};
+	prop.Type = D3D12_HEAP_TYPE_DEFAULT;
+	prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	prop.CreationNodeMask = 1;
+	prop.VisibleNodeMask = 1;
+
+	D3D12_CLEAR_VALUE clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, GraphicsConfigurator::getBackgroundColor());
+
+	createCommittedResource(device, prop, D3D12_HEAP_FLAG_NONE, desc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clear_value);
+	device->CreateRenderTargetView(getResource(), nullptr, this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+	setName(L"Composite Render Target");
+
 }
 
 void CompositeRenderTarget::initRootSignature(ID3D12Device* device)
@@ -189,24 +229,26 @@ void CompositeRenderTarget::initPipelineStateObject(ID3D12Device* device)
 /// <param name="device">GPUデバイス</param>
 void CompositeRenderTarget::initVertexBuffer(ID3D12Device* device)
 {
-	Vertex vertices[] = {
-		{{ -1.0f, -1.0f, 0.0f }, {0,1}}, // 左下
-		{{ -1.0f,  1.0f, 0.0f }, {0,0}}, // 左上
-		{{  1.0f, -1.0f, 0.0f }, {1,1}}, // 右下
-		{{  1.0f,  1.0f, 0.0f }, {1,0}}, // 右上
-	};
+	std::vector<Vertex> vertices(4);
+
+	vertices[0] = Vertex({ -1.0f, -1.0f, 0.0f }, { 0,1 });// 左下
+	vertices[1] = Vertex({ -1.0f, 1.0f, 0.0f }, { 0,0 }); // 左上
+	vertices[2] = Vertex({ 1.0f, -1.0f, 0.0f }, { 1,1 }); // 右下
+	vertices[3] = Vertex({ 1.0f,  1.0f, 0.0f }, { 1,0 }); // 右上
+	//{ { -1.0f, 1.0f, 0.0f }, { 0,0 } }, // 左上
+	//{ {  1.0f, -1.0f, 0.0f }, {1,1} }, // 右下
+	//{ {  1.0f,  1.0f, 0.0f }, {1,0} }, // 右上
+
 
 	VertexBuffer::VertexBufferConf vb_conf = {};
-	vb_conf.size = sizeof(vertices);
+	//vb_conf.size = sizeof(vertices);
+	vb_conf.size = vertices.size() * sizeof(Vertex);  // 修正点
 	vb_conf.stride = sizeof(Vertex);
 
 	this->vertex_buffer_ = VertexBufferFactory::create(vb_conf, device);
-	this->vertex_buffer_->map(vertices, this->vertex_buffer_->getConf().size);
+	this->vertex_buffer_->map(vertices.data(), vertices.size());
 }
 
-/// <summary>
-/// ディスクリプタヒープのキャッシュを初期化
-/// </summary>
 void CompositeRenderTarget::initDescriptorHeapCache()
 {
 	this->descriptor_cache_ = std::make_unique<DescriptorCache>();
@@ -215,9 +257,4 @@ void CompositeRenderTarget::initDescriptorHeapCache()
 ID3D12DescriptorHeap* CompositeRenderTarget::getRTVHeap() const
 {
 	return rtv_descriptor_heap_->getDescriptorHeap();
-}
-
-RenderTarget* CompositeRenderTarget::getRenderTarget() const
-{
-	return this->render_target_.get();
 }

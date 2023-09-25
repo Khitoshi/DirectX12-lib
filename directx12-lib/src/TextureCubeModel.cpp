@@ -13,11 +13,6 @@
 #include "RenderContext.h"
 #include "GraphicsConfigurator.h"
 
-
-/// <summary>
-/// 初期化処理
-/// </summary>
-/// <param name="device"></param>
 void TextureCubeModel::init(ID3D12Device* device, const char* texture_file_path)
 {
 	this->initRootSignature(device);
@@ -32,18 +27,11 @@ void TextureCubeModel::init(ID3D12Device* device, const char* texture_file_path)
 	this->initDepthStencil(device);
 }
 
-/// <summary>
-/// 更新処理
-/// </summary>
 void TextureCubeModel::update()
 {
-	this->constant_buffer_->map(&this->conf_, this->constant_buffer_->getConf().size);
+	this->constant_buffer_->map(&this->conf_, 1);
 }
 
-/// <summary>
-/// 描画処理
-/// </summary>
-/// <param name="rc"></param>
 void TextureCubeModel::draw(RenderContext* rc)
 {
 	this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
@@ -67,10 +55,7 @@ void TextureCubeModel::draw(RenderContext* rc)
 	OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(off_screen_render_target_.get());
 }
 
-/// <summary>
-/// ルートシグネチャの初期化
-/// </summary>
-/// <param name="device"></param>
+
 void TextureCubeModel::initRootSignature(ID3D12Device* device)
 {
 	RootSignature::RootSignatureConf rootSignatureConf = {};
@@ -84,6 +69,7 @@ void TextureCubeModel::initRootSignature(ID3D12Device* device)
 	rootSignatureConf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 	rootSignatureConf.visibility_cbv = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootSignatureConf.visibility_srv = D3D12_SHADER_VISIBILITY_PIXEL;
+
 	this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
 }
 
@@ -92,9 +78,6 @@ void TextureCubeModel::initDescriptorHeap(ID3D12Device* device)
 	this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2);
 }
 
-/// <summary>
-/// シェーダーの読み込み
-/// </summary>
 void TextureCubeModel::loadShader()
 {
 	{
@@ -113,10 +96,6 @@ void TextureCubeModel::loadShader()
 	}
 }
 
-/// <summary>
-/// パイプラインステートオブジェクトの初期化
-/// </summary>
-/// <param name="device"></param>
 void TextureCubeModel::initPipelineStateObject(ID3D12Device* device)
 {
 	D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
@@ -151,7 +130,6 @@ void TextureCubeModel::initPipelineStateObject(ID3D12Device* device)
 	rasterizer_desc.ForcedSampleCount = 0;
 	rasterizer_desc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
-
 	// インプットレイアウト
 	PipelineStateObject::PipelineStateObjectConf conf = {};
 	conf.desc.pRootSignature = this->root_signature_->getRootSignature();
@@ -175,10 +153,6 @@ void TextureCubeModel::initPipelineStateObject(ID3D12Device* device)
 	this->pso_ = PSOCacheManager::getInstance().getOrCreate(device, conf);
 }
 
-/// <summary>
-/// 頂点バッファの初期化
-/// </summary>
-/// <param name="device"></param>
 void TextureCubeModel::initVertexBuffer(ID3D12Device* device)
 {
 	//頂点データ
@@ -199,13 +173,9 @@ void TextureCubeModel::initVertexBuffer(ID3D12Device* device)
 	//初期化
 	this->vertex_buffer_ = VertexBufferFactory::create(conf, device);
 	//コピー
-	this->vertex_buffer_->map(this->vertices_, conf.size);
+	this->vertex_buffer_->map(this->vertices_, 8);
 }
 
-/// <summary>
-/// インデックスバッファの初期化
-/// </summary>
-/// <param name="device"></param>
 void TextureCubeModel::initIndexBuffer(ID3D12Device* device)
 {
 	//インデックスデータ
@@ -228,13 +198,9 @@ void TextureCubeModel::initIndexBuffer(ID3D12Device* device)
 	//初期化
 	this->index_buffer_ = IndexBufferFactory::create(indexBufferConf, device);
 	//コピー
-	this->index_buffer_->copy(static_cast<uint16_t*>(indices));
+	this->index_buffer_->map(static_cast<uint16_t*>(indices), this->num_indices_);
 }
 
-/// <summary>
-/// 定数バッファの初期化
-/// </summary>
-/// <param name="device"></param>
 void TextureCubeModel::initConstantBuffer(ID3D12Device* device)
 {
 	ConstantBuffer::ConstantBufferConf conf = {};
@@ -242,7 +208,7 @@ void TextureCubeModel::initConstantBuffer(ID3D12Device* device)
 	conf.descriptor_heap = this->srv_cbv_uav_descriptor_heap_.get();
 	conf.slot = 0;
 	this->constant_buffer_ = ConstantBufferFactory::create(device, conf);
-	this->constant_buffer_->map(&this->conf_, this->constant_buffer_->getConf().size);
+	this->constant_buffer_->map(&this->conf_, 1);
 }
 
 void TextureCubeModel::initTexture(ID3D12Device* device, const char* texture_file_path)
@@ -250,15 +216,10 @@ void TextureCubeModel::initTexture(ID3D12Device* device, const char* texture_fil
 	//テクスチャの初期化
 	this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
 	//ディスクリプタヒープに登録
-	//this->texture_->CreateShaderResourceView(device, this->srv_cbv_uav_descriptor_heap_.get(), 1);
 	this->texture_->createSRV(device, this->srv_cbv_uav_descriptor_heap_.get(), 1);
 	texture_descriptor_index_ = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 1;
 }
 
-/// <summary>
-/// オフスクリーンレンダーターゲットの初期化
-/// </summary>
-/// <param name="device"></param>
 void TextureCubeModel::initOffScreenRenderTarget(ID3D12Device* device)
 {
 	OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
@@ -291,10 +252,6 @@ void TextureCubeModel::initOffScreenRenderTarget(ID3D12Device* device)
 	this->off_screen_render_target_ = OffScreenRenderTargetFactory::create(osrtConf, device);
 }
 
-/// <summary>
-/// 深度ステンシルの初期化
-/// </summary>
-/// <param name="device"></param>
 void TextureCubeModel::initDepthStencil(ID3D12Device* device)
 {
 	DepthStencil::DepthStencilConf ds_conf = {};

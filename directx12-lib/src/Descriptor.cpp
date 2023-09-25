@@ -27,38 +27,3 @@ void Descriptor::setName(const LPCWSTR& name)
 }
 
 
-void Descriptor::map(void* src, const UINT size)
-{
-	void* pData = nullptr;
-	if (FAILED(this->resource_->Map(0, nullptr, &pData))) {
-		throw std::runtime_error("FAILED Descriptor::map Map");
-	}
-	memcpy(pData, src, size);
-	this->resource_->Unmap(0, nullptr);
-}
-
-void Descriptor::createCBV(
-	ID3D12Device* device,
-	const D3D12_CONSTANT_BUFFER_VIEW_DESC& desc,
-	const D3D12_CPU_DESCRIPTOR_HANDLE& handle) {
-	device->CreateConstantBufferView(&desc, handle);
-}
-
-void Descriptor::createSRV(
-	ID3D12Device* device,
-	const D3D12_SHADER_RESOURCE_VIEW_DESC& srv_desc,
-	const D3D12_CPU_DESCRIPTOR_HANDLE& handle) {
-	device->CreateShaderResourceView(this->resource_.Get(), &srv_desc, handle);
-}
-
-void Descriptor::writeToSubresource(const UINT& DstSubresource, const void* src, const UINT& SrcRowPitch, const UINT& SrcDepthPitch)
-{
-	if (FAILED(this->resource_->WriteToSubresource(DstSubresource, nullptr, src, SrcRowPitch, SrcDepthPitch))) {
-		throw std::runtime_error("FAILED Descriptor::WriteToSubresource WriteToSubresource");
-	}
-}
-
-void Descriptor::createRTV(ID3D12Device* device, const D3D12_RENDER_TARGET_VIEW_DESC* desc, const D3D12_CPU_DESCRIPTOR_HANDLE& handle)
-{
-
-}

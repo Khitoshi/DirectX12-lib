@@ -6,13 +6,11 @@
 
 void RenderTarget::init(ID3D12Device* device, IDXGISwapChain3* swap_chain, const UINT& buffer, const D3D12_CPU_DESCRIPTOR_HANDLE& handle)
 {
-
-	//resource_->createCommittedResource(swap_chain, buffer);
-	if (FAILED(swap_chain->GetBuffer(buffer, IID_PPV_ARGS(&this->resource_)))) {
+	if (FAILED(swap_chain->GetBuffer(buffer, IID_PPV_ARGS(getResourceAddress())))) {
 		throw std::runtime_error("FAILED Descriptor::createCommittedResource GetBuffer");
 	}
-	//descriptor_->createRTV(device, nullptr, handle);
-	device->CreateRenderTargetView(this->resource_.Get(), nullptr, handle);
+
+	device->CreateRenderTargetView(getResource(), nullptr, handle);
 	setName(L"RenderTarget");
 }
 
@@ -42,14 +40,14 @@ void RenderTarget::init(ID3D12Device* device, const D3D12_RESOURCE_STATES& initi
 	D3D12_CLEAR_VALUE clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, GraphicsConfigurator::getBackgroundColor());
 
 	createCommittedResource(device, prop, D3D12_HEAP_FLAG_NONE, desc, initial_state, &clear_value);
-	device->CreateRenderTargetView(this->resource_.Get(), nullptr, handle);
+	device->CreateRenderTargetView(getResource(), nullptr, handle);
 	setName(L"RenderTarget");
 }
 
 CD3DX12_RESOURCE_BARRIER RenderTarget::begin()
 {
 	return CD3DX12_RESOURCE_BARRIER::Transition(
-		resource_.Get(),
+		getResource(),
 		D3D12_RESOURCE_STATE_PRESENT,
 		D3D12_RESOURCE_STATE_RENDER_TARGET
 	);
@@ -58,29 +56,13 @@ CD3DX12_RESOURCE_BARRIER RenderTarget::begin()
 CD3DX12_RESOURCE_BARRIER RenderTarget::end()
 {
 	return CD3DX12_RESOURCE_BARRIER::Transition(
-		resource_.Get(),
+		getResource(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
 		D3D12_RESOURCE_STATE_PRESENT
 	);
 }
 
-CD3DX12_RESOURCE_BARRIER RenderTarget::testbegin()
-{
-	return CD3DX12_RESOURCE_BARRIER::Transition(
-		resource_.Get(),
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-		D3D12_RESOURCE_STATE_RENDER_TARGET);
-}
-
-CD3DX12_RESOURCE_BARRIER RenderTarget::testend()
-{
-	return CD3DX12_RESOURCE_BARRIER::Transition(
-		resource_.Get(),
-		D3D12_RESOURCE_STATE_RENDER_TARGET,
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-}
-
 D3D12_RESOURCE_DESC RenderTarget::getDesc()
 {
-	return resource_->GetDesc();
+	return getResource()->GetDesc();
 }

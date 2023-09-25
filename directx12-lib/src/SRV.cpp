@@ -27,12 +27,12 @@ void SRV::createSRV(ID3D12Device* device, const DXGI_FORMAT& format, DescriptorH
 
 	//createSRV(device, srv_desc, handle);
 
-	device->CreateShaderResourceView(this->resource_.Get(), &srv_desc, handle);
+	device->CreateShaderResourceView(getResource(), &srv_desc, handle);
 }
 
 void SRV::writeToSubresource(const UINT& DstSubresource, const void* src, const UINT& SrcRowPitch, const UINT& SrcDepthPitch)
 {
-	if (FAILED(this->resource_->WriteToSubresource(DstSubresource, nullptr, src, SrcRowPitch, SrcDepthPitch))) {
+	if (FAILED(getResource()->WriteToSubresource(DstSubresource, nullptr, src, SrcRowPitch, SrcDepthPitch))) {
 		throw std::runtime_error("FAILED SRV::WriteToSubresource WriteToSubresource");
 	}
 }

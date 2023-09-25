@@ -90,7 +90,7 @@ void FullScreenQuad::createVertexBuffer(ID3D12Device* device)
 	conf.size = sizeof(vertices);
 	conf.stride = sizeof(Vertex);
 	this->vertex_buffer_ = VertexBufferFactory::create(conf, device);
-	this->vertex_buffer_->map(vertices, this->vertex_buffer_->getConf().size);
+	this->vertex_buffer_->map(vertices, 4);
 }
 
 /// <summary>
@@ -167,6 +167,5 @@ void FullScreenQuad::createSRV(ID3D12Device* device, CompositeRenderTarget* osrt
 	srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srv_desc.Texture2D.MipLevels = 1;
-	//TODO:RTのテクスチャを取得する方式を考える
-	device->CreateShaderResourceView(osrt->getRenderTarget()->getResource(), &srv_desc, this->cbv_srv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+	device->CreateShaderResourceView(osrt->getResource(), &srv_desc, this->cbv_srv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 }

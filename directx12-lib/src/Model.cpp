@@ -35,7 +35,7 @@ void Model::init(ID3D12Device* device, const char* model_file_path)
 
 void Model::update()
 {
-	this->constant_buffer_->map(&this->conf_, this->constant_buffer_->getConf().size);
+	this->constant_buffer_->map(&this->conf_, 1);
 }
 
 void Model::draw(RenderContext* rc)
@@ -203,7 +203,7 @@ void Model::initVertexBuffer(ID3D12Device* device)
 		conf.size = static_cast<UINT>(sizeof(Vertex) * vertices.size());
 		conf.stride = sizeof(Vertex);
 		auto vb = VertexBufferFactory::create(conf, device);
-		vb->map(vertices.data(), conf.size);
+		vb->map(vertices.data(), vertices.size());
 
 		this->vertex_buffers_[i] = vb;
 	}
@@ -220,14 +220,16 @@ void Model::initIndexBuffer(ID3D12Device* device)
 		//インデックスバッファの設定
 		this->num_indices_[i] = static_cast<UINT>(indices.size());
 		IndexBuffer::IndexBufferConf indexBufferConf = {};
-		indexBufferConf.size = sizeof(indices.data()) * this->num_indices_[i];// 4 bytes * 要素数 indices
-		indexBufferConf.stride = sizeof(uint32_t);
+		//indexBufferConf.size = sizeof(indices.data()) * this->num_indices_[i];
+		indexBufferConf.size = sizeof(unsigned short) * this->num_indices_[i];
+		indexBufferConf.stride = sizeof(unsigned short);
 		indexBufferConf.count = this->num_indices_[i];
 
 		//初期化
 		auto ib = IndexBufferFactory::create(indexBufferConf, device);
 		//コピー
-		ib->copy(indices.data());
+		//ib->copy(indices.data());
+		ib->map(indices.data(), indices.size());
 
 		this->index_buffers_[i] = ib;
 	}
@@ -242,7 +244,7 @@ void Model::initConstantBuffer(ID3D12Device* device)
 		conf.slot = 0;
 		this->constant_buffer_ = ConstantBufferFactory::create(device, conf);
 
-		this->constant_buffer_->map(&this->conf_, conf.size);
+		this->constant_buffer_->map(&this->conf_, 1);
 	}
 
 
@@ -264,7 +266,7 @@ void Model::initConstantBuffer(ID3D12Device* device)
 			conf.slot = static_cast<UINT>(1 + i);
 			mesh_color_constant_buffers_[i] = ConstantBufferFactory::create(device, conf);
 
-			mesh_color_constant_buffers_[i]->map(&materialConf, conf.size);
+			mesh_color_constant_buffers_[i]->map(&materialConf, 1);
 		}
 	}
 
