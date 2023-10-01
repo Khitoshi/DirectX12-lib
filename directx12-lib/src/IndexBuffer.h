@@ -14,6 +14,7 @@ public:
 
 private:
 	IndexBuffer(IndexBufferConf c) :
+		Descriptor(Descriptor::DescriptorType::Index),
 		conf_(c),
 		index_buffer_view_(),
 		stride_in_bytes_(0),

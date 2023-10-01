@@ -2,6 +2,7 @@
 #include <d3d12.h>
 #include <DirectXMath.h>
 #include <wrl.h>
+#include <map>
 
 #include "d3dx12.h"
 #include "Descriptor.h"
@@ -11,7 +12,6 @@ class   DescriptorHeap;
 class   RenderContext;
 class   VertexBuffer;
 class   PipelineStateObject;
-class   DescriptorCache;
 class   Shader;
 
 /// <summary>
@@ -28,7 +28,7 @@ public:
 
 private:
 	CompositeRenderTarget(CompositeRenderTargetConf c) :
-
+		Descriptor(Descriptor::DescriptorType::RenderTarget),
 		conf_(c),
 		cbv_srv_uav_descriptor_heap_(),
 		rtv_descriptor_heap_(),
@@ -38,7 +38,7 @@ private:
 		pixel_shader_(),
 		vertex_shader_(),
 		srv_desc_(),
-		descriptor_cache_()
+		handle_chache_()
 	{};
 public:
 	~CompositeRenderTarget() {};
@@ -59,7 +59,6 @@ private:
 	void initShader(ID3D12Device* device);
 	void initPipelineStateObject(ID3D12Device* device);
 	void initVertexBuffer(ID3D12Device* device);
-	void initDescriptorHeapCache();
 
 public:
 	ID3D12DescriptorHeap* getRTVHeap() const;
@@ -83,5 +82,6 @@ private:
 	std::shared_ptr<Shader> vertex_shader_;
 	D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc_;
 
-	std::shared_ptr<DescriptorCache> descriptor_cache_;
+	std::map<UINT, ID3D12Resource*> handle_chache_;
+
 };

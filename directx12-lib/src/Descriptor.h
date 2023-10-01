@@ -3,15 +3,36 @@
 #include <string>
 #include <chrono>
 #include <dxgi1_4.h>
-
+#include <memory>
+#include "Cache.h"
 using namespace Microsoft::WRL;
+
+//TODO: çƒê∂ê¨ä÷êîÇÃçÏê¨
 
 class Descriptor
 {
+public:
+	enum class DescriptorType {
+		Vertex,
+		Index,
+		Constant,
+		ShaderResource,
+		UnorderedAccess,
+		RenderTarget,
+		DepthStencil,
+		Sampler,
+
+		Num
+	};
+
 protected:
-	Descriptor() :
+	Descriptor(DescriptorType type) :
 		resource_()
-	{}
+	{
+		//DescriptorCache::getInstance().addDescriptor(this);
+		if (!Descriptor::cache_) Descriptor::cache_ = std::make_shared<Cache<DescriptorType, Descriptor>>();
+		Descriptor::cache_->addDescriptor(type, this);
+	}
 
 public:
 	~Descriptor() {}
@@ -37,13 +58,6 @@ public:
 			throw std::runtime_error("FAILED Descriptor::map Map");
 		}
 
-		/*
-		T* typedData = static_cast<T*>(pData);
-		for (UINT i = 0; i < array_length; i++) {
-			typedData[i] = src[i];
-		}
-		*/
-
 		const UINT size = sizeof(T) * array_length;
 
 		memcpy(pData, src, size);
@@ -67,7 +81,11 @@ public:
 		return this->resource_.GetAddressOf();
 	}
 
-
 private:
 	ComPtr<ID3D12Resource> resource_;
+
+	static std::shared_ptr<Cache<DescriptorType, Descriptor>> cache_;
+
 };
+
+inline std::shared_ptr<Cache<Descriptor::DescriptorType, Descriptor>> Descriptor::cache_ = nullptr;

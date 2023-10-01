@@ -13,7 +13,8 @@ class RenderTarget :public Descriptor
 {
 	friend class RenderTargetFactory;
 private:
-	RenderTarget() {};
+	RenderTarget() :
+		Descriptor(Descriptor::DescriptorType::RenderTarget) {};
 
 public:
 	~RenderTarget() {};

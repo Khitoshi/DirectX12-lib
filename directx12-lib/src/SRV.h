@@ -8,7 +8,8 @@ class SRV : public Descriptor
 {
 	friend class SRVFactory;
 private:
-	SRV() {};
+	SRV() :
+		Descriptor(Descriptor::DescriptorType::ShaderResource) {};
 public:
 	~SRV() {};
 

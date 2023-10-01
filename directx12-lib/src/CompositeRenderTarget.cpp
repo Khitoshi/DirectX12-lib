@@ -1,5 +1,4 @@
 #include "CompositeRenderTarget.h"
-#include "DescriptorCache.h"
 #include "OffScreenRenderTargetCacheManager.h"
 #include "RootSignatureCacheManager.h"
 #include "DescriptorHeapFactory.h"
@@ -22,7 +21,6 @@ void CompositeRenderTarget::init(ID3D12Device* device)
 	initShader(device);
 	initVertexBuffer(device);
 	initPipelineStateObject(device);
-	initDescriptorHeapCache();
 }
 
 void CompositeRenderTarget::beginRender(RenderContext* rc, D3D12_CPU_DESCRIPTOR_HANDLE depthStencil_view_handle)
@@ -48,11 +46,15 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
 	UINT slot = 0;
 	for (auto& rt : OffScreenRenderTargetCacheManager::getInstance().getRenderTargetList())
 	{
-		//ディスクリプタの生成
-		DescriptorCache::DescriptorCacheConf dhcConf = {};
-		dhcConf.resource = rt->getResource();
-		dhcConf.slot = slot;
-		this->descriptor_cache_->getOrCreate(device, dhcConf, this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap(), srv_desc_);
+		//前回とリソースとスロットが違う場合はSRVを新しく作成する
+		auto it = this->handle_chache_.find(slot);
+		if (it == this->handle_chache_.end() || it->second != rt->getResource()) {
+			D3D12_CPU_DESCRIPTOR_HANDLE handle = this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+			handle.ptr += static_cast<unsigned long long>(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)) * slot;
+
+			device->CreateShaderResourceView(rt->getResource(), &srv_desc_, handle);
+			this->handle_chache_[slot] = rt->getResource();
+		}
 		slot++;
 	}
 	//ディスクリプタヒープを設定
@@ -247,11 +249,6 @@ void CompositeRenderTarget::initVertexBuffer(ID3D12Device* device)
 
 	this->vertex_buffer_ = VertexBufferFactory::create(vb_conf, device);
 	this->vertex_buffer_->map(vertices.data(), vertices.size());
-}
-
-void CompositeRenderTarget::initDescriptorHeapCache()
-{
-	this->descriptor_cache_ = std::make_unique<DescriptorCache>();
 }
 
 ID3D12DescriptorHeap* CompositeRenderTarget::getRTVHeap() const

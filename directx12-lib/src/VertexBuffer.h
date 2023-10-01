@@ -21,6 +21,7 @@ public:
 
 private:
 	VertexBuffer(const VertexBufferConf c) :
+		Descriptor(Descriptor::DescriptorType::Vertex),
 		conf_(c),
 		vertex_buffer_view_()
 	{};

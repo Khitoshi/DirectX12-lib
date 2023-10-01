@@ -166,6 +166,7 @@
     <ClInclude Include="lib\nlohmann\include\nlohmann\json_fwd.hpp" />
     <ClInclude Include="lib\nlohmann\include\nlohmann\ordered_map.hpp" />
     <ClInclude Include="src\AssimpLoader.h" />
+    <ClInclude Include="src\Cache.h" />
     <ClInclude Include="src\CameraController.h" />
     <ClInclude Include="src\CBVManager.h" />
     <ClInclude Include="src\ConstantBufferFactory.h" />
@@ -185,7 +186,6 @@
     <ClInclude Include="src\DepthStencil.h" />
     <ClInclude Include="src\DepthStencilCacheManager.h" />
     <ClInclude Include="src\DepthStencilFactory.h" />
-    <ClInclude Include="src\DescriptorCache.h" />
     <ClInclude Include="src\DescriptorHeap.h" />
     <ClInclude Include="src\DescriptorHeapFactory.h" />
     <ClInclude Include="src\DeviceContext.h" />

@@ -647,9 +647,6 @@
     <ClInclude Include="src\Descriptor.h">
       <Filter>src\Graphics\Descriptor</Filter>
     </ClInclude>
-    <ClInclude Include="src\DescriptorCache.h">
-      <Filter>src\Graphics\Descriptor</Filter>
-    </ClInclude>
     <ClInclude Include="src\DescriptorHeap.h">
       <Filter>src\Graphics\Descriptor</Filter>
     </ClInclude>
@@ -832,6 +829,9 @@
     </ClInclude>
     <ClInclude Include="src\SRVFactory.h">
       <Filter>src\Graphics\SRV</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Cache.h">
+      <Filter>src\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

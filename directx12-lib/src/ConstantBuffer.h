@@ -24,6 +24,7 @@ public:
 
 private:
 	ConstantBuffer(const ConstantBufferConf& c) :
+		Descriptor(Descriptor::DescriptorType::Constant),
 		conf_(c)
 	{}
 public:
