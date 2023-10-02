@@ -15,14 +15,15 @@ public:
 	}
 
 	//Ä¶¬
-	void regenerate() {
-		for (auto& typeVectorPair : cache_) {
-			for (Param* param : typeVectorPair.second) {
-				if (param) {
-					param->init();
-				}
+	void regenerate(Type type) {
+
+		/*
+		for (Param* param : this->cache_[type]) {
+			if (param) {
+				param->init();
 			}
 		}
+		*/
 	}
 
 private:

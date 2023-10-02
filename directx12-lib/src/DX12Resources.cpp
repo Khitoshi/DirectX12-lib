@@ -116,6 +116,9 @@ void DX12Resources::OnSizeChanged()
 {
 	waitForGPU();
 
+
+	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::RenderTarget);
+	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::DepthStencil);
 	/*
 	for (int i = 0; i < this->swap_chain_->getCurrentBackBufferIndex(); i++) {
 		this->render_target_->resourceReset(i);

@@ -7,7 +7,7 @@
 #include "Cache.h"
 using namespace Microsoft::WRL;
 
-//TODO: Ä¶¬ŠÖ”‚Ìì¬
+//TODO:ƒŠƒ\[ƒX‚ÌíœŠÖ”‚Ìì¬‚ð‚·‚é
 
 class Descriptor
 {
@@ -36,8 +36,6 @@ protected:
 
 public:
 	~Descriptor() {}
-
-
 
 protected:
 	void createCommittedResource(
@@ -84,6 +82,11 @@ public:
 	ID3D12Resource** getResourceAddress()
 	{
 		return this->resource_.GetAddressOf();
+	}
+
+	const static std::shared_ptr<Cache<DescriptorType, Descriptor>> getCache()
+	{
+		return Descriptor::cache_;
 	}
 
 private:

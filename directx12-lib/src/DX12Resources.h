@@ -83,8 +83,6 @@ private://ê∂ê¨ån
 	void initRenderContext();
 	void initFullScreenQuad();
 
-
-
 	void setMainRTVHandle();
 	void setOffScreenRTVHandle();
 	void updateDSVHandle();
