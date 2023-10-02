@@ -29,12 +29,13 @@ private:
 public:
 	~VertexBuffer() {};
 
-private:
-	void init(ID3D12Device* device);
 
-public:
+	void init(ID3D12Device* device)override;
+
+public://Žæ“¾Œn
 	const D3D12_VERTEX_BUFFER_VIEW& getVertexBufferView() const { return this->vertex_buffer_view_; }
 	VertexBufferConf getConf() const { return this->conf_; }
+
 private:
 	VertexBufferConf conf_;
 	D3D12_VERTEX_BUFFER_VIEW    vertex_buffer_view_;

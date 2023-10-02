@@ -49,7 +49,7 @@ void Texture::Load(ID3D12Device* device, const char* texture_file_path)
 	tex_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	tex_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	this->srv_ = SRVFactory::create(device, tex_heap_prop, tex_desc);
+	this->srv_ = SRVFactory::create(device, &tex_heap_prop, &tex_desc);
 	//this->srv_ = std::make_unique<SRV>();
 	//this->srv_->init(device, tex_heap_prop, tex_desc);
 

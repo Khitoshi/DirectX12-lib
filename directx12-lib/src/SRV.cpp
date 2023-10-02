@@ -1,13 +1,13 @@
 #include "SRV.h"
 #include "DescriptorHeap.h"
 
-void SRV::init(ID3D12Device* device, const D3D12_HEAP_PROPERTIES& heap_prop, const D3D12_RESOURCE_DESC& desc)
+void SRV::init(ID3D12Device* device)
 {
 	createCommittedResource(
 		device,
-		heap_prop,
+		*this->heap_prop_,
 		D3D12_HEAP_FLAG_NONE,
-		desc,
+		*this->desc_,
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 		nullptr);
 
@@ -24,8 +24,6 @@ void SRV::createSRV(ID3D12Device* device, const DXGI_FORMAT& format, DescriptorH
 	srv_desc.Texture2D.MipLevels = 1;
 	auto handle = descriptor_heap->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
 	handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * static_cast<unsigned long long>(slot);
-
-	//createSRV(device, srv_desc, handle);
 
 	device->CreateShaderResourceView(getResource(), &srv_desc, handle);
 }

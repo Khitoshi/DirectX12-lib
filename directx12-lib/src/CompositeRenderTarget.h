@@ -47,8 +47,8 @@ public:
 	void render(RenderContext* rc, ID3D12Device* device);
 	void endRender(RenderContext* rc);
 
+	void init(ID3D12Device* device)override;
 private:
-	void init(ID3D12Device* device);
 
 	void createSRVHeap(ID3D12Device* device);
 	void createSRVDesc(ID3D12Device* device);

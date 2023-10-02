@@ -37,6 +37,8 @@ protected:
 public:
 	~Descriptor() {}
 
+
+
 protected:
 	void createCommittedResource(
 		ID3D12Device* device,
@@ -64,6 +66,9 @@ public:
 
 		this->resource_->Unmap(0, nullptr);
 	}
+
+	//çƒê∂ê¨ä÷êî
+	virtual void init(ID3D12Device* device) = 0;
 
 public:
 	D3D12_GPU_VIRTUAL_ADDRESS getGPUVirtualAddress()

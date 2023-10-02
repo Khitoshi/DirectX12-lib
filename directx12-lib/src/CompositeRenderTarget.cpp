@@ -244,11 +244,11 @@ void CompositeRenderTarget::initVertexBuffer(ID3D12Device* device)
 
 	VertexBuffer::VertexBufferConf vb_conf = {};
 	//vb_conf.size = sizeof(vertices);
-	vb_conf.size = vertices.size() * sizeof(Vertex);  // èCê≥ì_
+	vb_conf.size = static_cast<UINT>(vertices.size() * sizeof(Vertex));  // èCê≥ì_
 	vb_conf.stride = sizeof(Vertex);
 
 	this->vertex_buffer_ = VertexBufferFactory::create(vb_conf, device);
-	this->vertex_buffer_->map(vertices.data(), vertices.size());
+	this->vertex_buffer_->map(vertices.data(), static_cast<UINT>(vertices.size()));
 }
 
 ID3D12DescriptorHeap* CompositeRenderTarget::getRTVHeap() const

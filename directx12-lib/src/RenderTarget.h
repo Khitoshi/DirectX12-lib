@@ -13,18 +13,27 @@ class RenderTarget :public Descriptor
 {
 	friend class RenderTargetFactory;
 private:
-	RenderTarget() :
-		Descriptor(Descriptor::DescriptorType::RenderTarget) {};
+	RenderTarget(IDXGISwapChain3* swap_chain, UINT buffer, D3D12_CPU_DESCRIPTOR_HANDLE handle) :
+		Descriptor(Descriptor::DescriptorType::RenderTarget),
+		swap_chain_(swap_chain),
+		buffer_(buffer),
+		handle_(handle),
+		resouce_status_()
+	{};
+
+	RenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE handle, D3D12_RESOURCE_STATES status) :
+		Descriptor(Descriptor::DescriptorType::RenderTarget),
+		swap_chain_(nullptr),
+		buffer_(NULL),
+		handle_(handle),
+		resouce_status_(status)
+	{};
 
 public:
 	~RenderTarget() {};
 
 private:
-	//メイン描画用レンダーターゲットを作成
-	void init(ID3D12Device* device, IDXGISwapChain3* swap_chain, const UINT& buffer, const D3D12_CPU_DESCRIPTOR_HANDLE& handle);
-
-	//オフスクリーン用レンダーターゲットを作成
-	void init(ID3D12Device* device, const D3D12_RESOURCE_STATES& initial_state, const D3D12_CPU_DESCRIPTOR_HANDLE& handle);
+	void init(ID3D12Device* device)override;
 
 public://取得系
 
@@ -32,4 +41,11 @@ public://取得系
 	CD3DX12_RESOURCE_BARRIER end();
 
 	D3D12_RESOURCE_DESC getDesc();
+
+public:
+	IDXGISwapChain3* swap_chain_;
+	UINT buffer_;
+	const D3D12_CPU_DESCRIPTOR_HANDLE handle_;
+
+	D3D12_RESOURCE_STATES resouce_status_;
 };

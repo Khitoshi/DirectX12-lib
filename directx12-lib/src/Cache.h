@@ -11,15 +11,21 @@ public:
 	~Cache() {}
 
 	void addDescriptor(Type type, Param* param) {
-		cache[type].push_back(param);
+		this->cache_[type].push_back(param);
 	}
 
 	//Ä¶¬
 	void regenerate() {
-
+		for (auto& typeVectorPair : cache_) {
+			for (Param* param : typeVectorPair.second) {
+				if (param) {
+					param->init();
+				}
+			}
+		}
 	}
 
 private:
-	std::map<Type, std::vector<Param*>>cache;
+	std::map<Type, std::vector<Param*>>cache_;
 
 };
