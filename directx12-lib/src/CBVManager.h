@@ -5,7 +5,7 @@
 #include <memory>
 
 
-//TODO:　このクラスをより抽象的にする具体的にはCBVだけのクラスになっているのでSRVやUAVもこのクラスのインスタンスで使用できるようにしたい
+//TODO:使用していないので削除する
 class CBVManager
 {
 private:

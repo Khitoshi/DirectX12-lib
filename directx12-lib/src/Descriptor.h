@@ -7,8 +7,6 @@
 #include "Cache.h"
 using namespace Microsoft::WRL;
 
-//TODO:リソースの削除関数の作成をする
-
 class Descriptor
 {
 public:
@@ -18,7 +16,9 @@ public:
 		Constant,
 		ShaderResource,
 		UnorderedAccess,
-		RenderTarget,
+		MainRenderTarget,
+		OffScreenRenderTarget,
+		CompositeRenderTarget,
 		DepthStencil,
 		Sampler,
 
@@ -29,8 +29,7 @@ protected:
 	Descriptor(DescriptorType type) :
 		resource_()
 	{
-		//DescriptorCache::getInstance().addDescriptor(this);
-		if (!Descriptor::cache_) Descriptor::cache_ = std::make_shared<Cache<DescriptorType, Descriptor>>();
+		Descriptor::cache_ = std::make_shared<Cache<DescriptorType, Descriptor>>();
 		Descriptor::cache_->addDescriptor(type, this);
 	}
 
@@ -67,6 +66,11 @@ public:
 
 	//再生成関数
 	virtual void init(ID3D12Device* device) = 0;
+
+	//リソースのリリース
+	void release() {
+		this->resource_.Reset();
+	}
 
 public:
 	D3D12_GPU_VIRTUAL_ADDRESS getGPUVirtualAddress()

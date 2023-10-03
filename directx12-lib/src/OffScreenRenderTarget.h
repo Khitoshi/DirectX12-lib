@@ -35,7 +35,7 @@ public:
 
 private:
 	OffScreenRenderTarget(OffScreenRenderTargetConf c) :
-		Descriptor(Descriptor::DescriptorType::RenderTarget),
+		Descriptor(Descriptor::DescriptorType::OffScreenRenderTarget),
 		conf_(c),
 		cbv_srv_uav_descriptor_heap_(),
 		rtv_descriptor_heap_(),

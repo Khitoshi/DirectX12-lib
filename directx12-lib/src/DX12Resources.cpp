@@ -116,9 +116,21 @@ void DX12Resources::OnSizeChanged()
 {
 	waitForGPU();
 
+	//ƒŠƒŠ[ƒX
+	Descriptor::getCache()->release(Descriptor::DescriptorType::MainRenderTarget);
+	Descriptor::getCache()->release(Descriptor::DescriptorType::OffScreenRenderTarget);
+	Descriptor::getCache()->release(Descriptor::DescriptorType::CompositeRenderTarget);
+	Descriptor::getCache()->release(Descriptor::DescriptorType::DepthStencil);
 
-	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::RenderTarget);
-	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::DepthStencil);
+	this->swap_chain_->resizeBuffer(1920, 1280);
+
+	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::MainRenderTarget, this->device_context_->getDevice());
+	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::OffScreenRenderTarget, this->device_context_->getDevice());
+	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::CompositeRenderTarget, this->device_context_->getDevice());
+	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::DepthStencil, this->device_context_->getDevice());
+
+
+
 	/*
 	for (int i = 0; i < this->swap_chain_->getCurrentBackBufferIndex(); i++) {
 		this->render_target_->resourceReset(i);

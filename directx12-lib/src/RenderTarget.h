@@ -14,13 +14,14 @@ class RenderTarget :public Descriptor
 	friend class RenderTargetFactory;
 private:
 	RenderTarget(IDXGISwapChain3* swap_chain, UINT buffer, D3D12_CPU_DESCRIPTOR_HANDLE handle) :
-		Descriptor(Descriptor::DescriptorType::RenderTarget),
+		Descriptor(Descriptor::DescriptorType::MainRenderTarget),
 		swap_chain_(swap_chain),
 		buffer_(buffer),
 		handle_(handle),
 		resouce_status_()
 	{};
 
+	/*
 	RenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE handle, D3D12_RESOURCE_STATES status) :
 		Descriptor(Descriptor::DescriptorType::RenderTarget),
 		swap_chain_(nullptr),
@@ -28,6 +29,7 @@ private:
 		handle_(handle),
 		resouce_status_(status)
 	{};
+	*/
 
 public:
 	~RenderTarget() {};

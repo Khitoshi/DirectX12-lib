@@ -13,7 +13,7 @@ void RenderTarget::init(ID3D12Device* device)
 
 		//device->CreateRenderTargetView(getResource(), nullptr, this->handle_);
 	}
-	else {
+	else {//TODO:汚いのでリファクタリングする
 		//レンダリングターゲットビューの作成
 		D3D12_RESOURCE_DESC desc = {};
 		desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;

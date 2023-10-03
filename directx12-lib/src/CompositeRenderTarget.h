@@ -28,7 +28,7 @@ public:
 
 private:
 	CompositeRenderTarget(CompositeRenderTargetConf c) :
-		Descriptor(Descriptor::DescriptorType::RenderTarget),
+		Descriptor(Descriptor::DescriptorType::CompositeRenderTarget),
 		conf_(c),
 		cbv_srv_uav_descriptor_heap_(),
 		rtv_descriptor_heap_(),
