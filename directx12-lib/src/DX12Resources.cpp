@@ -122,14 +122,18 @@ void DX12Resources::OnSizeChanged()
 	Descriptor::getCache()->release(Descriptor::DescriptorType::CompositeRenderTarget);
 	Descriptor::getCache()->release(Descriptor::DescriptorType::DepthStencil);
 
+	GraphicsConfigurator::setWindowHeight(1920);
+	GraphicsConfigurator::setWindowWidth(1280);
 	this->swap_chain_->resizeBuffer(1920, 1280);
 
-	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::MainRenderTarget, this->device_context_->getDevice());
-	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::OffScreenRenderTarget, this->device_context_->getDevice());
+	//Descriptor::getCache()->regenerate(Descriptor::DescriptorType::MainRenderTarget, this->device_context_->getDevice());
+	initRenderTarget();
+	//Descriptor::getCache()->regenerate(Descriptor::DescriptorType::OffScreenRenderTarget, this->device_context_->getDevice());
 	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::CompositeRenderTarget, this->device_context_->getDevice());
-	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::DepthStencil, this->device_context_->getDevice());
+	//Descriptor::getCache()->regenerate(Descriptor::DescriptorType::DepthStencil, this->device_context_->getDevice());
 
-
+	initViewport();
+	initScissorRect();
 
 	/*
 	for (int i = 0; i < this->swap_chain_->getCurrentBackBufferIndex(); i++) {

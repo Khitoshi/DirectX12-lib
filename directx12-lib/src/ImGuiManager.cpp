@@ -12,7 +12,7 @@
 /// </summary>
 /// <param name="device">GPUデバイス</param>
 /// <param name="hWnd">ウィンドウハンドルのインターフェース</param>
-void ImGuiManager::init(ID3D12Device* device, const HWND& hWnd)
+void ImGuiManager::init(ID3D12Device* device)
 {
 	createDescriptorHeap(device);
 	createOffScreenRenderTarget(device);
@@ -28,7 +28,7 @@ void ImGuiManager::init(ID3D12Device* device, const HWND& hWnd)
 	ImGui::StyleColorsDark();
 
 	// Setup Platform/Renderer backends
-	ImGui_ImplWin32_Init(hWnd);
+	ImGui_ImplWin32_Init(*this->hWnd_);
 	ImGui_ImplDX12_Init(
 		device,
 		GraphicsConfigurator::getFrameBufferCount(),
@@ -43,18 +43,7 @@ void ImGuiManager::init(ID3D12Device* device, const HWND& hWnd)
 /// </summary>
 void ImGuiManager::beginFrame(RenderContext* rc, ID3D12Device* device)
 {
-	//オフスクリーンレンダーターゲットで書き込みできる状態にする
-	//auto render_target = this->off_screen_render_target_->getRTVHeap();
-	//auto resource = off_screen_render_target_->getResource();
-	//auto depth_stencil = depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-
-	//ビューポートとシザリング矩形の設定
-	//rc->transitionOffScreenRenderTargetBegin(resource);
-	//rc->simpleStart(render_target->GetCPUDescriptorHandleForHeapStart(), depth_stencil);
-	//off_screen_render_target_->setDepthStencil(depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
-	//off_screen_render_target_->beginRender(rc);
 	this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
-
 
 	// Start the Dear ImGui frame
 	ImGui_ImplDX12_NewFrame();
@@ -77,6 +66,17 @@ void ImGuiManager::endFrame()
 /// <param name="device">GPUデバイス</param>
 void ImGuiManager::render(RenderContext* rc, ID3D12Device* device)
 {
+	//TODO:以下のifでは
+	// this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+	//で複数回simplestartを呼び出しているので、えらーが　発生しているので別の方法を考える
+	//しかしimguiのボタンでウィンドウサイズの変更を行っているのでbeginrenderで行うことができていないということがある
+
+	if (this->off_screen_render_target_->getResource() == nullptr) {
+		deinit();
+		init(device);
+		//beginFrame(rc, device);
+	}
+
 	ImGui::Render();
 	rc->setDescriptorHeap(this->descriptor_heap_.get());
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), rc->getCommandList());

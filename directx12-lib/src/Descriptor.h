@@ -29,7 +29,6 @@ protected:
 	Descriptor(DescriptorType type) :
 		resource_()
 	{
-		Descriptor::cache_ = std::make_shared<Cache<DescriptorType, Descriptor>>();
 		Descriptor::cache_->addDescriptor(type, this);
 	}
 
@@ -100,4 +99,4 @@ private:
 
 };
 
-inline std::shared_ptr<Cache<Descriptor::DescriptorType, Descriptor>> Descriptor::cache_ = nullptr;
+inline std::shared_ptr<Cache<Descriptor::DescriptorType, Descriptor>> Descriptor::cache_ = std::make_shared<Cache<DescriptorType, Descriptor>>();;
