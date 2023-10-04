@@ -152,7 +152,7 @@ void Framework::debugRender()
 	ImGui::Text("Shared System Memory: %d", gpu_info.shared_system_memory_);
 
 	if (ImGui::Button("FULLSCREEN")) {
-		this->dx12_resources_->OnSizeChanged();
+		this->dx12_resources_->setWindowSizeChanged(true);
 	}
 
 

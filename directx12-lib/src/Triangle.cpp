@@ -13,10 +13,7 @@
 #include "IndexBufferFactory.h"
 
 #include "GraphicsConfigurator.h"
-/// <summary>
-/// 三角形に必要なリソースの初期化
-/// </summary>
-/// <param name="conf">三角形の描画用設定</param>
+
 void Triangle::init(ID3D12Device* device)
 {
 	initRootSignature(device);
@@ -26,23 +23,20 @@ void Triangle::init(ID3D12Device* device)
 	initIndexBuffer(device);
 	initOffScreenRenderTarget(device);
 	initDepthStencil(device);
+
+	this->device_ = device;
 }
 
-/// <summary>
-/// 三角形描画
-/// </summary>
-/// <param name="rc">レンダーコンテキスト</param>
 void Triangle::draw(RenderContext* rc)
 {
-	//オフスクリーンレンダーターゲットで書き込みできる状態にする
-	auto render_target = this->off_screen_render_target_->getRTVHeap();
-	auto resource = this->off_screen_render_target_->getResource();
-	auto depth_stencil = this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+	//TODO:depth_stencil がフルスクリーンに切り替える際に削除されているが
+	//再生成されていないので、エラーが発生している。
+	if (!this->depth_stencil_->getResource())
+	{
+		init(this->device_);
+	}
 
 	//ビューポートとシザリング矩形の設定
-	//rc->transitionOffScreenRenderTargetBegin(resource);
-	//rc->simpleStart(render_target->GetCPUDescriptorHandleForHeapStart(), depth_stencil);
-	//this->off_screen_render_target_->beginRender(rc);
 	this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
 
@@ -52,7 +46,6 @@ void Triangle::draw(RenderContext* rc)
 	rc->setPipelineState(this->pso_[(int)this->render_mode_].get());
 	//プリミティブのトポロジーを設定。
 	rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 	//頂点バッファを設定。
 	rc->setVertexBuffer(this->vertex_buffer_.get());
 	//インデックスバッファを設定。
@@ -65,10 +58,6 @@ void Triangle::draw(RenderContext* rc)
 	OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(this->off_screen_render_target_.get());
 }
 
-/// <summary>
-/// ルートシグニチャの初期化
-/// </summary>
-/// <param name="conf">三角形の描画用設定</param>
 void Triangle::initRootSignature(ID3D12Device* device)
 {
 	//ルートシグネチャの設定(レジスタを使用しないので空にする)
@@ -77,9 +66,7 @@ void Triangle::initRootSignature(ID3D12Device* device)
 	this->root_signature_ = RootSignatureFactory::create(device, rs_conf);
 }
 
-/// <summary>
-/// シェーダーのロード(コンパイル)
-/// </summary>
+
 void Triangle::loadShader()
 {
 	{
@@ -101,10 +88,6 @@ void Triangle::loadShader()
 	}
 }
 
-/// <summary>
-/// psoの初期化
-/// </summary>
-/// <param name="conf">三角形の描画用設定</param>
 void Triangle::initPipelineStateObject(ID3D12Device* device)
 {
 	// インプットレイアウト
@@ -147,10 +130,6 @@ void Triangle::initPipelineStateObject(ID3D12Device* device)
 	this->pso_[(int)RenderMode::WireFrame] = PSOCacheManager::getInstance().getOrCreate(device, psoConf);
 }
 
-/// <summary>
-/// 頂点バッファの初期化
-/// </summary>
-/// <param name="conf">三角形の描画用設定</param>
 void Triangle::initVertexBuffer(ID3D12Device* device)
 {
 	//頂点データ
@@ -179,10 +158,6 @@ void Triangle::initVertexBuffer(ID3D12Device* device)
 	this->vertex_buffer_->map(this->vertices_, 3);
 }
 
-/// <summary>
-/// インデックスバッファの初期化
-/// </summary>
-/// <param name="conf">三角形の描画用設定</param>
 void Triangle::initIndexBuffer(ID3D12Device* device)
 {
 	unsigned short indices[] = {

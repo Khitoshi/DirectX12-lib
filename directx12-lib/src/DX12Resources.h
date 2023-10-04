@@ -45,7 +45,8 @@ public:
 		current_frame_buffer_rtv_handle_(),
 		current_frame_buffer_dsv_handle_(),
 		frame_index_(0),
-		full_screen_quad_()
+		full_screen_quad_(),
+		is_window_size_changed_(false)
 	{}
 	~DX12Resources() {}
 
@@ -64,7 +65,7 @@ public:
 
 	//void OnSizeChanged(const UINT width, const UINT height, bool minimized);
 	void OnSizeChanged();
-
+	void setWindowSizeChanged(bool is_window_size_changed) { is_window_size_changed_ = is_window_size_changed; }
 private://ê∂ê¨ån
 	void loadGraphicsConf();
 
@@ -115,4 +116,6 @@ private:
 
 	int frame_index_;
 	std::shared_ptr<FullScreenQuad> full_screen_quad_;
+
+	bool is_window_size_changed_;
 };

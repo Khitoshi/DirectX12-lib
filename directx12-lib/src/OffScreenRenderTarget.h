@@ -39,7 +39,8 @@ private:
 		conf_(c),
 		cbv_srv_uav_descriptor_heap_(),
 		rtv_descriptor_heap_(),
-		viewport_()
+		viewport_(),
+		device_()
 	{};
 
 public:
@@ -70,4 +71,7 @@ private:
 	std::shared_ptr<DescriptorHeap> cbv_srv_uav_descriptor_heap_;
 	std::shared_ptr<DescriptorHeap> rtv_descriptor_heap_;
 	D3D12_VIEWPORT viewport_;
+
+	//TODO:çÌèúÇ∑ÇÈ
+	ID3D12Device* device_;
 };

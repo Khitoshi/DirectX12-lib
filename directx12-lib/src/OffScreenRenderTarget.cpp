@@ -13,10 +13,16 @@ void OffScreenRenderTarget::init(ID3D12Device* device)
 	createShaderResourceView(device);
 	createRTVHeap(device);
 	createRenderTargetView(device);
+	this->device_ = device;
 }
 
 void OffScreenRenderTarget::beginRender(RenderContext* rc, D3D12_CPU_DESCRIPTOR_HANDLE dsv_handle)
 {
+	if (getResource() == nullptr)
+	{
+		init(this->device_);
+	}
+
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		getResource(),
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,

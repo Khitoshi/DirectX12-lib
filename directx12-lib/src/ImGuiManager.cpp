@@ -20,7 +20,7 @@ void ImGuiManager::init(ID3D12Device* device)
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGuiIO& io = ImGui::GetIO(); //(void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
@@ -43,6 +43,11 @@ void ImGuiManager::init(ID3D12Device* device)
 /// </summary>
 void ImGuiManager::beginFrame(RenderContext* rc, ID3D12Device* device)
 {
+	if (this->off_screen_render_target_->getResource() == nullptr) {
+		deinit();
+		init(device);
+	}
+
 	this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
 	// Start the Dear ImGui frame
@@ -66,16 +71,7 @@ void ImGuiManager::endFrame()
 /// <param name="device">GPUデバイス</param>
 void ImGuiManager::render(RenderContext* rc, ID3D12Device* device)
 {
-	//TODO:以下のifでは
-	// this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
-	//で複数回simplestartを呼び出しているので、えらーが　発生しているので別の方法を考える
-	//しかしimguiのボタンでウィンドウサイズの変更を行っているのでbeginrenderで行うことができていないということがある
 
-	if (this->off_screen_render_target_->getResource() == nullptr) {
-		deinit();
-		init(device);
-		//beginFrame(rc, device);
-	}
 
 	ImGui::Render();
 	rc->setDescriptorHeap(this->descriptor_heap_.get());

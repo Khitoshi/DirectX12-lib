@@ -64,17 +64,13 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
 	D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle = this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
 	rc->setGraphicsRootDescriptorTable(0, gpu_handle);
 
-	gpu_handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * 1;
+	gpu_handle.ptr += static_cast<unsigned long long>(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)) * 1;
 	rc->setGraphicsRootDescriptorTable(1, gpu_handle);
 
 	//ドローコール
 	rc->drawInstanced(4);
 }
 
-/// <summary>
-/// offscreenに描画をする為の終了処理
-/// </summary>
-/// <param name="rc">レンダーコンテキスト</param>
 void CompositeRenderTarget::endRender(RenderContext* rc)
 {
 	OffScreenRenderTargetCacheManager::getInstance().clearRenderTargetList();
@@ -109,11 +105,6 @@ void CompositeRenderTarget::createRTVHeap(ID3D12Device* device)
 
 void CompositeRenderTarget::createRenderTarget(ID3D12Device* device)
 {
-	//auto handle = this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-	//this->render_target_ = RenderTargetFactory::create(device, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, handle);
-
-	//createCommittedResource(device, this->conf_.heap_prop, D3D12_HEAP_FLAG_NONE, this->conf_.resource_desc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &this->conf_.clear_value);
-
 	//レンダリングターゲットビューの作成
 	D3D12_RESOURCE_DESC desc = {};
 	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -177,10 +168,6 @@ void CompositeRenderTarget::initShader(ID3D12Device* device)
 	}
 }
 
-/// <summary>
-/// パイプラインステートオブジェクトの初期化
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void CompositeRenderTarget::initPipelineStateObject(ID3D12Device* device)
 {
 	//インプットレイアウト
@@ -225,10 +212,6 @@ void CompositeRenderTarget::initPipelineStateObject(ID3D12Device* device)
 	this->pso_ = PSOCacheManager::getInstance().getOrCreate(device, pso_conf);
 }
 
-/// <summary>
-/// 頂点バッファを初期化処理
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void CompositeRenderTarget::initVertexBuffer(ID3D12Device* device)
 {
 	std::vector<Vertex> vertices(4);
@@ -237,13 +220,8 @@ void CompositeRenderTarget::initVertexBuffer(ID3D12Device* device)
 	vertices[1] = Vertex({ -1.0f, 1.0f, 0.0f }, { 0,0 }); // 左上
 	vertices[2] = Vertex({ 1.0f, -1.0f, 0.0f }, { 1,1 }); // 右下
 	vertices[3] = Vertex({ 1.0f,  1.0f, 0.0f }, { 1,0 }); // 右上
-	//{ { -1.0f, 1.0f, 0.0f }, { 0,0 } }, // 左上
-	//{ {  1.0f, -1.0f, 0.0f }, {1,1} }, // 右下
-	//{ {  1.0f,  1.0f, 0.0f }, {1,0} }, // 右上
-
 
 	VertexBuffer::VertexBufferConf vb_conf = {};
-	//vb_conf.size = sizeof(vertices);
 	vb_conf.size = static_cast<UINT>(vertices.size() * sizeof(Vertex));  // 修正点
 	vb_conf.stride = sizeof(Vertex);
 

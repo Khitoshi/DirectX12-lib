@@ -13,9 +13,6 @@ class DescriptorHeap;
 
 using namespace Microsoft::WRL;
 
-/// <summary>
-/// imguiの管理クラス
-/// </summary>
 class ImGuiManager
 {
 public:
@@ -27,26 +24,20 @@ public:
 	{};
 	~ImGuiManager() {};
 
-	//初期化処理
 	void init(ID3D12Device* device);
-	//フレーム開始処理
 	void beginFrame(RenderContext* rc, ID3D12Device* device);
-	//フレーム終了処理
 	void endFrame();
-	//描画処理
 	void render(RenderContext* rc, ID3D12Device* device);
-	//解放処理
 	void deinit();
+
 private:
-	//ディスクリプタヒープ生成
 	void createDescriptorHeap(ID3D12Device* device);
-	//オフスクリーンレンダーターゲット生成
 	void createOffScreenRenderTarget(ID3D12Device* device);
-	//深度ステンシル生成
 	void createDepthStencil(ID3D12Device* device);
+
 private:
 	const HWND* hWnd_;
-	std::shared_ptr<DescriptorHeap> descriptor_heap_;                      //ディスクリプタヒープ
-	std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;    //オフスクリーンレンダーターゲット
-	std::shared_ptr<DepthStencil> depth_stencil_;                       //深度ステンシル
+	std::shared_ptr<DescriptorHeap> descriptor_heap_;
+	std::shared_ptr<OffScreenRenderTarget> off_screen_render_target_;
+	std::shared_ptr<DepthStencil> depth_stencil_;
 };

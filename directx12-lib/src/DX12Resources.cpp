@@ -42,9 +42,15 @@ void DX12Resources::init(HWND hWnd)
 
 void DX12Resources::beginRender()
 {
-	this->frame_index_ = this->swap_chain_->getCurrentBackBufferIndex();
 	this->command_allocator_->reset();
 	this->render_context_->reset(this->command_allocator_->GetAllocator(), nullptr);
+
+	if (this->is_window_size_changed_) {
+		OnSizeChanged();
+	}
+
+	this->frame_index_ = this->swap_chain_->getCurrentBackBufferIndex();
+
 	this->updateDSVHandle();
 }
 
@@ -116,55 +122,29 @@ void DX12Resources::OnSizeChanged()
 {
 	waitForGPU();
 
+	this->swap_chain_->SetFullScreen(true);
+
 	//リリース
 	Descriptor::getCache()->release(Descriptor::DescriptorType::MainRenderTarget);
 	Descriptor::getCache()->release(Descriptor::DescriptorType::OffScreenRenderTarget);
 	Descriptor::getCache()->release(Descriptor::DescriptorType::CompositeRenderTarget);
 	Descriptor::getCache()->release(Descriptor::DescriptorType::DepthStencil);
 
-	GraphicsConfigurator::setWindowHeight(1920);
-	GraphicsConfigurator::setWindowWidth(1280);
+	GraphicsConfigurator::setWindowHeight(1280);
+	GraphicsConfigurator::setWindowWidth(1920);
 	this->swap_chain_->resizeBuffer(1920, 1280);
 
-	//Descriptor::getCache()->regenerate(Descriptor::DescriptorType::MainRenderTarget, this->device_context_->getDevice());
 	initRenderTarget();
-	//Descriptor::getCache()->regenerate(Descriptor::DescriptorType::OffScreenRenderTarget, this->device_context_->getDevice());
-	Descriptor::getCache()->regenerate(Descriptor::DescriptorType::CompositeRenderTarget, this->device_context_->getDevice());
-	//Descriptor::getCache()->regenerate(Descriptor::DescriptorType::DepthStencil, this->device_context_->getDevice());
+	initCompositeRenderTarget();
+	initDepthStencil();
 
 	initViewport();
 	initScissorRect();
 
-	/*
-	for (int i = 0; i < this->swap_chain_->getCurrentBackBufferIndex(); i++) {
-		this->render_target_->resourceReset(i);
-	}
-	OffScreenRenderTargetCacheManager::getInstance().clearRenderTargetTest();
+	this->render_context_->setViewport(this->viewport_);
+	this->render_context_->setScissorRect(this->viewport_);
 
-	DescriptorHeapManager::clear(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	DescriptorHeapManager::clear(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	// フルスクリーン状態の切り替え
-	static BOOL is_fullscreen = FALSE; // グローバルまたはメンバ変数として保持する
-	is_fullscreen != is_fullscreen;
-	this->swap_chain_->getSwapChain()->SetFullscreenState(!is_fullscreen, nullptr);
-
-	// 必要に応じてバッファをリサイズ
-	UINT width = !is_fullscreen ? 1920 : 1280; // サイズを適切に設定
-	UINT height = !is_fullscreen ? 1080 : 720;
-	GraphicsConfigurator::setWindowHeight(width);
-	GraphicsConfigurator::setWindowWidth(height);
-
-	this->swap_chain_->resizeBuffer(width, height);
-
-
-	// 新しいリソースの作成
-	DescriptorHeapManager::reinit(this->device_context_->getDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	OffScreenRenderTargetCacheManager::getInstance().reinit(this->device_context_->getDevice());
-	DescriptorHeapManager::reinit(this->device_context_->getDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	initViewport();
-	initScissorRect();
-	*/
-
+	is_window_size_changed_ = false;
 }
 
 void DX12Resources::loadGraphicsConf()

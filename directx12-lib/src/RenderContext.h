@@ -237,9 +237,6 @@ public:
 		this->command_list_->SetDescriptorHeaps(static_cast<UINT>(ds.size()), ds.data());
 	}
 
-
-
-
 	/// <summary>
 	/// 単純な描画開始処理
 	/// </summary>
@@ -268,9 +265,8 @@ public://取得系
 	ID3D12GraphicsCommandList4* getCommandList() { return this->command_list_; }//コマンドリストの取得
 
 private:
+	ID3D12GraphicsCommandList4* command_list_;
+	D3D12_VIEWPORT current_viewport_;
 
-	ID3D12GraphicsCommandList4* command_list_;        //コマンドリスト
-	D3D12_VIEWPORT current_viewport_;				    //現在のビューポート
-
-	std::vector<CD3DX12_RESOURCE_BARRIER> barriers_; //RESOURCE_BARRIERのリスト
+	std::vector<CD3DX12_RESOURCE_BARRIER> barriers_;
 };
