@@ -7,11 +7,6 @@
 #include "DescriptorHeapFactory.h"
 #include <stdexcept>
 
-/// <summary>
-/// imguiの初期化
-/// </summary>
-/// <param name="device">GPUデバイス</param>
-/// <param name="hWnd">ウィンドウハンドルのインターフェース</param>
 void ImGuiManager::init(ID3D12Device* device)
 {
 	createDescriptorHeap(device);
@@ -20,7 +15,7 @@ void ImGuiManager::init(ID3D12Device* device)
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); //(void)io;
+	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
@@ -38,9 +33,6 @@ void ImGuiManager::init(ID3D12Device* device)
 		this->descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 }
 
-/// <summary>
-/// Frame開始処理
-/// </summary>
 void ImGuiManager::beginFrame(RenderContext* rc, ID3D12Device* device)
 {
 	if (this->off_screen_render_target_->getResource() == nullptr) {
@@ -56,23 +48,13 @@ void ImGuiManager::beginFrame(RenderContext* rc, ID3D12Device* device)
 	ImGui::NewFrame();
 }
 
-/// <summary>
-/// Frame終了処理
-/// </summary>
 void ImGuiManager::endFrame()
 {
 	ImGui::Render();
 }
 
-/// <summary>
-/// imguiの描画
-/// </summary>
-/// <param name="rc">レンダーコンテキスト</param>
-/// <param name="device">GPUデバイス</param>
 void ImGuiManager::render(RenderContext* rc, ID3D12Device* device)
 {
-
-
 	ImGui::Render();
 	rc->setDescriptorHeap(this->descriptor_heap_.get());
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), rc->getCommandList());
@@ -82,9 +64,6 @@ void ImGuiManager::render(RenderContext* rc, ID3D12Device* device)
 	OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(this->off_screen_render_target_.get());
 }
 
-/// <summary>
-/// 解放処理
-/// </summary>
 void ImGuiManager::deinit()
 {
 	// Cleanup
@@ -93,10 +72,6 @@ void ImGuiManager::deinit()
 	ImGui::DestroyContext();
 }
 
-/// <summary>
-/// ディスクリプタヒープの作成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void ImGuiManager::createDescriptorHeap(ID3D12Device* device)
 {
 	this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);

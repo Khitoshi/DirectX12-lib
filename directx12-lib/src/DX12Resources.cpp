@@ -38,6 +38,8 @@ void DX12Resources::init(HWND hWnd)
 	initScissorRect();
 	initRenderContext();
 	initFullScreenQuad();
+	initWindowAssociation(factory.Get());
+
 }
 
 void DX12Resources::beginRender()
@@ -46,7 +48,7 @@ void DX12Resources::beginRender()
 	this->render_context_->reset(this->command_allocator_->GetAllocator(), nullptr);
 
 	if (this->is_window_size_changed_) {
-		OnSizeChanged();
+		OnSizeChanged(1920, 1280, this->is_window_size_changed_);
 	}
 
 	this->frame_index_ = this->swap_chain_->getCurrentBackBufferIndex();
@@ -63,7 +65,6 @@ void DX12Resources::endRender()
 	this->setMainRTVHandle();
 
 	//Fullスクリーン四角形の描画開始処理
-	//this->render_context_->transitionMainRenderTargetBegin(this->render_target_[this->frame_index_]->getResource());
 	this->render_context_->registerResouceBarrier(this->render_target_[this->frame_index_]->begin());
 	this->render_context_->simpleStart(this->current_frame_buffer_rtv_handle_, this->current_frame_buffer_dsv_handle_);
 
@@ -71,7 +72,6 @@ void DX12Resources::endRender()
 	full_screen_quad_->draw(this->render_context_.get(), this->device_context_->getDevice(), composite_render_target_.get());
 
 	//Mainレンダーターゲットの描画完了を待つ
-	//this->render_context_->transitionMainRenderTargetEnd(this->render_target_[this->frame_index_]->end());
 	this->render_context_->registerResouceBarrier(this->render_target_[this->frame_index_]->end());
 
 	//リソースバリアの実行
@@ -117,12 +117,13 @@ void DX12Resources::waitForGPU()
 	this->fence_->incrementValue();
 }
 
+//TODO:個々の処理にhttps://github.com/techlabxe/d3d12_book_2/blob/master/common/D3D12AppBase.cppのToggleFullscreenを参考にする
 //void DX12Resources::OnSizeChanged(const UINT width, const UINT height, bool minimized)
-void DX12Resources::OnSizeChanged()
+void DX12Resources::OnSizeChanged(const UINT width, const UINT height, bool is_fullscreen)
 {
 	waitForGPU();
 
-	this->swap_chain_->SetFullScreen(true);
+	this->swap_chain_->SetFullScreen(is_fullscreen);
 
 	//リリース
 	Descriptor::getCache()->release(Descriptor::DescriptorType::MainRenderTarget);
@@ -130,9 +131,9 @@ void DX12Resources::OnSizeChanged()
 	Descriptor::getCache()->release(Descriptor::DescriptorType::CompositeRenderTarget);
 	Descriptor::getCache()->release(Descriptor::DescriptorType::DepthStencil);
 
-	GraphicsConfigurator::setWindowHeight(1280);
-	GraphicsConfigurator::setWindowWidth(1920);
-	this->swap_chain_->resizeBuffer(1920, 1280);
+	GraphicsConfigurator::setWindowWidth(width);
+	GraphicsConfigurator::setWindowHeight(height);
+	this->swap_chain_->resizeBuffer(width, height);
 
 	initRenderTarget();
 	initCompositeRenderTarget();
@@ -291,14 +292,19 @@ void DX12Resources::initFullScreenQuad()
 	this->full_screen_quad_ = FullScreenQuadFactory::create(this->device_context_->getDevice());
 }
 
+void DX12Resources::initWindowAssociation(IDXGIFactory4* factory)
+{
+	if (factory->MakeWindowAssociation(*this->hWnd_, DXGI_MWA_NO_ALT_ENTER)) {
+		throw std::runtime_error("failed to make window association");
+	}
+}
+
 void DX12Resources::setMainRTVHandle()
 {
 	//レンダーターゲットのディスクリプタヒープの先頭アドレスを取得
 	this->current_frame_buffer_rtv_handle_ = this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
 	//フレームバッファ数分ずらす
-	//this->current_frame_buffer_rtv_handle_.ptr += static_cast<unsigned long long>(this->render_target_->getDescriptorHeapSize()) * this->frame_index_;
 	const UINT size = this->device_context_->getDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV) * this->frame_index_;
-	//this->current_frame_buffer_rtv_handle_.ptr += static_cast<unsigned long long>(size) * this->frame_index_;
 	this->current_frame_buffer_rtv_handle_.ptr += size;
 }
 

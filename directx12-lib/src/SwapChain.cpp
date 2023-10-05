@@ -80,11 +80,9 @@ void SwapChain::createCurrentBackBufferIndex()
 }
 
 
-
 void SwapChain::SetFullScreen(bool toFullScreen)
 {
-	if (toFullScreen)
-	{
+	if (toFullScreen) {
 		ComPtr<IDXGIOutput> output;
 		this->swap_chain_->GetContainingOutput(&output);
 		if (output)

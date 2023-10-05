@@ -39,13 +39,9 @@ public:
 	void resizeBuffer(const UINT& width, const UINT& height);
 	void SetFullScreen(bool is_full_screen);
 private:
-	//スワップチェイン関係の生成
 	void init();
-	//スワップチェインの生成
 	void createSwapChain();
-	//バックバッファの生成
 	void createCurrentBackBufferIndex();
-
 public:
 	IDXGISwapChain3* getSwapChain() const { return swap_chain_.Get(); }
 	UINT getCurrentBackBufferIndex() const { return this->swap_chain_->GetCurrentBackBufferIndex(); }
