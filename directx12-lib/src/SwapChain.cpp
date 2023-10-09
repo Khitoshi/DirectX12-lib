@@ -1,18 +1,15 @@
 #include "SwapChain.h"
 #include <stdexcept>
 #include <comdef.h>
-/// <summary>
-/// 初期化
-/// </summary>
+
 void SwapChain::init()
 {
 	createSwapChain();
 	createCurrentBackBufferIndex();
+
+	this->swap_chain_->GetDesc1(&this->desc_);
 }
 
-/// <summary>
-/// バックバッファとフロントバッファを入れ替える
-/// </summary>
 void SwapChain::present()
 {
 	//スワップチェインのプレゼント
@@ -23,7 +20,6 @@ void SwapChain::present()
 	// バックバッファインデックスの更新
 	this->current_back_buffer_index_ = this->swap_chain_->GetCurrentBackBufferIndex();
 }
-
 
 void SwapChain::resizeBuffer(const UINT& width, const UINT& height)
 {
@@ -36,10 +32,13 @@ void SwapChain::resizeBuffer(const UINT& width, const UINT& height)
 
 }
 
+void SwapChain::resizeTarget(DXGI_MODE_DESC& desc)
+{
+	if (FAILED(this->swap_chain_->ResizeTarget(&desc))) {
+		throw std::runtime_error("スワップチェインのリサイズに失敗しました");
+	}
+}
 
-/// <summary>
-/// スワップチェイン生成
-/// </summary>
 void SwapChain::createSwapChain()
 {
 	//スワップチェインの設定
@@ -71,16 +70,12 @@ void SwapChain::createSwapChain()
 	}
 }
 
-/// <summary>
-/// 現在のバックバッファのインデックスを取得
-/// </summary>
 void SwapChain::createCurrentBackBufferIndex()
 {
 	this->current_back_buffer_index_ = this->swap_chain_->GetCurrentBackBufferIndex();
 }
 
-
-void SwapChain::SetFullScreen(bool toFullScreen)
+void SwapChain::setFullScreen(bool toFullScreen)
 {
 	if (toFullScreen) {
 		ComPtr<IDXGIOutput> output;

@@ -22,7 +22,6 @@ void DX12Resources::init(HWND hWnd)
 {
 	hWnd_ = &hWnd;
 
-	loadGraphicsConf();
 	ComPtr<IDXGIFactory4> factory = createFactory();
 	this->device_context_ = DeviceContextFactory::create(factory.Get());
 	initCommandQueue();
@@ -48,7 +47,9 @@ void DX12Resources::beginRender()
 	this->render_context_->reset(this->command_allocator_->GetAllocator(), nullptr);
 
 	if (this->is_window_size_changed_) {
-		OnSizeChanged(1920, 1280, this->is_window_size_changed_);
+		//OnSizeChanged(1920, 1280, this->is_window_size_changed_);
+		toggleFullscreen();
+		is_window_size_changed_ = false;
 	}
 
 	this->frame_index_ = this->swap_chain_->getCurrentBackBufferIndex();
@@ -97,9 +98,7 @@ void DX12Resources::deinit()
 	this->swap_chain_->getSwapChain()->SetFullscreenState(FALSE, nullptr);
 }
 
-/// <summary>
-/// 描画の終了を待つ
-/// </summary>
+
 void DX12Resources::waitForGPU()
 {
 	//フェンスのシグナル
@@ -119,21 +118,23 @@ void DX12Resources::waitForGPU()
 
 //TODO:個々の処理にhttps://github.com/techlabxe/d3d12_book_2/blob/master/common/D3D12AppBase.cppのToggleFullscreenを参考にする
 //void DX12Resources::OnSizeChanged(const UINT width, const UINT height, bool minimized)
-void DX12Resources::OnSizeChanged(const UINT width, const UINT height, bool is_fullscreen)
+void DX12Resources::onSizeChanged()
 {
 	waitForGPU();
 
-	this->swap_chain_->SetFullScreen(is_fullscreen);
+	//this->swap_chain_->SetFullScreen(is_fullscreen);
 
 	//リリース
+	//ここでエラー発生!
+	/*
 	Descriptor::getCache()->release(Descriptor::DescriptorType::MainRenderTarget);
 	Descriptor::getCache()->release(Descriptor::DescriptorType::OffScreenRenderTarget);
 	Descriptor::getCache()->release(Descriptor::DescriptorType::CompositeRenderTarget);
 	Descriptor::getCache()->release(Descriptor::DescriptorType::DepthStencil);
 
-	GraphicsConfigurator::setWindowWidth(width);
-	GraphicsConfigurator::setWindowHeight(height);
-	this->swap_chain_->resizeBuffer(width, height);
+	//GraphicsConfigurator::setWindowWidth(width);
+	//GraphicsConfigurator::setWindowHeight(height);
+	this->swap_chain_->resizeBuffer(GraphicsConfigurator::getWindowWidth(), GraphicsConfigurator::getWindowHeight());
 
 	initRenderTarget();
 	initCompositeRenderTarget();
@@ -144,13 +145,63 @@ void DX12Resources::OnSizeChanged(const UINT width, const UINT height, bool is_f
 
 	this->render_context_->setViewport(this->viewport_);
 	this->render_context_->setScissorRect(this->viewport_);
+	*/
 
-	is_window_size_changed_ = false;
 }
 
-void DX12Resources::loadGraphicsConf()
+void DX12Resources::toggleFullscreen()
 {
-	GraphicsConfigurator::init();
+	/*
+	waitForGPU();
+	//UINT width = 1920;
+	//UINT height = 1280;
+	//
+	//GraphicsConfigurator::setWindowWidth(width);
+	//GraphicsConfigurator::setWindowHeight(height);
+
+	if (this->swap_chain_->isFullScreen()) {
+		//fullscreen -> windowed
+		UINT width = 1280;
+		UINT height = 720;
+		GraphicsConfigurator::setWindowWidth(width);
+		GraphicsConfigurator::setWindowHeight(height);
+
+		DXGI_MODE_DESC desc = {};
+		desc.Width = GraphicsConfigurator::getWindowWidth();
+		desc.Height = GraphicsConfigurator::getWindowHeight();
+		desc.Format = this->swap_chain_->getDesc().Format;
+		desc.RefreshRate.Denominator = 1;
+		desc.RefreshRate.Numerator = 60;
+		desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		this->swap_chain_->resizeTarget(desc);
+
+		this->swap_chain_->setFullScreen(false);
+		//SetWindowLong(*this->hWnd_, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+		//ShowWindow(*this->hWnd_, SW_NORMAL);
+	}
+	else {
+
+		UINT width = 1920;
+		UINT height = 1280;
+		GraphicsConfigurator::setWindowWidth(width);
+		GraphicsConfigurator::setWindowHeight(height);
+
+		//windowed -> fullscreen
+		DXGI_MODE_DESC desc = {};
+		desc.Width = GraphicsConfigurator::getWindowWidth();
+		desc.Height = GraphicsConfigurator::getWindowHeight();
+		desc.Format = this->swap_chain_->getDesc().Format;
+		desc.RefreshRate.Denominator = 1;
+		desc.RefreshRate.Numerator = 60;
+		desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		this->swap_chain_->resizeTarget(desc);
+
+		this->swap_chain_->setFullScreen(true);
+	}
+	onSizeChanged();
+	*/
 }
 
 ComPtr<IDXGIFactory4> DX12Resources::createFactory() {

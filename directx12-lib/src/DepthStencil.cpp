@@ -2,10 +2,6 @@
 #include "DescriptorHeapFactory.h"
 #include <stdexcept>
 
-/// <summary>
-/// 深度ステンシルバッファの初期化処理
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void DepthStencil::init(ID3D12Device* device)
 {
 	createDescriptorHeap(device);
@@ -13,20 +9,12 @@ void DepthStencil::init(ID3D12Device* device)
 	createDSV(device);
 }
 
-/// <summary>
-/// ディスクリプタヒープの生成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void DepthStencil::createDescriptorHeap(ID3D12Device* device)
 {
 	//ディスクリプタヒープの設定
 	this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, this->conf_.frame_buffer_count);
 }
 
-/// <summary>
-/// リソース生成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void DepthStencil::createResource(ID3D12Device* device)
 {
 	//深度ステンシルビュー用リソースの設定
@@ -52,10 +40,6 @@ void DepthStencil::createResource(ID3D12Device* device)
 
 }
 
-/// <summary>
-/// ディスクリプタ作成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void DepthStencil::createDSV(ID3D12Device* device)
 {
 	//深度ステンシルビューの設定

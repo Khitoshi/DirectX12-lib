@@ -1,7 +1,7 @@
 #include <Windows.h>
 
 #include "Window.h"
-//#include "GraphicsConfigurator.h"
+#include "GraphicsConfigurator.h"
 #include "InputManager.h"
 #include "HighResolutionTimer.h"
 #include <stdexcept>
@@ -131,7 +131,9 @@ void Window::init() {
 /// </summary>
 void Window::deinit() {
 	//ウィンドウクラスの登録解除
-	UnregisterClass(this->conf_.app_name, this->hInstance_);
+	std::wstring stemp = std::wstring(this->conf_.app_name.begin(), this->conf_.app_name.end());
+	LPCWSTR appName = stemp.c_str();
+	UnregisterClass(appName, this->hInstance_);
 }
 
 /// <summary>
@@ -141,8 +143,12 @@ void Window::deinit() {
 /// 生成した新しいウィンドウへのハンドル
 /// </returns>
 void Window::create() {
+	//stringをwstringに変換
+	std::wstring stemp = std::wstring(this->conf_.app_name.begin(), this->conf_.app_name.end());
+	LPCWSTR appName = stemp.c_str();
+
 	//windowクラスのパラメータ設定
-	WNDCLASSEX wc;
+	WNDCLASSEX wc{};
 	wc.cbSize = sizeof(WNDCLASSEX);		//構造体サイズ
 	wc.style = CS_CLASSDC;				//ウィンドウのスタイル
 	wc.lpfnWndProc = (WNDPROC)windowProcedure;	//ウィンドウプロシージャへのポインター
@@ -153,7 +159,7 @@ void Window::create() {
 	wc.hCursor = NULL;						//カーソルへのハンドル(NULL = ウィンドウに移動するたびにアプリケーションでカーソルの図形を明示的に設定する必要がある)
 	wc.hbrBackground = NULL;						//背景ブラシへのハンドル(NULL = 独自背景が必要)
 	wc.lpszMenuName = NULL;						//既定のメニューのマクロ(NULL = 規定メニュー無し)
-	wc.lpszClassName = this->conf_.app_name;	//ウィンドウクラスの名前を指定
+	wc.lpszClassName = appName;	//ウィンドウクラスの名前を指定
 	wc.hIconSm = NULL;						//アイコンへのハンドル(NULL = 自動で適切なサイズのアイコンを検索)
 	//ウィンドウクラスの登録
 	RegisterClassEx(&wc);
@@ -163,17 +169,15 @@ void Window::create() {
 	//RECT rect = { 0, 0, windowWidth, windowHeight };
 	//AdjustWindowRect(&rect, dwStyle, FALSE);
 
-	//TODO:マジックナンバーを使用しているので，GraphicsConfiguratorの情報を使用する方式に変更する
-
 	//window生成 & 新しいウィンドウへのハンドルをreturn
 	this->hwnd_ = CreateWindow(
-		this->conf_.app_name,	//ウィンドウクラスの名前
-		this->conf_.app_name,	//ウィンドウの名前,ウィンドウクラスの名前と別名でok
+		appName,	//ウィンドウクラスの名前
+		appName,	//ウィンドウの名前,ウィンドウクラスの名前と別名でok
 		dwStyle,	            //ウィンドウスタイル
 		this->conf_.x,		    //ウィンドウ表示位置:x
 		this->conf_.y,		    //ウィンドウ表示位置:y
-		1280,	        //ウィンドウのサイズ:幅
-		720,	        //ウィンドウのサイズ:高さ
+		GraphicsConfigurator::getWindowWidth(),	        //ウィンドウのサイズ:幅
+		GraphicsConfigurator::getWindowHeight(),	        //ウィンドウのサイズ:高さ
 		NULL,					//親ウィンドウのハンドル
 		NULL,					//メニューのハンドル
 		this->hInstance_,		//インスタンスのハンドル

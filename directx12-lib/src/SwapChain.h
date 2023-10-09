@@ -27,21 +27,24 @@ private:
 	SwapChain(const SwapChainConf& c) :
 		conf_(c),
 		swap_chain_(),
+		desc_(),
 		current_back_buffer_index_(0)
 	{};
 
 public:
 	~SwapChain() {};
 
-	//スワップチェインのプレゼント
 	void present();
 
 	void resizeBuffer(const UINT& width, const UINT& height);
-	void SetFullScreen(bool is_full_screen);
+	void setFullScreen(bool is_full_screen);
+	void resizeTarget(DXGI_MODE_DESC& desc);
+
 private:
 	void init();
 	void createSwapChain();
 	void createCurrentBackBufferIndex();
+
 public:
 	IDXGISwapChain3* getSwapChain() const { return swap_chain_.Get(); }
 	UINT getCurrentBackBufferIndex() const { return this->swap_chain_->GetCurrentBackBufferIndex(); }
@@ -52,8 +55,12 @@ public:
 		}
 		return fullscreen_state;
 	}
+	DXGI_SWAP_CHAIN_DESC1 getDesc() const { return this->desc_; }
+
 private:
-	SwapChainConf conf_;                    //設定
-	ComPtr<IDXGISwapChain3> swap_chain_;    //スワップチェイン
-	UINT current_back_buffer_index_;        //現在のバックバッファの番号
+	SwapChainConf conf_;
+	ComPtr<IDXGISwapChain3> swap_chain_;
+	DXGI_SWAP_CHAIN_DESC1 desc_;
+	UINT current_back_buffer_index_;
+
 };

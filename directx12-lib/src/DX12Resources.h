@@ -63,12 +63,14 @@ public:
 	void deinit();
 	void waitForGPU();
 
-	void OnSizeChanged(const UINT width, const UINT height, bool minimized);
+	//void OnSizeChanged(const UINT width, const UINT height, bool minimized);
+	void onSizeChanged();
+	void toggleFullscreen();
+
 	//void OnSizeChanged();
 	void setWindowSizeChanged(bool is_window_size_changed) { is_window_size_changed_ = is_window_size_changed; }
 
 private://ê∂ê¨ån
-	void loadGraphicsConf();
 
 	ComPtr<IDXGIFactory4> createFactory();
 	void initCommandQueue();

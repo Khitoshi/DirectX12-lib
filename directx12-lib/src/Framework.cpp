@@ -45,7 +45,7 @@ int Framework::run(std::function<bool()> processMessages)
 			HighResolutionTimer::getInstance().Tick();
 			const float elapsed_time_ = HighResolutionTimer::getInstance().TimeInterval();
 
-			calculateFrameStats();
+			//calculateFrameStats();
 			this->update();
 			this->render();
 		}

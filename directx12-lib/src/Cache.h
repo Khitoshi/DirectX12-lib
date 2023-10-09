@@ -30,6 +30,9 @@ public:
 				param->release();
 			}
 		}
+
+		//ƒLƒƒƒbƒVƒ…‚©‚çíœ
+		this->cache_.erase(type);
 	}
 
 private:

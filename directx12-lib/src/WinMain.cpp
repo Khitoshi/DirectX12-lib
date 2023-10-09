@@ -3,6 +3,7 @@
 #include "FrameworkFactory.h"
 
 #include <memory>
+#include "GraphicsConfigurator.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
@@ -12,10 +13,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif
 
 	//windows初期化処理
-	//TODO: ウィンドウの設定をjsonファイルから読み込む
+	GraphicsConfigurator::init();
+
 	Window::WindowConfig winConf = {};
-	winConf.app_name = TEXT("DirectX12");
+
+	winConf.app_name = GraphicsConfigurator::getAppName();
+	//winConf.x = GraphicsConfigurator::getPositionX();
 	winConf.x = 0;
+	//winConf.y = GraphicsConfigurator::getPositionY();
 	winConf.y = 0;
 	std::shared_ptr<Window> window = std::make_shared<Window>(winConf, hInstance, nCmdShow);
 	window->init();
