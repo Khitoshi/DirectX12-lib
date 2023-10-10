@@ -120,13 +120,14 @@ void DX12Resources::waitForGPU()
 //void DX12Resources::OnSizeChanged(const UINT width, const UINT height, bool minimized)
 void DX12Resources::onSizeChanged()
 {
+	/*
 	waitForGPU();
 
 	//this->swap_chain_->SetFullScreen(is_fullscreen);
 
 	//リリース
 	//ここでエラー発生!
-	/*
+
 	Descriptor::getCache()->release(Descriptor::DescriptorType::MainRenderTarget);
 	Descriptor::getCache()->release(Descriptor::DescriptorType::OffScreenRenderTarget);
 	Descriptor::getCache()->release(Descriptor::DescriptorType::CompositeRenderTarget);
@@ -146,62 +147,47 @@ void DX12Resources::onSizeChanged()
 	this->render_context_->setViewport(this->viewport_);
 	this->render_context_->setScissorRect(this->viewport_);
 	*/
-
 }
 
 void DX12Resources::toggleFullscreen()
 {
 	/*
 	waitForGPU();
-	//UINT width = 1920;
-	//UINT height = 1280;
-	//
-	//GraphicsConfigurator::setWindowWidth(width);
-	//GraphicsConfigurator::setWindowHeight(height);
 
 	if (this->swap_chain_->isFullScreen()) {
 		//fullscreen -> windowed
-		UINT width = 1280;
-		UINT height = 720;
-		GraphicsConfigurator::setWindowWidth(width);
-		GraphicsConfigurator::setWindowHeight(height);
 
-		DXGI_MODE_DESC desc = {};
-		desc.Width = GraphicsConfigurator::getWindowWidth();
-		desc.Height = GraphicsConfigurator::getWindowHeight();
-		desc.Format = this->swap_chain_->getDesc().Format;
-		desc.RefreshRate.Denominator = 1;
-		desc.RefreshRate.Numerator = 60;
-		desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		this->swap_chain_->resizeTarget(desc);
+		//DXGI_MODE_DESC desc = {};
+		//desc.Width = GraphicsConfigurator::getWindowWidth();
+		//desc.Height = GraphicsConfigurator::getWindowHeight();
+		//desc.Format = this->swap_chain_->getDesc().Format;
+		//desc.RefreshRate.Denominator = 1;
+		//desc.RefreshRate.Numerator = 60;
+		//desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		//desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		//this->swap_chain_->resizeTarget(desc);
 
 		this->swap_chain_->setFullScreen(false);
 		//SetWindowLong(*this->hWnd_, GWL_STYLE, WS_OVERLAPPEDWINDOW);
 		//ShowWindow(*this->hWnd_, SW_NORMAL);
 	}
 	else {
-
-		UINT width = 1920;
-		UINT height = 1280;
-		GraphicsConfigurator::setWindowWidth(width);
-		GraphicsConfigurator::setWindowHeight(height);
-
 		//windowed -> fullscreen
-		DXGI_MODE_DESC desc = {};
-		desc.Width = GraphicsConfigurator::getWindowWidth();
-		desc.Height = GraphicsConfigurator::getWindowHeight();
-		desc.Format = this->swap_chain_->getDesc().Format;
-		desc.RefreshRate.Denominator = 1;
-		desc.RefreshRate.Numerator = 60;
-		desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		this->swap_chain_->resizeTarget(desc);
+		//DXGI_MODE_DESC desc = {};
+		//desc.Width = GraphicsConfigurator::getWindowWidth();
+		//desc.Height = GraphicsConfigurator::getWindowHeight();
+		//desc.Format = this->swap_chain_->getDesc().Format;
+		//desc.RefreshRate.Denominator = 1;
+		//desc.RefreshRate.Numerator = 60;
+		//desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		//desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		//this->swap_chain_->resizeTarget(desc);
 
 		this->swap_chain_->setFullScreen(true);
 	}
 	onSizeChanged();
 	*/
+
 }
 
 ComPtr<IDXGIFactory4> DX12Resources::createFactory() {
