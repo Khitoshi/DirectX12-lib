@@ -11,6 +11,7 @@ class CommandQueue;
 class SwapChain;
 class CommandAllocator;
 class GraphicsCommandList;
+class DescriptorHeap;
 class RenderTarget;
 
 class CompositeRenderTarget;
@@ -27,99 +28,99 @@ using namespace Microsoft::WRL;
 class DX12Resources
 {
 public:
-    DX12Resources() :
-        device_context_(nullptr),
-        command_queue_(),
-        swap_chain_(),
-        command_allocator_(),
-        command_list_(),
-        render_target_(),
-        composite_render_target_(),
-        depth_stencil_(),
-        fence_(),
-        viewport_(),
-        scissor_rect_(),
-        render_context_(),
-        current_frame_buffer_rtv_handle_(),
-        current_frame_buffer_dsv_handle_(),
-        frame_index_(0),
-        full_screen_quad_()
-    {}
-    ~DX12Resources() {}
+	DX12Resources() :
+		hWnd_(nullptr),
+		device_context_(nullptr),
+		command_queue_(),
+		swap_chain_(),
+		command_allocator_(),
+		command_list_(),
+		render_target_(),
+		composite_render_target_(),
+		depth_stencil_(),
+		fence_(),
+		viewport_(),
+		scissor_rect_(),
+		render_context_(),
+		current_frame_buffer_rtv_handle_(),
+		current_frame_buffer_dsv_handle_(),
+		frame_index_(0),
+		full_screen_quad_(),
+		is_window_size_changed_(false)
+	{}
+	~DX12Resources() {}
 
-    //初期化処理
-    void init(const HWND hWnd);
+	//初期化処理
+	void init(HWND hWnd);
 
-    //レンダリング開始処理
-    void beginRender();
+	//レンダリング開始処理
+	void beginRender();
 
-    //レンダリング終了処理
-    void endRender();
+	//レンダリング終了処理
+	void endRender();
 
-    //描画の終了を待機する
-    void waitEndOfDrawing();
+	//描画の終了を待機する
+	void deinit();
+	void waitForGPU();
+
+	//void OnSizeChanged(const UINT width, const UINT height, bool minimized);
+	void onSizeChanged();
+	void toggleFullscreen();
+
+	//void OnSizeChanged();
+	void setWindowSizeChanged(bool is_window_size_changed) { is_window_size_changed_ = is_window_size_changed; }
 
 private://生成系
-    //IDXGIファクトリ生成
-    ComPtr<IDXGIFactory4> createFactory();
-    void initCommandQueue();
-    //スワップチェイン生成
-    void initSwapChain(const HWND hWnd, IDXGIFactory4* factory);
-    //コマンドアロケータ生成
-    void initCommandAllocator();
-    //コマンドリスト生成
-    void initCommandList();
-    //Mainレンダーターゲット生成
-    void initRenderTarget();
-    //オフスクリーンレンダーターゲット生成
-    void initCompositeRenderTarget();
-    //深度ステンシル生成
-    void initDepthStencil();
-    //フェンス生成
-    void initFence();
-    //ビューポート設定
-    void initViewport();
-    //シザリング矩形設定
-    void initScissorRect();
-    //レンダーコンテキスト生成
-    void initRenderContext();
-    //フルスクリーン四角形生成
-    void initFullScreenQuad();
 
-    //レンダーターゲットビューのハンドルを設定
-    void setMainRTVHandle();
-    //オフスクリーンレンダーターゲットビューのハンドルを設定
-    void setOffScreenRTVHandle();
-    //深度ステンシルビューのハンドルを設定
-    void updateDSVHandle();
+	ComPtr<IDXGIFactory4> createFactory();
+	void initCommandQueue();
+	void initSwapChain(IDXGIFactory4* factory);
+	void initCommandAllocator();
+	void initCommandList();
+	void initDescriptorHeap();
+	void initRenderTarget();
+	void initCompositeRenderTarget();
+	void initDepthStencil();
+	void initFence();
+	void initViewport();
+	void initScissorRect();
+	void initRenderContext();
+	void initFullScreenQuad();
+	void initWindowAssociation(IDXGIFactory4* factory);
+
+	void setMainRTVHandle();
+	void setOffScreenRTVHandle();
+	void updateDSVHandle();
 
 public://取得系
-    //デバイス取得
-    DeviceContext* getDeviceContext() const { return device_context_.get(); }
-    //レンダーコンテキスト取得
-    RenderContext* getRenderContext() const { return render_context_.get(); }
-    //ビューポート取得
-    D3D12_VIEWPORT getViewport() const { return viewport_; }
-    //現在書き込み中のフレームバッファの深度ステンシルビューのハンドル取得
-    D3D12_CPU_DESCRIPTOR_HANDLE getCurrentFrameBufferDSVHandle() const { return current_frame_buffer_dsv_handle_; }
+	DeviceContext* getDeviceContext() const { return device_context_.get(); }
+	RenderContext* getRenderContext() const { return render_context_.get(); }
+	D3D12_VIEWPORT getViewport() const { return viewport_; }
+	D3D12_CPU_DESCRIPTOR_HANDLE getCurrentFrameBufferDSVHandle() const { return current_frame_buffer_dsv_handle_; }
 
 private:
-    std::shared_ptr<DeviceContext>device_context_;                                   //デバイス
-    std::shared_ptr<CommandQueue>command_queue_;                       //コマンドキュー
-    std::shared_ptr<SwapChain>swap_chain_;                          //スワップチェイン
-    std::shared_ptr<CommandAllocator>command_allocator_;               //コマンドアロケータ
-    std::shared_ptr<GraphicsCommandList> command_list_;
-    std::shared_ptr<RenderTarget>render_target_;                    //レンダーターゲット
-    std::shared_ptr<CompositeRenderTarget>composite_render_target_; //オフスクリーンレンダーターゲット
-    std::shared_ptr<DepthStencil>depth_stencil_;                    //深度ステンシル
-    std::shared_ptr<Fence> fence_;                                  //フェンス
-    D3D12_VIEWPORT viewport_;                                       //ビューポート
-    D3D12_RECT scissor_rect_;                                       //シザリング矩形
-    std::shared_ptr<RenderContext> render_context_;                 //レンダーコンテキスト
+	HWND* hWnd_;
 
-    D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_rtv_handle_;	//現在書き込み中のフレームバッファのレンダーターゲットビューのハンドル
-    D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_dsv_handle_;	//現在書き込み中のフレームバッファの深度ステンシルビューのハンドル
+	std::shared_ptr<DeviceContext>device_context_;
+	std::shared_ptr<CommandQueue>command_queue_;
+	std::shared_ptr<SwapChain>swap_chain_;
+	std::shared_ptr<CommandAllocator>command_allocator_;
+	std::shared_ptr<GraphicsCommandList> command_list_;
+	std::shared_ptr<DescriptorHeap> rtv_descriptor_heap_;
+	std::vector<std::shared_ptr<RenderTarget>>render_target_;
+	std::shared_ptr<CompositeRenderTarget>composite_render_target_;
+	std::shared_ptr<DepthStencil>depth_stencil_;
+	std::shared_ptr<Fence> fence_;
+	D3D12_VIEWPORT viewport_;
+	D3D12_RECT scissor_rect_;
+	std::shared_ptr<RenderContext> render_context_;
 
-    int frame_index_;                                               //フレームの番号
-    std::shared_ptr<FullScreenQuad> full_screen_quad_;              //フルスクリーン四角形
+	D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_rtv_handle_;
+	D3D12_CPU_DESCRIPTOR_HANDLE current_frame_buffer_dsv_handle_;
+
+	int frame_index_;
+	std::shared_ptr<FullScreenQuad> full_screen_quad_;
+
+	bool is_window_size_changed_;
+
 };

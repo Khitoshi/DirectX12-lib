@@ -10,49 +10,65 @@
 class OffScreenRenderTargetCacheManager
 {
 private:
-    OffScreenRenderTargetCacheManager() :
-        off_screen_Render_target_list_()
-    {};
-    ~OffScreenRenderTargetCacheManager() {};
+	OffScreenRenderTargetCacheManager() :
+		off_screen_Render_target_list_()
+	{};
+	~OffScreenRenderTargetCacheManager() {};
 
 public:
-    /// <summary>
-    /// シングルトンなインスタンスを取得
-    /// </summary>
-    /// <returns>シングルトンなインスタンス</returns>
-    static OffScreenRenderTargetCacheManager& getInstance()
-    {
-        static OffScreenRenderTargetCacheManager instance;
-        return instance;
-    }
+	/// <summary>
+	/// シングルトンなインスタンスを取得
+	/// </summary>
+	/// <returns>シングルトンなインスタンス</returns>
+	static OffScreenRenderTargetCacheManager& getInstance()
+	{
+		static OffScreenRenderTargetCacheManager instance;
+		return instance;
+	}
 
-    /// <summary>
-    /// 描画予定のレンダーターゲットリストを取得
-    /// </summary>
-    /// <returns>レンダーターゲットリスト</returns>
-    std::vector<OffScreenRenderTarget*> getRenderTargetList() const
-    {
-        return this->off_screen_Render_target_list_;
-    }
+	/// <summary>
+	/// 描画予定のレンダーターゲットリストを取得
+	/// </summary>
+	/// <returns>レンダーターゲットリスト</returns>
+	std::vector<OffScreenRenderTarget*> getRenderTargetList() const
+	{
+		return this->off_screen_Render_target_list_;
+	}
 
-    /// <summary>
-    /// レンダーターゲットリストの追加
-    /// 後ろから追加される
-    /// </summary>
-    /// <param name="ort">オフスクリーンレンダーターゲット</param>
-    void addRenderTargetList(OffScreenRenderTarget* ort)
-    {
-        this->off_screen_Render_target_list_.push_back(ort);
-    }
+	/// <summary>
+	/// レンダーターゲットリストの追加
+	/// 後ろから追加される
+	/// </summary>
+	/// <param name="ort">オフスクリーンレンダーターゲット</param>
+	void addRenderTargetList(OffScreenRenderTarget* ort)
+	{
+		this->off_screen_Render_target_list_.push_back(ort);
+	}
 
-    /// <summary>
-    /// レンダーターゲットリストをクリア
-    /// </summary>
-    void clearRenderTargetList()
-    {
-        this->off_screen_Render_target_list_.clear();
-    }
+	/// <summary>
+	/// レンダーターゲットリストをクリア
+	/// </summary>
+	void clearRenderTargetList()
+	{
+		this->off_screen_Render_target_list_.clear();
+	}
+
+	void clearRenderTargetTest()
+	{
+		//for (auto& rt : this->off_screen_Render_target_list_)
+		//{
+		//	rt->clearResouce();
+		//};
+	}
+
+	void reinit(ID3D12Device* device)
+	{
+		for (auto& rt : this->off_screen_Render_target_list_)
+		{
+			rt->createRenderTargetView(device);
+		};
+	}
 
 private:
-    std::vector<OffScreenRenderTarget*> off_screen_Render_target_list_;  //レンダーターゲットリスト
+	std::vector<OffScreenRenderTarget*> off_screen_Render_target_list_;  //レンダーターゲットリスト
 };

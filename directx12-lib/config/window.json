@@ -1,0 +1,19 @@
+{
+  "title": "directx12-lib",
+
+  "posX": 0,
+  "posY": 0,
+
+  "width": 1280,
+  "height": 720,
+
+  "frameBufferCount": 2,
+  "backgroundColor": [
+    0,
+    0,
+    0,
+    0
+  ],
+
+  "isFullScreen": false
+}

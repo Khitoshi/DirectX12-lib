@@ -3,61 +3,51 @@
 #include "d3dx12.h"
 #include <dxgi1_4.h>
 #include <vector>
+#include "Descriptor.h"
 
 class DescriptorHeap;
 
 using namespace Microsoft::WRL;
 
-/// <summary>
-/// レンダーターゲット生成用クラス
-/// </summary>
-class RenderTarget
+class RenderTarget :public Descriptor
 {
-    friend class RenderTargetFactory;
-public:
-    /// <summary>
-    /// レンダーターゲット生成時に使用する設定
-    /// </summary>
-    struct RenderTargetConf {
-        UINT frame_buffer_count;        //フレームバッファの数
-        IDXGISwapChain3* swap_chain;    //スワップチェイン
-    };
-
+	friend class RenderTargetFactory;
 private:
-    RenderTarget(const RenderTargetConf c) :
-        conf_(c),
-        descriptor_heap_(),
-        descriptor_heap_size_(0),
-        resource_()
-    {};
+	RenderTarget(IDXGISwapChain3* swap_chain, UINT buffer, D3D12_CPU_DESCRIPTOR_HANDLE handle) :
+		Descriptor(Descriptor::DescriptorType::MainRenderTarget),
+		swap_chain_(swap_chain),
+		buffer_(buffer),
+		handle_(handle),
+		resouce_status_()
+	{};
 
-public:
-    ~RenderTarget() {};
-
-private:
-    //初期化処理
-    void init(ID3D12Device* device);
-    //ディスクリプタヒープの生成
-    void createDescriptorHeap(ID3D12Device* device);
-    //ディスクリプタヒープのサイズの取得
-    void createDescriptorHeapSize(ID3D12Device* device);
-    //リソースの生成
-    void createResource(ID3D12Device* device);
+	/*
+	RenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE handle, D3D12_RESOURCE_STATES status) :
+		Descriptor(Descriptor::DescriptorType::RenderTarget),
+		swap_chain_(nullptr),
+		buffer_(NULL),
+		handle_(handle),
+		resouce_status_(status)
+	{};
+	*/
 
 public:
-    //ディスクリプタヒープの取得
-    ID3D12DescriptorHeap* getDescriptorHeap() const;
-    //ディスクリプタヒープのサイズの取得
-    int getDescriptorHeapSize() const { return this->descriptor_heap_size_; }
-    //リソースの取得
-    ID3D12Resource* getResource(int index) const { return resource_[index].Get(); }
+	~RenderTarget() {};
 
 private:
-    RenderTargetConf conf_;                         //設定
+	void init(ID3D12Device* device)override;
 
-    //ComPtr<ID3D12DescriptorHeap> descriptor_heap_;  //ディスクリプタヒープ
-    std::shared_ptr<DescriptorHeap> descriptor_heap_;  //ディスクリプタヒープ
+public://取得系
 
-    int descriptor_heap_size_;                      //ディスクリプタヒープのサイズ
-    std::vector<ComPtr<ID3D12Resource>> resource_;  //リソース
+	CD3DX12_RESOURCE_BARRIER begin();
+	CD3DX12_RESOURCE_BARRIER end();
+
+	D3D12_RESOURCE_DESC getDesc();
+
+public:
+	IDXGISwapChain3* swap_chain_;
+	UINT buffer_;
+	const D3D12_CPU_DESCRIPTOR_HANDLE handle_;
+
+	D3D12_RESOURCE_STATES resouce_status_;
 };

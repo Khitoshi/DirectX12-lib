@@ -1,64 +1,56 @@
 #pragma once
-
 #include "d3dx12.h"
 #include <dxgi1_4.h>
 #include <vector>
 
-class DescriptorHeap;
+#include "Descriptor.h"
 
 using namespace Microsoft::WRL;
 
-/// <summary>
-/// 深度ステンシルバッファ生成用クラス
-/// </summary>
-class DepthStencil
+class DescriptorHeap;
+
+
+class DepthStencil :public Descriptor
 {
-    friend class DepthStencilFactory;
+	friend class DepthStencilFactory;
 public:
-    /// <summary>
-    /// 深度ステンシルバッファ生成時に使用する設定
-    /// </summary>
-    struct DepthStencilConf
-    {
-        UINT frame_buffer_count;    //フレームバッファ数
-        UINT width;                 //幅
-        UINT height;                //高さ
+	struct DepthStencilConf
+	{
+		UINT frame_buffer_count;
+		UINT width;
+		UINT height;
 
-        bool operator==(const DepthStencilConf& conf) const
-        {
-            return
-                frame_buffer_count == conf.frame_buffer_count &&
-                width == conf.width &&
-                height == conf.height;
-        }
-    };
+		bool operator==(const DepthStencilConf& conf) const
+		{
+			return
+				frame_buffer_count == conf.frame_buffer_count &&
+				width == conf.width &&
+				height == conf.height;
+		}
+	};
 
 private:
-    DepthStencil(const DepthStencilConf c) :conf_(c), descriptor_heap_(), resource_() {};
+	DepthStencil(const DepthStencilConf c) :
+		Descriptor(Descriptor::DescriptorType::DepthStencil),
+		conf_(c),
+		descriptor_heap_()
+	{};
 
 public:
-    ~DepthStencil() {};
+	~DepthStencil() {};
+
+	void init(ID3D12Device* device);
 
 private:
-    //初期化処理
-    void init(ID3D12Device* device);
-    //ディスクリプタヒープの生成
-    void createDescriptorHeap(ID3D12Device* device);
-    //リソースの生成
-    void createResource(ID3D12Device* device);
-    //深度ステンシルビュー生成
-    void createDSV(ID3D12Device* device);
+	void createDescriptorHeap(ID3D12Device* device);
+	void createResource(ID3D12Device* device);
+	void createDSV(ID3D12Device* device);
 
 public:
-    //ディスクリプタヒープの取得
-    ID3D12DescriptorHeap* getDescriptorHeap() const;
-
-    //リソースの取得
-    ID3D12Resource* getResource() const { return resource_.Get(); }
+	ID3D12DescriptorHeap* getDescriptorHeap() const;
 
 private:
-    DepthStencilConf conf_;                             //深度ステンシルバッファ生成時に使用する設定
-    //ComPtr<ID3D12DescriptorHeap>    descriptor_heap_;   //ディスクリプタヒープ
-    std::shared_ptr<DescriptorHeap>    descriptor_heap_;   //ディスクリプタヒープ
-    ComPtr<ID3D12Resource>          resource_;          //リソース
+	DepthStencilConf conf_;
+	std::shared_ptr<DescriptorHeap> descriptor_heap_;
+
 };

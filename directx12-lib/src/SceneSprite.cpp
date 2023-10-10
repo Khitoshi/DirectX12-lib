@@ -24,16 +24,10 @@ void SceneSprite::init(ID3D12Device* device)
     this->vertex_[3] = this->sprite_->getVertices(3);
 }
 
-/// <summary>
-/// 終了化処理
-/// </summary>
 void SceneSprite::finalize()
 {
 }
 
-/// <summary>
-/// 更新処理
-/// </summary>
 void SceneSprite::update()
 {
     //頂点座標を更新

@@ -31,6 +31,9 @@
     <ClCompile Include="src\CameraController.cpp" />
     <ClCompile Include="src\CommandAllocator.cpp" />
     <ClCompile Include="src\CommandQueue.cpp" />
+    <ClCompile Include="src\Descriptor.cpp" />
+    <ClCompile Include="src\DescriptorHeapManager.cpp" />
+    <ClCompile Include="src\GraphicsConfigurator.cpp" />
     <ClCompile Include="src\CompositeRenderTarget.cpp" />
     <ClCompile Include="src\ConstantBuffer.cpp" />
     <ClCompile Include="src\CubeModel.cpp" />
@@ -39,6 +42,7 @@
     <ClCompile Include="src\DeviceContext.cpp" />
     <ClCompile Include="src\DX12Resources.cpp" />
     <ClCompile Include="src\Fence.cpp" />
+    <ClCompile Include="src\FetchJson.cpp" />
     <ClCompile Include="src\Framework.cpp" />
     <ClCompile Include="src\FullScreenQuad.cpp" />
     <ClCompile Include="src\GraphicsCommandList.cpp" />
@@ -56,6 +60,7 @@
     <ClCompile Include="src\SceneTriangle.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderCacheManager.cpp" />
+    <ClCompile Include="src\SRV.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\SceneSprite.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
@@ -155,8 +160,15 @@
     <ClInclude Include="lib\imgui\include\imgui\imstb_rectpack.h" />
     <ClInclude Include="lib\imgui\include\imgui\imstb_textedit.h" />
     <ClInclude Include="lib\imgui\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="lib\nlohmann\include\nlohmann\adl_serializer.hpp" />
+    <ClInclude Include="lib\nlohmann\include\nlohmann\byte_container_with_subtype.hpp" />
+    <ClInclude Include="lib\nlohmann\include\nlohmann\json.hpp" />
+    <ClInclude Include="lib\nlohmann\include\nlohmann\json_fwd.hpp" />
+    <ClInclude Include="lib\nlohmann\include\nlohmann\ordered_map.hpp" />
     <ClInclude Include="src\AssimpLoader.h" />
+    <ClInclude Include="src\Cache.h" />
     <ClInclude Include="src\CameraController.h" />
+    <ClInclude Include="src\CBVManager.h" />
     <ClInclude Include="src\ConstantBufferFactory.h" />
     <ClInclude Include="src\CubeModel.h" />
     <ClInclude Include="src\Camera.h" />
@@ -164,7 +176,9 @@
     <ClInclude Include="src\CommandAllocatorFactory.h" />
     <ClInclude Include="src\CommandQueue.h" />
     <ClInclude Include="src\CommandQueueFactory.h" />
-    <ClInclude Include="src\CommonGraphicsConfig.h" />
+    <ClInclude Include="src\Descriptor.h" />
+    <ClInclude Include="src\DescriptorHeapManager.h" />
+    <ClInclude Include="src\GraphicsConfigurator.h" />
     <ClInclude Include="src\CompositeRenderTarget.h" />
     <ClInclude Include="src\CompositeRenderTargetFactory.h" />
     <ClInclude Include="src\ConstantBuffer.h" />
@@ -172,7 +186,6 @@
     <ClInclude Include="src\DepthStencil.h" />
     <ClInclude Include="src\DepthStencilCacheManager.h" />
     <ClInclude Include="src\DepthStencilFactory.h" />
-    <ClInclude Include="src\DescriptorCache.h" />
     <ClInclude Include="src\DescriptorHeap.h" />
     <ClInclude Include="src\DescriptorHeapFactory.h" />
     <ClInclude Include="src\DeviceContext.h" />
@@ -180,6 +193,7 @@
     <ClInclude Include="src\DX12Resources.h" />
     <ClInclude Include="src\Fence.h" />
     <ClInclude Include="src\FenceFactory.h" />
+    <ClInclude Include="src\Json.h" />
     <ClInclude Include="src\FileUtil.h" />
     <ClInclude Include="src\Framework.h" />
     <ClInclude Include="src\FrameworkFactory.h" />
@@ -191,16 +205,6 @@
     <ClInclude Include="src\Hashes.h" />
     <ClInclude Include="src\HighResolutionTimer.h" />
     <ClInclude Include="src\ImGuiManager.h" />
-    <ClInclude Include="src\imgui\imconfig.h" />
-    <ClInclude Include="src\imgui\imfilebrowser.h" />
-    <ClInclude Include="src\imgui\imgui.h" />
-    <ClInclude Include="src\imgui\ImGuiManager.h" />
-    <ClInclude Include="src\imgui\imgui_impl_dx12.h" />
-    <ClInclude Include="src\imgui\imgui_impl_win32.h" />
-    <ClInclude Include="src\imgui\imgui_internal.h" />
-    <ClInclude Include="src\imgui\imstb_rectpack.h" />
-    <ClInclude Include="src\imgui\imstb_textedit.h" />
-    <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\IndexBufferFactory.h" />
     <ClInclude Include="src\InputManager.h" />
@@ -232,9 +236,11 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderCacheManager.h" />
     <ClInclude Include="src\ShaderFactory.h" />
+    <ClInclude Include="src\SRV.h" />
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\SceneSprite.h" />
     <ClInclude Include="src\SpriteModifier.h" />
+    <ClInclude Include="src\SRVFactory.h" />
     <ClInclude Include="src\StringUtil.h" />
     <ClInclude Include="src\SwapChain.h" />
     <ClInclude Include="src\OffScreenRenderTarget.h" />
@@ -453,6 +459,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -514,14 +521,16 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./lib/assimp/include;./lib/imgui/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./lib/assimp/include;./lib/imgui/include;./lib/nlohmann/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);./lib\assimp\build\lib/$(Configuration)</AdditionalLibraryDirectories>
-      <DelayLoadDLLs>assimp-vc142-mtd.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
-      <AdditionalDependencies>assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);./lib\assimp\lib/$(Configuration)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>assimp-vc143-mtd.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalDependencies>assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -532,16 +541,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./lib/assimp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./lib/assimp/include;./lib/nlohmann/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);./lib\assimp\build\lib/$(Configuration)</AdditionalLibraryDirectories>
-      <DelayLoadDLLs>assimp-vc142-mt.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
-      <AdditionalDependencies>libfbxsdk-mt.lib;libxml2-mt.lib;zlib-mt.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);./lib\assimp\lib/$(Configuration)</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>assimp-vc143-mt.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <AdditionalDependencies>libfbxsdk-mt.lib;libxml2-mt.lib;zlib-mt.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
