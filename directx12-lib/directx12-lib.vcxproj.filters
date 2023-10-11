@@ -133,6 +133,9 @@
     <Filter Include="src\Graphics\SwapChain">
       <UniqueIdentifier>{d7cc85f5-ad65-405e-abb4-3bb64a779456}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Graphics\Phong">
+      <UniqueIdentifier>{d99c105c-6611-4e35-aaf7-b439f1867f3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\imgui\include\imgui\imgui.cpp">
@@ -287,6 +290,9 @@
     </ClCompile>
     <ClCompile Include="src\SRV.cpp">
       <Filter>src\Graphics\SRV</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhongShading.cpp">
+      <Filter>src\Graphics\Phong</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -832,6 +838,9 @@
     </ClInclude>
     <ClInclude Include="src\Cache.h">
       <Filter>src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PhongShading.h">
+      <Filter>src\Graphics\Phong</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

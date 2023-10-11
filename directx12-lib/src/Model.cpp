@@ -40,18 +40,7 @@ void Model::update()
 
 void Model::draw(RenderContext* rc)
 {
-	{
-		////オフスクリーンレンダーターゲットで書き込みできる状態にする
-		//auto renderTarget = this->off_screen_render_target_->getRTVHeap();
-		//auto resource = this->off_screen_render_target_->getResource();
-		//auto depth_stencil = this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-		////ビューポートとシザリング矩形の設定
-		//rc->transitionOffScreenRenderTargetBegin(resource);
-		//rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depth_stencil);
-		//this->off_screen_render_target_->beginRender(rc);
-	}
 	this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
-
 
 	for (size_t i = 0; i < this->meshes_.size(); i++)
 	{
@@ -67,7 +56,6 @@ void Model::draw(RenderContext* rc)
 		handle.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (1 + i);
 		rc->setGraphicsRootDescriptorTable(1, handle);//メッシュの色
 		rc->setGraphicsRootDescriptorTable(2, this->meshes_[i].material.handle_gpu);//テクスチャ
-
 
 		rc->drawIndexed(this->num_indices_[i]);
 	}
@@ -99,9 +87,9 @@ void Model::initDescriptorHeap(ID3D12Device* device)
 
 void Model::loadModel(ID3D12Device* device, const char* model_file_path)
 {
+	//TODO:マジックナンバーを使用しているので修正する
 	this->meshes_ = ModelMeshCacheManager::getInstance().getMeshes(model_file_path, false, true);
 	num_descriptors_ = static_cast<UINT>(1 + (meshes_.size() * 2));
-
 }
 
 void Model::loadShader()

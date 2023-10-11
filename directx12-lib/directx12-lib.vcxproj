@@ -51,6 +51,7 @@
     <ClCompile Include="src\InputManager.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\OffScreenRenderTarget.cpp" />
+    <ClCompile Include="src\PhongShading.cpp" />
     <ClCompile Include="src\PipelineStateObject.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\RootSignature.cpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="src\MouseInputListener.h" />
     <ClInclude Include="src\OffScreenRenderTargetCacheManager.h" />
     <ClInclude Include="src\OffScreenRenderTargetFactory.h" />
+    <ClInclude Include="src\PhongShading.h" />
     <ClInclude Include="src\PipelineStateObject.h" />
     <ClInclude Include="src\PipelineStateObjectFactory.h" />
     <ClInclude Include="src\PSOCacheManager.h" />

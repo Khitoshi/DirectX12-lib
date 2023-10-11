@@ -47,6 +47,7 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
 	for (auto& rt : OffScreenRenderTargetCacheManager::getInstance().getRenderTargetList())
 	{
 		//前回とリソースとスロットが違う場合はSRVを新しく作成する
+		//TODO:汚いのでリファクタリングする
 		auto it = this->handle_chache_.find(slot);
 		if (it == this->handle_chache_.end() || it->second != rt->getResource()) {
 			D3D12_CPU_DESCRIPTOR_HANDLE handle = this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();

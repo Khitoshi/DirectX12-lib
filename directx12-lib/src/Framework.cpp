@@ -11,11 +11,6 @@
 #include <iostream>
 #include <sstream>
 
-/// <summary>
-/// デバッグ用出力関数
-/// </summary>
-/// <param name="format"></param>
-/// <param name=""></param>
 void DebugOutputFormatString(const char* format, ...) {
 #ifdef _DEBUG
 	va_list valist;
@@ -27,14 +22,6 @@ void DebugOutputFormatString(const char* format, ...) {
 #endif
 }
 
-/// <summary>
-/// 実行処理
-/// </summary>
-/// <param name="processMessages">メッセージ処理ループ</param>
-/// <returns>
-/// 正常終了: EXIT_SUCCESSを返す
-/// エラー : EXIT_FAILUREを返す
-/// </returns>
 int Framework::run(std::function<bool()> processMessages)
 {
 	MSG msg = {};
@@ -65,9 +52,6 @@ int Framework::run(std::function<bool()> processMessages)
 	return EXIT_SUCCESS;
 }
 
-/// <summary>
-/// dllの設定と読み込み
-/// </summary>
 void Framework::setDirectoryAndDll()
 {
 #ifdef _DEBUG
@@ -81,9 +65,6 @@ void Framework::setDirectoryAndDll()
 
 }
 
-/// <summary>
-/// 更新処理
-/// </summary>
 void Framework::init()
 {
 	setDirectoryAndDll();
@@ -101,20 +82,13 @@ void Framework::init()
 	SceneManager::getInstance().init(this->dx12_resources_->getDeviceContext()->getDevice(), std::make_shared<SceneTriangle>());
 }
 
-/// <summary>
-/// 更新処理
-/// </summary>
 void Framework::update()
 {
-
 	this->dx12_resources_->beginRender();
 
 	SceneManager::getInstance().update();
 }
 
-/// <summary>
-/// メイン描画処理
-/// </summary>
 void Framework::render()
 {
 	debugRender();
@@ -125,9 +99,7 @@ void Framework::render()
 	SceneManager::getInstance().changeScene(device_context->getDevice());
 }
 
-/// <summary>
-/// デバッグ用描画処理
-/// </summary>
+
 void Framework::debugRender()
 {
 	//imguiFrame開始処理
@@ -151,10 +123,11 @@ void Framework::debugRender()
 	ImGui::Text("Dedicated System Memory: %d", gpu_info.dedicated_system_memory_);
 	ImGui::Text("Shared System Memory: %d", gpu_info.shared_system_memory_);
 
+	/*
 	if (ImGui::Button("FULLSCREEN")) {
 		this->dx12_resources_->setWindowSizeChanged(true);
 	}
-
+	*/
 
 	ImGui::End();
 
@@ -170,19 +143,12 @@ void Framework::debugRender()
 
 }
 
-/// <summary>
-/// 終了処理
-/// </summary>
 void Framework::deinit()
 {
 	this->imgui_manager_->deinit();
 	this->dx12_resources_->deinit();
 }
 
-
-/// <summary>
-/// フレームレート計算処理
-/// </summary>
 void Framework::calculateFrameStats()
 {
 	static int frames = 0;
