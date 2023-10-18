@@ -68,6 +68,7 @@ void Framework::setDirectoryAndDll()
 void Framework::init()
 {
 	setDirectoryAndDll();
+
 	//DX12初期化処理
 	this->dx12_resources_ = std::make_shared<DX12Resources>();
 	this->dx12_resources_->init(this->hWnd_);
@@ -84,18 +85,20 @@ void Framework::init()
 
 void Framework::update()
 {
-	this->dx12_resources_->beginRender();
 
 	SceneManager::getInstance().update();
 }
 
 void Framework::render()
 {
+	this->dx12_resources_->beginRender();
 	debugRender();
 	SceneManager::getInstance().render(this->dx12_resources_->getRenderContext());
+
 	this->dx12_resources_->endRender();
 
 	auto device_context = this->dx12_resources_->getDeviceContext();
+
 	SceneManager::getInstance().changeScene(device_context->getDevice());
 }
 
@@ -106,7 +109,7 @@ void Framework::debugRender()
 	auto render_context = this->dx12_resources_->getRenderContext();
 	auto device_context = this->dx12_resources_->getDeviceContext();
 
-	this->imgui_manager_->beginFrame(render_context, device_context->getDevice());
+	this->imgui_manager_->beginRender(render_context, device_context->getDevice());
 	ImGui::Begin("System");
 
 	//マウス座標表示
@@ -132,14 +135,12 @@ void Framework::debugRender()
 	ImGui::End();
 
 	//imguiメニュー更新処理
-	SceneManager::getInstance().updateImguiMenu();
+	SceneManager::getInstance().updateImguiMenu(render_context, this->imgui_manager_.get());
 	//シーン選択
 	SceneManager::getInstance().sceneSelect();
 
-	//Frame終了処理
-	this->imgui_manager_->endFrame();
 	//imgui描画処理
-	this->imgui_manager_->render(render_context, device_context->getDevice());
+	this->imgui_manager_->endRender(render_context, device_context->getDevice());
 
 }
 

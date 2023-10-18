@@ -176,8 +176,8 @@ void Window::create() {
 		dwStyle,	            //ウィンドウスタイル
 		this->conf_.x,		    //ウィンドウ表示位置:x
 		this->conf_.y,		    //ウィンドウ表示位置:y
-		GraphicsConfigurator::getWindowWidth(),	        //ウィンドウのサイズ:幅
-		GraphicsConfigurator::getWindowHeight(),	        //ウィンドウのサイズ:高さ
+		GraphicsConfigurator::getInstance().getConfigurationData().window_width,	        //ウィンドウのサイズ:幅
+		GraphicsConfigurator::getInstance().getConfigurationData().window_height,	        //ウィンドウのサイズ:高さ
 		NULL,					//親ウィンドウのハンドル
 		NULL,					//メニューのハンドル
 		this->hInstance_,		//インスタンスのハンドル

@@ -13,11 +13,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif
 
 	//windowsèâä˙âªèàóù
-	GraphicsConfigurator::init();
+	GraphicsConfigurator::getInstance().init();
 
 	Window::WindowConfig winConf = {};
 
-	winConf.app_name = GraphicsConfigurator::getAppName();
+	winConf.app_name = GraphicsConfigurator::getInstance().getConfigurationData().app_name;
 	//winConf.x = GraphicsConfigurator::getPositionX();
 	winConf.x = 0;
 	//winConf.y = GraphicsConfigurator::getPositionY();

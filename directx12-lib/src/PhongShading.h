@@ -46,7 +46,6 @@ private:
 	void initDepthStencil(ID3D12Device* device);
 	void initOffScreenRenderTarget(ID3D12Device* device);
 
-
 	void initTexture(ID3D12Device* device, OffScreenRenderTarget* offscreen_rt);
 private:
 	struct PhongConf

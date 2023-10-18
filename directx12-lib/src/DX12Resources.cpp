@@ -244,9 +244,9 @@ void DX12Resources::initCommandQueue()
 void DX12Resources::initSwapChain(IDXGIFactory4* factory) {
 	SwapChain::SwapChainConf sc_conf = {};
 	sc_conf.hWnd = *hWnd_;
-	sc_conf.width = GraphicsConfigurator::getWindowWidth();
-	sc_conf.height = GraphicsConfigurator::getWindowHeight();
-	sc_conf.frame_buffer_count = GraphicsConfigurator::getFrameBufferCount();
+	sc_conf.width = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
+	sc_conf.height = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
+	sc_conf.frame_buffer_count = GraphicsConfigurator::getInstance().getConfigurationData().frame_buffer_count;
 	sc_conf.factory = factory;
 	sc_conf.command_queue = this->command_queue_->getCommandQueue();
 	this->swap_chain_ = SwapChainFactory::create(sc_conf);
@@ -264,15 +264,15 @@ void DX12Resources::initCommandList()
 
 void DX12Resources::initDescriptorHeap()
 {
-	this->rtv_descriptor_heap_ = DescriptorHeapFactory::create(this->device_context_->getDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, GraphicsConfigurator::getFrameBufferCount());
+	this->rtv_descriptor_heap_ = DescriptorHeapFactory::create(this->device_context_->getDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, GraphicsConfigurator::getInstance().getConfigurationData().frame_buffer_count);
 }
 
 void DX12Resources::initRenderTarget()
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-	this->render_target_.resize(GraphicsConfigurator::getFrameBufferCount());
-
-	for (UINT i = 0; i < GraphicsConfigurator::getFrameBufferCount(); i++) {
+	this->render_target_.resize(GraphicsConfigurator::getInstance().getConfigurationData().frame_buffer_count);
+	//TODO:リファクタリング
+	for (UINT i = 0; i < GraphicsConfigurator::getInstance().getConfigurationData().frame_buffer_count; i++) {
 		this->render_target_[i] = RenderTargetFactory::create(this->device_context_->getDevice(), this->swap_chain_->getSwapChain(), i, handle);
 		handle.ptr += this->device_context_->getDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	}
@@ -290,9 +290,9 @@ void DX12Resources::initCompositeRenderTarget()
 void DX12Resources::initDepthStencil()
 {
 	DepthStencil::DepthStencilConf ds_conf = {};
-	ds_conf.width = GraphicsConfigurator::getWindowWidth();
-	ds_conf.height = GraphicsConfigurator::getWindowHeight();
-	ds_conf.frame_buffer_count = GraphicsConfigurator::getFrameBufferCount();
+	ds_conf.width = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
+	ds_conf.height = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
+	ds_conf.frame_buffer_count = GraphicsConfigurator::getInstance().getConfigurationData().frame_buffer_count;
 	this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, this->device_context_->getDevice());
 }
 
@@ -305,8 +305,8 @@ void DX12Resources::initViewport()
 {
 	this->viewport_.TopLeftX = 0;
 	this->viewport_.TopLeftY = 0;
-	this->viewport_.Width = static_cast<FLOAT>(GraphicsConfigurator::getWindowWidth());
-	this->viewport_.Height = static_cast<FLOAT>(GraphicsConfigurator::getWindowHeight());
+	this->viewport_.Width = static_cast<FLOAT>(GraphicsConfigurator::getInstance().getConfigurationData().window_width);
+	this->viewport_.Height = static_cast<FLOAT>(GraphicsConfigurator::getInstance().getConfigurationData().window_height);
 	this->viewport_.MinDepth = D3D12_MIN_DEPTH;
 	this->viewport_.MaxDepth = D3D12_MAX_DEPTH;
 }
@@ -315,8 +315,8 @@ void DX12Resources::initScissorRect()
 {
 	this->scissor_rect_.left = 0;
 	this->scissor_rect_.top = 0;
-	this->scissor_rect_.right = GraphicsConfigurator::getWindowWidth();
-	this->scissor_rect_.bottom = GraphicsConfigurator::getWindowHeight();
+	this->scissor_rect_.right = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
+	this->scissor_rect_.bottom = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
 }
 
 void DX12Resources::initRenderContext()

@@ -13,6 +13,7 @@
 #include "ConstantBufferFactory.h"
 #include "TextureCacheManager.h"
 #include "RenderContext.h"
+#include "GeometryBuffer.h"
 #include "GraphicsConfigurator.h"
 #include <stdexcept>
 #include <math.h>
@@ -20,6 +21,7 @@
 void Model::init(ID3D12Device* device, const char* model_file_path)
 {
 	this->device_ = device;
+
 	this->initRootSignature(device);
 	this->loadShader();
 	this->initPipelineStateObject(device);
@@ -31,6 +33,8 @@ void Model::init(ID3D12Device* device, const char* model_file_path)
 	this->initIndexBuffer(device);
 	this->initOffScreenRenderTarget(device);
 	this->initDepthStencil(device);
+
+	this->initGBuffers(device);
 }
 
 void Model::update()
@@ -40,6 +44,11 @@ void Model::update()
 
 void Model::draw(RenderContext* rc)
 {
+
+	for (auto& gbuffer : this->geometry_buffer_) {
+		gbuffer->draw(rc);
+	}
+
 	this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
 	for (size_t i = 0; i < this->meshes_.size(); i++)
@@ -162,6 +171,7 @@ void Model::initPipelineStateObject(ID3D12Device* device)
 	conf.desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	conf.desc.SampleMask = UINT_MAX;
 	conf.desc.RasterizerState = rasterizer_desc;
+	//conf.desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	conf.desc.DepthStencilState = ds_desc;
 	//conf.desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	conf.desc.InputLayout = { inputElementDesc, _countof(inputElementDesc) };
@@ -289,8 +299,8 @@ void Model::initOffScreenRenderTarget(ID3D12Device* device)
 		D3D12_RESOURCE_DESC desc = {};
 		desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		desc.Alignment = 0;
-		desc.Width = GraphicsConfigurator::getWindowWidth();
-		desc.Height = GraphicsConfigurator::getWindowHeight();
+		desc.Width = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
+		desc.Height = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
 		desc.DepthOrArraySize = 1;
 		desc.MipLevels = 1;
 		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -304,12 +314,140 @@ void Model::initOffScreenRenderTarget(ID3D12Device* device)
 	this->off_screen_render_target_ = OffScreenRenderTargetFactory::create(osrtConf, device);
 }
 
+void Model::initGBuffers(ID3D12Device* device)
+{
+	//メモ: meshの要素数 * メッシュのメンバ数
+	//this->geometry_buffer_.resize(this->meshes_.size() * 5);
+	for (auto& mesh : this->meshes_) {
+		std::vector<GeometryBuffer::Conf::Vertex> positions;
+		std::vector<GeometryBuffer::Conf::Vertex> normals;
+		std::vector<GeometryBuffer::Conf::Vertex> texcoords;
+		std::vector<GeometryBuffer::Conf::Vertex> tangents;
+		std::vector<GeometryBuffer::Conf::Vertex> colors;
+
+		for (auto& vertex : mesh.vertices) {
+			GeometryBuffer::Conf::Vertex position = {};
+			position.position.x = vertex.Position.x;
+			position.position.y = vertex.Position.y;
+			position.position.z = vertex.Position.z;
+			position.position.w = 1.0f;
+			positions.push_back(position);
+
+			GeometryBuffer::Conf::Vertex normal = {};
+			normal.data.x = vertex.Normal.x;
+			normal.data.y = vertex.Normal.y;
+			normal.data.z = vertex.Normal.z;
+			normal.data.w = 1.0f;
+			normal.position.x = vertex.Position.x;
+			normal.position.y = vertex.Position.y;
+			normal.position.z = vertex.Position.z;
+			normal.position.w = 1.0f;
+			normals.push_back(normal);
+
+			GeometryBuffer::Conf::Vertex texcoord = {};
+			texcoord.data.x = vertex.UV.x;
+			texcoord.data.y = vertex.UV.y;
+			texcoord.data.z = 0.0f;
+			texcoord.data.w = 1.0f;
+			texcoord.position.x = vertex.Position.x;
+			texcoord.position.y = vertex.Position.y;
+			texcoord.position.z = vertex.Position.z;
+			texcoord.position.w = 1.0f;
+			texcoords.push_back(texcoord);
+
+			GeometryBuffer::Conf::Vertex tangent = {};
+			tangent.data.x = vertex.Tangent.x;
+			tangent.data.y = vertex.Tangent.y;
+			tangent.data.z = vertex.Tangent.z;
+			tangent.data.w = 1.0f;
+			tangent.position.x = vertex.Position.x;
+			tangent.position.y = vertex.Position.y;
+			tangent.position.z = vertex.Position.z;
+			tangent.position.w = 1.0f;
+			tangents.push_back(tangent);
+
+			GeometryBuffer::Conf::Vertex color = {};
+			color.data.x = vertex.Color.x;
+			color.data.y = vertex.Color.y;
+			color.data.z = vertex.Color.z;
+			color.data.w = vertex.Color.w;
+			color.position.x = vertex.Position.x;
+			color.position.y = vertex.Position.y;
+			color.position.z = vertex.Position.z;
+			color.position.w = 1.0f;
+
+			colors.push_back(color);
+		}
+
+		{
+			this->geometry_buffer_.push_back(
+				std::make_shared<GeometryBuffer>(
+					GeometryBuffer::Conf(
+						GeometryBuffer::Conf::Semantic::POSITION,
+						GeometryBuffer::Conf::Format::FLOAT4,
+						positions,
+						mesh.indices
+					)
+				)
+			);
+
+			this->geometry_buffer_.push_back(
+				std::make_shared<GeometryBuffer>(
+					GeometryBuffer::Conf(
+						GeometryBuffer::Conf::Semantic::NORMAL,
+						GeometryBuffer::Conf::Format::FLOAT4,
+						normals,
+						mesh.indices
+					)
+				)
+			);
+
+			this->geometry_buffer_.push_back(
+				std::make_shared<GeometryBuffer>(
+					GeometryBuffer::Conf(
+						GeometryBuffer::Conf::Semantic::TEXCOORD,
+						GeometryBuffer::Conf::Format::FLOAT4,
+						texcoords,
+						mesh.indices
+					)
+				)
+			);
+
+			this->geometry_buffer_.push_back(
+				std::make_shared<GeometryBuffer>(
+					GeometryBuffer::Conf(
+						GeometryBuffer::Conf::Semantic::TANGENT,
+						GeometryBuffer::Conf::Format::FLOAT4,
+						tangents,
+						mesh.indices
+					)
+				)
+			);
+
+			this->geometry_buffer_.push_back(
+				std::make_shared<GeometryBuffer>(
+					GeometryBuffer::Conf(
+						GeometryBuffer::Conf::Semantic::COLOR,
+						GeometryBuffer::Conf::Format::FLOAT4,
+						colors,
+						mesh.indices
+					)
+				)
+			);
+		}
+	}
+
+	for (auto& gbuffer : this->geometry_buffer_) {
+		gbuffer->init(device);
+	}
+}
+
 void Model::initDepthStencil(ID3D12Device* device)
 {
 	DepthStencil::DepthStencilConf ds_conf = {};
 	ds_conf.frame_buffer_count = 1;
-	ds_conf.width = GraphicsConfigurator::getWindowWidth();
-	ds_conf.height = GraphicsConfigurator::getWindowHeight();
+	ds_conf.width = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
+	ds_conf.height = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
 	this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, device);
 }
 

@@ -14,7 +14,7 @@ void Scene3dCube::init(ID3D12Device* device)
 	this->camera_ = std::make_shared<Camera>();
 
 
-	this->camera_->init(static_cast<float>(GraphicsConfigurator::getWindowWidth()), static_cast<float>(GraphicsConfigurator::getWindowHeight()));
+	this->camera_->init(static_cast<float>(GraphicsConfigurator::getInstance().getConfigurationData().window_width), static_cast<float>(GraphicsConfigurator::getInstance().getConfigurationData().window_height));
 	this->camera_controller_ = std::make_shared<CameraController>(this->camera_.get());
 	InputManager::Instance().addMouseInputListener(this->camera_controller_.get());
 
@@ -39,7 +39,7 @@ void Scene3dCube::finalize()
 /// </summary>
 void Scene3dCube::update()
 {
-	this->camera_->update(GraphicsConfigurator::getWindowWidth(), GraphicsConfigurator::getWindowHeight());
+	this->camera_->update(GraphicsConfigurator::getInstance().getConfigurationData().window_width, GraphicsConfigurator::getInstance().getConfigurationData().window_height);
 
 	//if (is_change_camera_) {
 	CubeModel::CubeModelConf conf = {};
@@ -65,7 +65,7 @@ void Scene3dCube::render(RenderContext* rc)
 /// <summary>
 /// デバッグ用のimguiのmenuを表示
 /// </summary>
-void Scene3dCube::updateImguiMenu()
+void Scene3dCube::updateImguiMenu(RenderContext* rc, ImGuiManager* igm)
 {
 	ImGui::Begin("3dCube");
 	{//カメラの位置を変更する

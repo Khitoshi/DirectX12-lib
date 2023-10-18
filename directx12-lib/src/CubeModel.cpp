@@ -281,8 +281,8 @@ void CubeModel::initOffScreenRenderTarget(ID3D12Device* device)
 		D3D12_RESOURCE_DESC desc = {};
 		desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		desc.Alignment = 0;
-		desc.Width = GraphicsConfigurator::getWindowWidth();
-		desc.Height = GraphicsConfigurator::getWindowHeight();
+		desc.Width = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
+		desc.Height = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
 		desc.DepthOrArraySize = 1;
 		desc.MipLevels = 1;
 		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -304,7 +304,7 @@ void CubeModel::initDepthStencil(ID3D12Device* device)
 {
 	DepthStencil::DepthStencilConf ds_conf = {};
 	ds_conf.frame_buffer_count = 1;
-	ds_conf.width = GraphicsConfigurator::getWindowWidth();
-	ds_conf.height = GraphicsConfigurator::getWindowHeight();
+	ds_conf.width = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
+	ds_conf.height = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
 	this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, device);
 }

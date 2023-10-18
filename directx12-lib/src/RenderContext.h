@@ -211,7 +211,6 @@ public:
 		this->command_list_->SetGraphicsRootSignature(rootSignature->getRootSignature());
 	}
 
-
 	/// <summary>
 	/// ディスクリプタヒープを単体登録
 	/// </summary>
@@ -255,7 +254,7 @@ public:
 		this->setScissorRect(this->current_viewport_);
 
 		//レンダーターゲットのクリア
-		this->clearRenderTarget(rtv_handle, GraphicsConfigurator::getBackgroundColor());
+		this->clearRenderTarget(rtv_handle, GraphicsConfigurator::getInstance().getConfigurationData().background_color);
 
 		//深度ステンシルのクリア
 		this->clearDepthStencil(dsv_handle, 1.0f);

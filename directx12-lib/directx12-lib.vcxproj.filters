@@ -136,6 +136,15 @@
     <Filter Include="src\Graphics\Phong">
       <UniqueIdentifier>{d99c105c-6611-4e35-aaf7-b439f1867f3f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Phong">
+      <UniqueIdentifier>{c4b9e935-7b44-4c67-b85a-6916e52fb805}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Graphics\GeometryBuffer">
+      <UniqueIdentifier>{ece28ca9-b222-4a90-b522-bc94c4e0122a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\G-Buffer">
+      <UniqueIdentifier>{19a345ab-f0e6-445d-b624-fc2be839e692}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\imgui\include\imgui\imgui.cpp">
@@ -258,9 +267,6 @@
     <ClCompile Include="src\Texture.cpp">
       <Filter>src\Graphics\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="src\Triangle.cpp">
-      <Filter>src\Graphics\Model</Filter>
-    </ClCompile>
     <ClCompile Include="src\TextureCubeModel.cpp">
       <Filter>src\Graphics\Model</Filter>
     </ClCompile>
@@ -293,6 +299,12 @@
     </ClCompile>
     <ClCompile Include="src\PhongShading.cpp">
       <Filter>src\Graphics\Phong</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GeometryBuffer.cpp">
+      <Filter>src\Graphics\GeometryBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Triangle.cpp">
+      <Filter>src\Graphics\ViewObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -842,6 +854,9 @@
     <ClInclude Include="src\PhongShading.h">
       <Filter>src\Graphics\Phong</Filter>
     </ClInclude>
+    <ClInclude Include="src\GeometryBuffer.h">
+      <Filter>src\Graphics\GeometryBuffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\TrianglePS.hlsl">
@@ -891,6 +906,18 @@
     </FxCompile>
     <FxCompile Include="src\shaders\3dModelPS.hlsl">
       <Filter>Shaders\3dModel</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\PhongVS.hlsl">
+      <Filter>Shaders\Phong</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\PhongPS.hlsl">
+      <Filter>Shaders\Phong</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\GeometryBufferVS.hlsl">
+      <Filter>Shaders\G-Buffer</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\GeometryBufferPS.hlsl">
+      <Filter>Shaders\G-Buffer</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -948,6 +975,12 @@
     </None>
     <None Include="lib\assimp\include\assimp\vector3.inl">
       <Filter>lib\assimp</Filter>
+    </None>
+    <None Include="src\shaders\Phong.hlsli">
+      <Filter>Shaders\Phong</Filter>
+    </None>
+    <None Include="src\shaders\GeometryBuffer.hlsli">
+      <Filter>Shaders\G-Buffer</Filter>
     </None>
   </ItemGroup>
 </Project>

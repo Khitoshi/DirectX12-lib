@@ -4,6 +4,7 @@
 #include <map>
 #include "d3dx12.h"
 #include "Mesh.h"
+
 class RootSignature;
 class DescriptorHeap;
 class Shader;
@@ -15,9 +16,9 @@ class DepthStencil;
 class Texture;
 class OffScreenRenderTarget;
 class RenderContext;
+class GeometryBuffer;
 
 
-//fbxƒ‚ƒfƒ‹ƒNƒ‰ƒX
 class Model
 {
 public:
@@ -65,9 +66,14 @@ private:
 	void initDepthStencil(ID3D12Device* device);
 	void initOffScreenRenderTarget(ID3D12Device* device);
 
+	void initGBuffers(ID3D12Device* device);
+
 public:
 	void setConf(const ModelConf& c) { conf_ = c; }
 	void setModel(const char* model_file_path);
+
+public:
+	std::vector<std::shared_ptr<GeometryBuffer>> getGeometryBuffer() { return geometry_buffer_; }
 private:
 	ModelConf conf_;
 	std::vector<Mesh> meshes_;
@@ -92,4 +98,7 @@ private:
 	ID3D12Device* device_;
 
 	UINT num_descriptors_;
+
+	std::vector<std::shared_ptr<GeometryBuffer>> geometry_buffer_;
+
 };
