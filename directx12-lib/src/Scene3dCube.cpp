@@ -5,10 +5,7 @@
 #include "GraphicsConfigurator.h"
 #include <imgui/imgui.h>
 #include "InputManager.h"
-/// <summary>
-/// 初期化処理
-/// </summary>
-/// <param name="device"></param>
+
 void Scene3dCube::init(ID3D12Device* device)
 {
 	this->camera_ = std::make_shared<Camera>();
@@ -27,21 +24,15 @@ void Scene3dCube::init(ID3D12Device* device)
 	this->cube_model_->init(device);
 }
 
-/// <summary>
-/// 終了化処理
-/// </summary>
+
 void Scene3dCube::finalize()
 {
 }
 
-/// <summary>
-/// 更新処理
-/// </summary>
 void Scene3dCube::update()
 {
 	this->camera_->update(GraphicsConfigurator::getInstance().getConfigurationData().window_width, GraphicsConfigurator::getInstance().getConfigurationData().window_height);
 
-	//if (is_change_camera_) {
 	CubeModel::CubeModelConf conf = {};
 	DirectX::XMStoreFloat4x4(&conf.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f)));
 	DirectX::XMStoreFloat4x4(&conf.view, DirectX::XMMatrixTranspose(this->camera_->getViewMatrix()));
@@ -49,22 +40,13 @@ void Scene3dCube::update()
 
 	this->cube_model_->setConf(conf);
 	this->cube_model_->update();
-	//is_change_camera_ = false;
-	//}
 }
 
-/// <summary>
-/// 描画処理
-/// </summary>
-/// <param name="rc"></param>
 void Scene3dCube::render(RenderContext* rc)
 {
 	this->cube_model_->draw(rc);
 }
 
-/// <summary>
-/// デバッグ用のimguiのmenuを表示
-/// </summary>
 void Scene3dCube::updateImguiMenu(RenderContext* rc, ImGuiManager* igm)
 {
 	ImGui::Begin("3dCube");

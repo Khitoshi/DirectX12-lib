@@ -9,10 +9,7 @@
 #include "PSOCacheManager.h"
 #include "CompositeRenderTarget.h"
 #include "RenderTarget.h"
-/// <summary>
-/// 初期化処理
-/// </summary>
-/// <param name="device">GPUデバイス</param>
+
 void FullScreenQuad::init(ID3D12Device* device)
 {
 	createShader(device);
@@ -23,26 +20,14 @@ void FullScreenQuad::init(ID3D12Device* device)
 	this->num_indices_ = 4;
 }
 
-/// <summary>
-/// 描画処理
-/// </summary>
-/// <param name="rc">レンダーコンテキスト</param>
-/// <param name="osrt">オフスクリーンレンダーターゲット</param>
 void FullScreenQuad::draw(RenderContext* rc, ID3D12Device* device, CompositeRenderTarget* crt)
 {
-	//ルートシグネチャを設定
 	rc->setRootSignature(this->root_signature_.get());
-	//パイプラインステートを設定
 	rc->setPipelineState(this->pso_.get());
-	//プリミティブのトポロジーを設定
 	rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	//頂点バッファを設定
 	rc->setVertexBuffer(this->vertex_buffer_.get());
-	//ディスクリプタ作成
 	this->createSRV(device, crt);
-	//SRVヒープを設定
 	rc->setDescriptorHeap(this->cbv_srv_descriptor_heap_.get());
-	//GPUハンドルをcommandlistに設定
 	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = this->cbv_srv_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
 	rc->setGraphicsRootDescriptorTable(0, gpuHandle);
 
@@ -50,10 +35,6 @@ void FullScreenQuad::draw(RenderContext* rc, ID3D12Device* device, CompositeRend
 	rc->drawInstanced(this->num_indices_);
 }
 
-/// <summary>
-/// Basicシェーダーのペア生成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void FullScreenQuad::createShader(ID3D12Device* device)
 {
 	{//頂点シェーダー
@@ -72,10 +53,6 @@ void FullScreenQuad::createShader(ID3D12Device* device)
 	}
 }
 
-/// <summary>
-/// 頂点バッファの作成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void FullScreenQuad::createVertexBuffer(ID3D12Device* device)
 {
 	//頂点バッファの作成
@@ -93,10 +70,6 @@ void FullScreenQuad::createVertexBuffer(ID3D12Device* device)
 	this->vertex_buffer_->map(vertices, 4);
 }
 
-/// <summary>
-/// ルートシグニチャの作成
-/// </summary>
-/// <param name="device">初期化&生成済みのGPUデバイス</param>
 void FullScreenQuad::createRootSignature(ID3D12Device* device)
 {
 	//ルートシグニチャの設定(レジスタを使用しないので空にする)
@@ -112,10 +85,6 @@ void FullScreenQuad::createRootSignature(ID3D12Device* device)
 	this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, conf);
 }
 
-/// <summary>
-/// パイプラインステートオブジェクト作成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void FullScreenQuad::createPipelineState(ID3D12Device* device)
 {
 	// インプットレイアウト
@@ -150,10 +119,6 @@ void FullScreenQuad::createPipelineState(ID3D12Device* device)
 	this->pso_ = PSOCacheManager::getInstance().getOrCreate(device, conf);
 }
 
-/// <summary>
-/// ディスクリプタヒープの作成
-/// </summary>
-/// <param name="device"></param>
 void FullScreenQuad::createSRVHeap(ID3D12Device* device)
 {
 	this->cbv_srv_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);

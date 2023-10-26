@@ -9,8 +9,11 @@
 #include "DepthStencilCacheManager.h"
 
 #include "OffScreenRenderTargetCacheManager.h"
-
+#include "GeometryBuffer.h"
 #include "RenderContext.h"
+#include <imgui/imgui.h>
+#include "ImGuiManager.h"
+
 void PhongShading::init(ID3D12Device* device)
 {
 	loadShader();
@@ -21,16 +24,98 @@ void PhongShading::init(ID3D12Device* device)
 	initConstantBuffer(device);
 	initDepthStencil(device);
 	initOffScreenRenderTarget(device);
+	this->device_ = device;
 }
 
-void PhongShading::update()
+void PhongShading::update(
+	Camera* camera,
+	OffScreenRenderTarget* ort,
+	GeometryBuffer* world_pos,
+	GeometryBuffer* normal,
+	GeometryBuffer* color,
+	GeometryBuffer* albedo)
 {
+	{
+		this->camera_ = *camera;
+
+		this->cb_[0]->map(&this->camera_, 1);
+		this->cb_[1]->map(&this->light_, 1);
+	}
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+	srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	srv_desc.Texture2D.MipLevels = 1;
+	srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+	//モデル
+	auto srv_handle = descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+	srv_handle.ptr += static_cast<unsigned long long>(this->device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)) * 2;
+	device_->CreateShaderResourceView(ort->getResource(), &srv_desc, srv_handle);
+
+	//ワールド座標
+	srv_handle.ptr += static_cast<unsigned long long>(this->device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+	device_->CreateShaderResourceView(world_pos->getOffScreenRenderTarget()->getResource(), &srv_desc, srv_handle);
+
+	//法線
+	srv_handle.ptr += static_cast<unsigned long long>(this->device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+	device_->CreateShaderResourceView(normal->getOffScreenRenderTarget()->getResource(), &srv_desc, srv_handle);
+
+	//カラー
+	srv_handle.ptr += static_cast<unsigned long long>(this->device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+	device_->CreateShaderResourceView(color->getOffScreenRenderTarget()->getResource(), &srv_desc, srv_handle);
+
+	//アルベド
+	srv_handle.ptr += static_cast<unsigned long long>(this->device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+	device_->CreateShaderResourceView(albedo->getOffScreenRenderTarget()->getResource(), &srv_desc, srv_handle);
 }
 
 void PhongShading::draw(RenderContext* rc)
 {
+	this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+
+	rc->setRootSignature(this->root_signature_.get());
+	rc->setPipelineState(this->pso_.get());
+	rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	rc->setVertexBuffer(this->vb_.get());
+
+	rc->setDescriptorHeap(this->descriptor_heap_.get());
+	//model行列等
+	D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle = this->descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+	for (int i = 0; i < 7; i++) {
+		rc->setGraphicsRootDescriptorTable(i, gpu_handle);
+		gpu_handle.ptr += static_cast<unsigned long long>(this->device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+	}
+	rc->drawInstanced(4);
+
+	this->off_screen_render_target_->endRender(rc);
+	OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(off_screen_render_target_.get());
 }
 
+void PhongShading::debugDraw()
+{
+	ImGui::Begin("Phong Light");
+
+	{//光源の方向
+		float ligdir[3] = { this->light_.direction.x, this->light_.direction.y, this->light_.direction.z };
+		if (ImGui::DragFloat3("light direciton", ligdir)) {
+			this->light_.direction.x = ligdir[0];
+			this->light_.direction.y = ligdir[1];
+			this->light_.direction.z = ligdir[2];
+		}
+	}
+
+	{//光源の色
+		float ligcolor[3] = { this->light_.color.x, this->light_.color.y, this->light_.color.z };
+		if (ImGui::DragFloat3("light color", ligcolor)) {
+			this->light_.color.x = ligcolor[0];
+			this->light_.color.y = ligcolor[1];
+			this->light_.color.z = ligcolor[2];
+		}
+	}
+
+	ImGui::End();
+}
 
 void PhongShading::loadShader()
 {
@@ -38,14 +123,14 @@ void PhongShading::loadShader()
 		Shader::ShaderConf conf = {};
 		conf.entry_func_name = "VSMain";
 		conf.current_shader_model_type = Shader::ShaderConf::ShaderModelType::VERTEX;
-		conf.file_path = "./src/shaders/3dModelVS.hlsl";
+		conf.file_path = "./src/shaders/PhongVS.hlsl";
 		this->vs_ = ShaderCacheManager::getInstance().getOrCreate(conf);
 	}
 	{//ピクセル
 		Shader::ShaderConf conf = {};
 		conf.entry_func_name = "PSMain";
 		conf.current_shader_model_type = Shader::ShaderConf::ShaderModelType::PIXEL;
-		conf.file_path = "./src/shaders/3dModelPS.hlsl";
+		conf.file_path = "./src/shaders/PhongPS.hlsl";
 		this->ps_ = ShaderCacheManager::getInstance().getOrCreate(conf);
 	}
 }
@@ -58,27 +143,24 @@ void PhongShading::initRootSignature(ID3D12Device* device)
 	rootSignatureConf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	rootSignatureConf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	rootSignatureConf.num_cbv = 2;
-	rootSignatureConf.num_srv = 1;
+	rootSignatureConf.num_srv = 5;
 	rootSignatureConf.num_sampler = 1;
 	rootSignatureConf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	rootSignatureConf.visibility_cbv = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootSignatureConf.visibility_cbv = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootSignatureConf.visibility_srv = D3D12_SHADER_VISIBILITY_PIXEL;
 	this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
 }
 
 void PhongShading::initDescriptorHeap(ID3D12Device* device)
 {
-	this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
+	this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 8);
 }
 
 void PhongShading::initPipelineStateObject(ID3D12Device* device)
 {
 	D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
 		{"POSITION",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
-		{"NORMAL",      0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
-		{"TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT,    0, 24,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
-		{"TANGENT",     0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
-		{"COLOR",       0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 44,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
+		{"TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT,    0, 12,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
 	};
 
 	//深度ステンシルステート
@@ -165,13 +247,24 @@ void PhongShading::initVertexBuffer(ID3D12Device* device)
 
 void PhongShading::initConstantBuffer(ID3D12Device* device)
 {
-	ConstantBuffer::ConstantBufferConf conf = {};
-	conf.size = sizeof(PhongConf);
-	conf.descriptor_heap = this->srv_cbv_uav_descriptor_heap_.get();
-	conf.slot = 0;
-	this->cb_ = ConstantBufferFactory::create(device, conf);
+	{
+		ConstantBuffer::ConstantBufferConf c = {};
+		c.size = sizeof(Camera);
+		c.descriptor_heap = this->descriptor_heap_.get();
+		c.slot = 0;
+		this->cb_[0] = ConstantBufferFactory::create(device, c);
 
-	this->cb_->map(&this->conf_, 1);
+		this->cb_[0]->map(&this->camera_, 1);
+	}
+
+	{
+		ConstantBuffer::ConstantBufferConf c = {};
+		c.size = sizeof(Light);
+		c.descriptor_heap = this->descriptor_heap_.get();
+		c.slot = 1;
+		this->cb_[1] = ConstantBufferFactory::create(device, c);
+		this->cb_[1]->map(&this->light_, 1);
+	}
 }
 
 void PhongShading::initDepthStencil(ID3D12Device* device)
@@ -214,24 +307,3 @@ void PhongShading::initOffScreenRenderTarget(ID3D12Device* device)
 
 	this->off_screen_render_target_ = OffScreenRenderTargetFactory::create(osrtConf, device);
 }
-
-
-
-
-
-//TODO:initではないので直す
-void PhongShading::initTexture(ID3D12Device* device, OffScreenRenderTarget* offscreen_rt)
-{
-	//シェーダーリソースビューの設定
-	D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc_ = {};
-	srv_desc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srv_desc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	srv_desc_.Texture2D.MipLevels = 1;
-	srv_desc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE handle = this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-
-	device->CreateShaderResourceView(offscreen_rt->getResource(), &srv_desc_, handle);
-}
-
-

@@ -21,10 +21,8 @@ void ImGuiManager::init(ID3D12Device* device)
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 
-	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(*this->hWnd_);
 	ImGui_ImplDX12_Init(
 		device,
@@ -46,11 +44,9 @@ void ImGuiManager::beginRender(RenderContext* rc, ID3D12Device* device)
 	rc->setDescriptorHeap(this->descriptor_heap_.get());
 	rc->setRootSignature(this->root_signature_.get());
 
-	// Start the Dear ImGui frame
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-
 }
 
 void ImGuiManager::endRender(RenderContext* rc, ID3D12Device* device)
@@ -58,14 +54,12 @@ void ImGuiManager::endRender(RenderContext* rc, ID3D12Device* device)
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), rc->getCommandList());
 
-	//オフスクリーンレンダーターゲットの書き込みを終了する。
 	this->off_screen_render_target_->endRender(rc);
 	OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(this->off_screen_render_target_.get());
 }
 
 void ImGuiManager::deinit()
 {
-	// Cleanup
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
@@ -78,7 +72,6 @@ void ImGuiManager::createDescriptorHeap(ID3D12Device* device)
 
 void ImGuiManager::createOffScreenRenderTarget(ID3D12Device* device)
 {
-	//TODO:リファクタリング対象
 	OffScreenRenderTarget::OffScreenRenderTargetConf osrt_conf = {};
 	{//ディスクリプタヒープの設定
 		D3D12_DESCRIPTOR_HEAP_DESC desc = {};
@@ -116,7 +109,7 @@ void ImGuiManager::createRootSignature(ID3D12Device* device)
 	rootSignatureConf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	rootSignatureConf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	rootSignatureConf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	rootSignatureConf.num_srv = 2;
+	rootSignatureConf.num_srv = 16;
 	rootSignatureConf.visibility_cbv = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootSignatureConf.visibility_srv = D3D12_SHADER_VISIBILITY_PIXEL;
 	this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
@@ -129,8 +122,4 @@ void ImGuiManager::createDepthStencil(ID3D12Device* device)
 	ds_conf.width = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
 	ds_conf.height = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
 	this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, device);
-}
-
-void ImGuiManager::createPipelineStateObject(ID3D12Device* device)
-{
 }

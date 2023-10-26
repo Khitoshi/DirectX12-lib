@@ -1,6 +1,7 @@
 #include "DescriptorHeap.h"
 #include <stdexcept>
 #include "DescriptorHeapManager.h"
+
 void DescriptorHeap::init(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, UINT num_descriptors)
 {
 	this->type_ = type;

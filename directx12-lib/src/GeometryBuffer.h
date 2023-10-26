@@ -23,93 +23,59 @@ public:
 	struct Conf
 	{
 		enum class Semantic {
-			POSITION,
 			NORMAL,
-			TEXCOORD,
-			TANGENT,
 			COLOR,
-		};
 
-		enum class Format {
-			FLOAT4,
-			FLOAT3,
-			FLOAT2,
+			ALBEDO,
+			POSITION,
 		};
 
 		struct Vertex
 		{
-			DirectX::XMFLOAT4 position;
-			//std::vector<float> data;
+			DirectX::XMFLOAT3 position;
 			DirectX::XMFLOAT4 data;
 		};
 
+		struct Matrix
+		{
+			DirectX::XMFLOAT4X4  model;
+			DirectX::XMFLOAT4X4  view;
+			DirectX::XMFLOAT4X4  projection;
+		};
 
-		Conf(const Semantic s, const Format f, const std::vector<Vertex> v, const std::vector<unsigned short>i) :
+		Conf(const Semantic s, const std::vector<Vertex> v, const std::vector<unsigned short>i, Matrix m) :
 			semantic(s),
-			format(f),
 			vertices(v),
-			indices(i)
+			indices(i),
+			matrix(m)
 		{};
-
-		/*
-		UINT getStrideSize() const {
-
-			switch (format) {
-			case Conf::Format::FLOAT4:
-				return sizeof(float) * 4;
-			case Conf::Format::FLOAT3:
-				return sizeof(float) * 3;
-			case Conf::Format::FLOAT2:
-				return sizeof(float) * 2;
-			default:
-				return 0;
-			}
-		}
-		*/
 
 		std::string getSemanticName() const {
 			switch (semantic) {
-			case Conf::Semantic::POSITION:
-				return "Position";
 			case Conf::Semantic::NORMAL:
 				return "Normal";
-			case Conf::Semantic::TEXCOORD:
-				return "Texcoord";
-			case Conf::Semantic::TANGENT:
-				return "Tangent";
+
 			case Conf::Semantic::COLOR:
 				return "Color";
 
+			case Conf::Semantic::ALBEDO:
+				return "Albedo";
+
+			case Conf::Semantic::POSITION:
+				return "Position";
 
 			default:
 				return "SemanticERROR";
 			}
 		}
 
-		std::string getFormatName() const {
-			switch (format) {
-			case Conf::Format::FLOAT4:
-				return "F4";
-			case Conf::Format::FLOAT3:
-				return "F3";
-			case Conf::Format::FLOAT2:
-				return "F2";
-
-
-			default:
-				return "FormatERROR";
-			}
-		}
-
-
 		const Semantic semantic;
-
-		const Format format;
 
 		const std::vector<Vertex> vertices;
 
 		const std::vector<unsigned short> indices;
 
+		Matrix matrix;
 	};
 
 public:
@@ -132,7 +98,7 @@ public:
 	~GeometryBuffer() {};
 
 	void init(ID3D12Device* device);
-	void update();
+	void update(const Conf::Matrix& m);
 	void draw(RenderContext* rc);
 	void debugDraw(RenderContext* rc, ImGuiManager* igm, int i);
 private:
@@ -141,12 +107,13 @@ private:
 	void initPSO(ID3D12Device* device);
 	void initVertexBuffer(ID3D12Device* device);
 	void initIndexBuffer(ID3D12Device* device);
-	void initSRVHeap(ID3D12Device* device);
+	void initConstantBuffer(ID3D12Device* device);
+	void initDescriptorHeap(ID3D12Device* device);
 	void initDepthStencil(ID3D12Device* device);
 	void initOffScreenRenderTarget(ID3D12Device* device);
 
-
-	void initSRV();
+public://Žæ“¾Œn
+	std::shared_ptr<OffScreenRenderTarget> getOffScreenRenderTarget() const { return off_screen_render_target_; }
 
 private:
 	const Conf conf_;
@@ -158,6 +125,8 @@ private:
 	std::shared_ptr<PipelineStateObject> pso_;
 	std::shared_ptr<VertexBuffer> vb_;
 	std::shared_ptr<IndexBuffer> ib_;
+	std::shared_ptr<ConstantBuffer> cb_;
+
 	std::shared_ptr<DescriptorHeap> descriptor_heap_;
 	std::shared_ptr<DepthStencil> depth_stencil_;
 

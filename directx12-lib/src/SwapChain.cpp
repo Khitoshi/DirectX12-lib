@@ -13,12 +13,10 @@ void SwapChain::init()
 
 void SwapChain::present()
 {
-	//スワップチェインのプレゼント
 	if (FAILED(this->swap_chain_->Present(1, 0))) {
 		throw std::runtime_error("スワップチェインのプレゼントに失敗しました");
 	}
 
-	// バックバッファインデックスの更新
 	this->current_back_buffer_index_ = this->swap_chain_->GetCurrentBackBufferIndex();
 }
 
@@ -51,19 +49,6 @@ void SwapChain::createSwapChain()
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapChainDesc.SampleDesc.Count = 1;
-	//swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-
-	/*
-	//HAX: フルスクリーンに非対応
-	DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullScreenDesc = {};
-	//fullScreenDesc.Windowed = TRUE;
-	fullScreenDesc.Windowed = FALSE;
-	//fullScreenDesc.Windowed = GraphicsConfigurator::getIsFullScreen();
-	fullScreenDesc.RefreshRate.Numerator = 60;
-	fullScreenDesc.RefreshRate.Denominator = 1;
-	fullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	fullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	*/
 
 	//スワップチェイン1生成
 	ComPtr<IDXGISwapChain1> swap_chain1;
@@ -79,7 +64,6 @@ void SwapChain::createSwapChain()
 		throw std::runtime_error("スワップチェイン1の生成に失敗しました");
 	}
 
-	//IDXGISwapChain3のインターフェースを取得
 	if (FAILED(swap_chain1->QueryInterface(IID_PPV_ARGS(&this->swap_chain_)))) {
 		throw std::runtime_error("スワップチェイン3のインターフェースの取得に失敗しました");
 	}

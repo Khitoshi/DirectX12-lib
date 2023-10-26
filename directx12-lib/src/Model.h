@@ -17,7 +17,8 @@ class Texture;
 class OffScreenRenderTarget;
 class RenderContext;
 class GeometryBuffer;
-
+class PhongShading;
+class ImGuiManager;
 
 class Model
 {
@@ -34,7 +35,7 @@ public:
 		conf_(c),
 		meshes_(),
 		root_signature_(),
-		srv_cbv_uav_descriptor_heap_(),
+		descriptor_heap_(),
 		vertex_shader_(),
 		pixel_shader_(),
 		pso_(),
@@ -45,14 +46,18 @@ public:
 		depth_stencil_(),
 		off_screen_render_target_(),
 		device_(0),
-		num_descriptors_(0)
+		num_cb_descriptors_(0),
+		num_srv_descriptors_(0),
+		geometry_buffer_(),
+		phong_shading_(),
+		camera_position_()
 	{};
 	~Model() {};
 
 	void init(ID3D12Device* device, const char* model_file_path);
 	void update();
 	void draw(RenderContext* rc);
-
+	void debugDraw(RenderContext* rc, ImGuiManager* igm);
 private:
 	void loadModel(ID3D12Device* device, const char* model_file_path);
 	void loadShader();
@@ -71,14 +76,15 @@ private:
 public:
 	void setConf(const ModelConf& c) { conf_ = c; }
 	void setModel(const char* model_file_path);
-
+	void setCameraPosition(DirectX::XMFLOAT3 pos) { camera_position_ = pos; }
 public:
 	std::vector<std::shared_ptr<GeometryBuffer>> getGeometryBuffer() { return geometry_buffer_; }
+
 private:
 	ModelConf conf_;
 	std::vector<Mesh> meshes_;
 	std::shared_ptr<RootSignature> root_signature_;
-	std::shared_ptr<DescriptorHeap> srv_cbv_uav_descriptor_heap_;
+	std::shared_ptr<DescriptorHeap> descriptor_heap_;
 
 	std::shared_ptr<Shader> vertex_shader_;
 	std::shared_ptr<Shader> pixel_shader_;
@@ -97,8 +103,12 @@ private:
 
 	ID3D12Device* device_;
 
-	UINT num_descriptors_;
+	UINT num_cb_descriptors_;
+	UINT num_srv_descriptors_;
 
 	std::vector<std::shared_ptr<GeometryBuffer>> geometry_buffer_;
 
+	std::shared_ptr<PhongShading> phong_shading_;
+
+	DirectX::XMFLOAT3 camera_position_;
 };

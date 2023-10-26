@@ -10,10 +10,8 @@ void RenderTarget::init(ID3D12Device* device)
 		if (FAILED(swap_chain_->GetBuffer(this->buffer_, IID_PPV_ARGS(getResourceAddress())))) {
 			throw std::runtime_error("FAILED Descriptor::createCommittedResource GetBuffer");
 		}
-
-		//device->CreateRenderTargetView(getResource(), nullptr, this->handle_);
 	}
-	else {//TODO:汚いのでリファクタリングする
+	else {
 		//レンダリングターゲットビューの作成
 		D3D12_RESOURCE_DESC desc = {};
 		desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;

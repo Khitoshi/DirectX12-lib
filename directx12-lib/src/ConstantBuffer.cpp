@@ -2,13 +2,6 @@
 #include "DescriptorHeap.h"
 #include <stdexcept>
 
-/*
-void ConstantBuffer::copy(void* src_constants)
-{
-	this->descriptor_->map(src_constants, this->conf_.size);
-}
-*/
-
 void ConstantBuffer::init(ID3D12Device* device)
 {
 	this->createResource(device);
@@ -33,6 +26,5 @@ void ConstantBuffer::createView(ID3D12Device* device)
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = this->conf_.descriptor_heap->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
 	handle.ptr += static_cast<unsigned long long>(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)) * this->conf_.slot;
 
-	//this->descriptor_->createCBV(device, cbv_desc, handle);
 	device->CreateConstantBufferView(&cbv_desc, handle);
 }

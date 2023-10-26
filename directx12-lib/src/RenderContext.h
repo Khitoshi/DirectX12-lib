@@ -261,7 +261,7 @@ public:
 	}
 
 public://取得系
-	ID3D12GraphicsCommandList4* getCommandList() { return this->command_list_; }//コマンドリストの取得
+	ID3D12GraphicsCommandList4* getCommandList() { return this->command_list_; }
 
 private:
 	ID3D12GraphicsCommandList4* command_list_;

@@ -7,7 +7,9 @@
 #include "DescriptorHeap.h"
 #include "Hashes.h"
 
-
+/// <summary>
+/// ディスクリプタヒープ管理クラス
+/// </summary>
 class DescriptorHeapManager
 {
 	friend class DescriptorHeap;
@@ -16,12 +18,7 @@ private:
 	~DescriptorHeapManager() {}
 
 public:
-	// ディスクリプタヒープの解放
-	// スワップチェインのリサイズ前に呼び出す
 	static void clear(const D3D12_DESCRIPTOR_HEAP_TYPE type);
-
-	// ディスクリプタヒープの再生成
-	// スワップチェインのリサイズ後に呼び出す
 	static void reinit(ID3D12Device* device, const D3D12_DESCRIPTOR_HEAP_TYPE type);
 
 private:

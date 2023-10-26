@@ -10,24 +10,22 @@
 class CameraController :public MouseInputListener
 {
 public:
-    CameraController(Camera* camera) :
-        camera_(camera),
-        is_left_button_down_(false),
-        is_right_button_down_(false)
-    {}
-    ~CameraController() {}
+	CameraController(Camera* camera) :
+		camera_(camera),
+		is_left_button_down_(false),
+		is_right_button_down_(false)
+	{}
+	~CameraController() {}
 
-    void onMouseMove(int x, int y) override;
+	void onMouseMove(int x, int y) override;
 
-    //void onKeyDown(LPARAM lParam) override;
-
-    void onMouseLeftButtonDown() override;
-    void onMouseLeftButtonUp() override;
-    void onMouseRightButtonDown() override;
-    void onMouseRightButtonUp() override;
+	void onMouseLeftButtonDown() override;
+	void onMouseLeftButtonUp() override;
+	void onMouseRightButtonDown() override;
+	void onMouseRightButtonUp() override;
 
 private:
-    Camera* camera_;
-    bool is_left_button_down_;
-    bool is_right_button_down_;
+	Camera* camera_;
+	bool is_left_button_down_;
+	bool is_right_button_down_;
 };

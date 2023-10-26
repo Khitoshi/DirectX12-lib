@@ -4,24 +4,23 @@
 using namespace Microsoft::WRL;
 
 /// <summary>
-/// コマンドキュー
+/// コマンドキューラッピングクラス
 /// </summary>
 class CommandQueue
 {
-    friend class CommandQueueFactory;
+	friend class CommandQueueFactory;
 private:
-    CommandQueue() :command_queue_() {};
+	CommandQueue() :command_queue_() {};
 public:
-    ~CommandQueue() {};
+	~CommandQueue() {};
 
-private:
-    //初期化
-    void init(ID3D12Device* device, const D3D12_COMMAND_QUEUE_DESC desc);
+private://初期化系
+	void init(ID3D12Device* device, const D3D12_COMMAND_QUEUE_DESC desc);
 
 public://取得系
-    //コマンドキューを取得
-    ID3D12CommandQueue* getCommandQueue() { return command_queue_.Get(); }
+
+	ID3D12CommandQueue* getCommandQueue() { return command_queue_.Get(); }
 
 private:
-    ComPtr<ID3D12CommandQueue>command_queue_;   //コマンドキュー
+	ComPtr<ID3D12CommandQueue>command_queue_;
 };

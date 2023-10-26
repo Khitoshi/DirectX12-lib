@@ -13,14 +13,13 @@ class SwapChain
 {
 	friend class SwapChainFactory;
 public:
-	//スワップチェインの生成時に使用する設定
 	struct SwapChainConf {
-		UINT frame_buffer_count;           //バッファ数
-		UINT width;                      //幅
-		UINT height;                     //高さ
-		HWND hWnd;                       //ウィンドウハンドル
-		IDXGIFactory4* factory;      //DXGIファクトリ
-		ID3D12CommandQueue* command_queue;//コマンドキュー
+		UINT frame_buffer_count;
+		UINT width;
+		UINT height;
+		HWND hWnd;
+		IDXGIFactory4* factory;
+		ID3D12CommandQueue* command_queue;
 	};
 
 private:

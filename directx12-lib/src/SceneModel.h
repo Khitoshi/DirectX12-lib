@@ -7,7 +7,6 @@ class Model;
 class Camera;
 class CameraController;
 
-// assimp‚É‘Î‰‚·‚éƒ‚ƒfƒ‹‚ğ“Ç‚İ‚ñ‚Å•\¦‚·‚éscene
 class SceneModel final : public Scene
 {
 public:

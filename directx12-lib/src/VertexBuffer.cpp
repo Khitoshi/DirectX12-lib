@@ -1,10 +1,6 @@
 #include "VertexBuffer.h"
 #include <stdexcept>
 
-/// <summary>
-/// 頂点バッファの初期化
-/// </summary>
-/// <param name="conf">頂点バッファ生成用の設定</param>
 void VertexBuffer::init(ID3D12Device* device)
 {
 	D3D12_HEAP_PROPERTIES heap_prop = {};

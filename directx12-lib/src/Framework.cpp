@@ -77,9 +77,6 @@ void Framework::init()
 	this->imgui_manager_ = std::make_shared<ImGuiManager>(&this->hWnd_);
 	this->imgui_manager_->init(this->dx12_resources_->getDeviceContext()->getDevice());
 
-	//ƒV[ƒ““o˜^ˆ—
-	//SceneManager::getInstance().registerScene();
-	//SceneManager::getInstance().init(this->dx12_resources_->getDeviceContext()->getDevice(), std::make_shared<SceneModel>());
 	SceneManager::getInstance().init(this->dx12_resources_->getDeviceContext()->getDevice(), std::make_shared<SceneTriangle>());
 }
 
@@ -125,12 +122,6 @@ void Framework::debugRender()
 	ImGui::Text("Dedicated Video Memory: %d", gpu_info.dedicated_video_memory_);
 	ImGui::Text("Dedicated System Memory: %d", gpu_info.dedicated_system_memory_);
 	ImGui::Text("Shared System Memory: %d", gpu_info.shared_system_memory_);
-
-	/*
-	if (ImGui::Button("FULLSCREEN")) {
-		this->dx12_resources_->setWindowSizeChanged(true);
-	}
-	*/
 
 	ImGui::End();
 

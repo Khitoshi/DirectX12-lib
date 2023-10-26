@@ -21,24 +21,19 @@ public:
 	{};
 	~SceneSprite() {};
 
-	//初期化処理
 	void init(ID3D12Device* device)override;
-	//終了処理
 	void finalize()override;
-	//更新処理
 	void update()override;
-	//描画処理
 	void render(RenderContext* rc)override;
-	//ImGuiメニュー
 	void updateImguiMenu(RenderContext* rc, ImGuiManager* igm)override;
 
 private:
-	std::shared_ptr<Sprite> sprite_;    //スプライト
-	Sprite::Vertex vertex_[4];          //頂点座標
-	bool is_change_vertex_;             //頂点座標を変更したか
+	std::shared_ptr<Sprite> sprite_;
+	Sprite::Vertex vertex_[4];
+	bool is_change_vertex_;
 
-	ID3D12Device* device_;              //デバイス
+	ID3D12Device* device_;
 
-	static std::string file_path_;      //ファイルパス
-	bool is_change_texture_;            //テクスチャを変更したか
+	static std::string file_path_;
+	bool is_change_texture_;
 };

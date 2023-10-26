@@ -5,7 +5,6 @@
 #include "Descriptor.h"
 using namespace Microsoft::WRL;
 
-//class Descriptor;
 class DescriptorHeap;
 
 /// <summary>
@@ -27,10 +26,12 @@ private:
 		Descriptor(Descriptor::DescriptorType::Constant),
 		conf_(c)
 	{}
+
 public:
 	~ConstantBuffer() {}
 
 	ConstantBufferConf getConf()const { return conf_; }
+
 private:
 	void init(ID3D12Device* device);
 	void createResource(ID3D12Device* device);

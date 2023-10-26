@@ -3,12 +3,11 @@
 #include <memory>
 
 /// <summary>
-/// レンダーターゲットを生成するクラス
+/// レンダーターゲットのファクトリクラス
 /// </summary>
 class RenderTargetFactory
 {
 public:
-	//メインで使用するレンダーターゲットを作成
 	static std::shared_ptr<RenderTarget> create(
 		ID3D12Device* device,
 		IDXGISwapChain3* swap_chain,

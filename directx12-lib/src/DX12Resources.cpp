@@ -46,12 +46,6 @@ void DX12Resources::beginRender()
 	this->command_allocator_->reset();
 	this->render_context_->reset(this->command_allocator_->GetAllocator(), nullptr);
 
-	if (this->is_window_size_changed_) {
-		//OnSizeChanged(1920, 1280, this->is_window_size_changed_);
-		toggleFullscreen();
-		is_window_size_changed_ = false;
-	}
-
 	this->frame_index_ = this->swap_chain_->getCurrentBackBufferIndex();
 
 	this->updateDSVHandle();
@@ -116,79 +110,6 @@ void DX12Resources::waitForGPU()
 	this->fence_->incrementValue();
 }
 
-//TODO:個々の処理にhttps://github.com/techlabxe/d3d12_book_2/blob/master/common/D3D12AppBase.cppのToggleFullscreenを参考にする
-//void DX12Resources::OnSizeChanged(const UINT width, const UINT height, bool minimized)
-void DX12Resources::onSizeChanged()
-{
-	/*
-	waitForGPU();
-
-	//this->swap_chain_->SetFullScreen(is_fullscreen);
-
-	//リリース
-	//ここでエラー発生!
-
-	Descriptor::getCache()->release(Descriptor::DescriptorType::MainRenderTarget);
-	Descriptor::getCache()->release(Descriptor::DescriptorType::OffScreenRenderTarget);
-	Descriptor::getCache()->release(Descriptor::DescriptorType::CompositeRenderTarget);
-	Descriptor::getCache()->release(Descriptor::DescriptorType::DepthStencil);
-
-	//GraphicsConfigurator::setWindowWidth(width);
-	//GraphicsConfigurator::setWindowHeight(height);
-	this->swap_chain_->resizeBuffer(GraphicsConfigurator::getWindowWidth(), GraphicsConfigurator::getWindowHeight());
-
-	initRenderTarget();
-	initCompositeRenderTarget();
-	initDepthStencil();
-
-	initViewport();
-	initScissorRect();
-
-	this->render_context_->setViewport(this->viewport_);
-	this->render_context_->setScissorRect(this->viewport_);
-	*/
-}
-
-void DX12Resources::toggleFullscreen()
-{
-	/*
-	waitForGPU();
-
-	if (this->swap_chain_->isFullScreen()) {
-		//fullscreen -> windowed
-
-		//DXGI_MODE_DESC desc = {};
-		//desc.Width = GraphicsConfigurator::getWindowWidth();
-		//desc.Height = GraphicsConfigurator::getWindowHeight();
-		//desc.Format = this->swap_chain_->getDesc().Format;
-		//desc.RefreshRate.Denominator = 1;
-		//desc.RefreshRate.Numerator = 60;
-		//desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		//desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		//this->swap_chain_->resizeTarget(desc);
-
-		this->swap_chain_->setFullScreen(false);
-		//SetWindowLong(*this->hWnd_, GWL_STYLE, WS_OVERLAPPEDWINDOW);
-		//ShowWindow(*this->hWnd_, SW_NORMAL);
-	}
-	else {
-		//windowed -> fullscreen
-		//DXGI_MODE_DESC desc = {};
-		//desc.Width = GraphicsConfigurator::getWindowWidth();
-		//desc.Height = GraphicsConfigurator::getWindowHeight();
-		//desc.Format = this->swap_chain_->getDesc().Format;
-		//desc.RefreshRate.Denominator = 1;
-		//desc.RefreshRate.Numerator = 60;
-		//desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		//desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		//this->swap_chain_->resizeTarget(desc);
-
-		this->swap_chain_->setFullScreen(true);
-	}
-	onSizeChanged();
-	*/
-
-}
 
 ComPtr<IDXGIFactory4> DX12Resources::createFactory() {
 	UINT dxgi_factory_flags = 0;
@@ -271,7 +192,7 @@ void DX12Resources::initRenderTarget()
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
 	this->render_target_.resize(GraphicsConfigurator::getInstance().getConfigurationData().frame_buffer_count);
-	//TODO:リファクタリング
+
 	for (UINT i = 0; i < GraphicsConfigurator::getInstance().getConfigurationData().frame_buffer_count; i++) {
 		this->render_target_[i] = RenderTargetFactory::create(this->device_context_->getDevice(), this->swap_chain_->getSwapChain(), i, handle);
 		handle.ptr += this->device_context_->getDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -281,7 +202,6 @@ void DX12Resources::initRenderTarget()
 void DX12Resources::initCompositeRenderTarget()
 {
 	CompositeRenderTarget::CompositeRenderTargetConf crt_conf = {};
-	//crt_conf.resource_desc = this->render_target_[0]->getResource()->GetDesc();
 	crt_conf.resource_desc = this->render_target_[0]->getDesc();
 	crt_conf.descriptor_heap_desc = this->rtv_descriptor_heap_->getDescriptorHeap()->GetDesc();
 	this->composite_render_target_ = CompositeRenderTargetFactory::create(crt_conf, this->device_context_->getDevice());

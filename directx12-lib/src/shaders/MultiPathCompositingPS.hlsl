@@ -1,9 +1,7 @@
 #include "./MultiPathCompositing.hlsli"
 
-//オフスクリーンテクスチャ
 Texture2D OffScreenTexture0 : register(t0);
 Texture2D OffScreenTexture1 : register(t1);
-
 
 SamplerState sam : register(s0);
 

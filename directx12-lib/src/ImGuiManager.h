@@ -38,7 +38,6 @@ private:
 	void createOffScreenRenderTarget(ID3D12Device* device);
 	void createRootSignature(ID3D12Device* device);
 	void createDepthStencil(ID3D12Device* device);
-	void createPipelineStateObject(ID3D12Device* device);
 
 public:
 	std::shared_ptr<DescriptorHeap> getDescriptorHeap() { return descriptor_heap_; }

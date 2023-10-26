@@ -2,10 +2,14 @@
 
 struct VSInput
 {
+    float3 position : POSITION;
+    float2 texcoord : TEXCOORD0;
 };
 
-VSOutput VSMain(VSInput In)
+VSOutput VSMain(VSInput input)
 {
-    VSOutput result;
-    return result;
+    VSOutput o;
+    o.position = float4(input.position, 1.0f);
+    o.texcoord = input.texcoord;
+    return o;
 }

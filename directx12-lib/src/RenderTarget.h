@@ -21,16 +21,6 @@ private:
 		resouce_status_()
 	{};
 
-	/*
-	RenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE handle, D3D12_RESOURCE_STATES status) :
-		Descriptor(Descriptor::DescriptorType::RenderTarget),
-		swap_chain_(nullptr),
-		buffer_(NULL),
-		handle_(handle),
-		resouce_status_(status)
-	{};
-	*/
-
 public:
 	~RenderTarget() {};
 
@@ -38,7 +28,6 @@ private:
 	void init(ID3D12Device* device)override;
 
 public://Žæ“¾Œn
-
 	CD3DX12_RESOURCE_BARRIER begin();
 	CD3DX12_RESOURCE_BARRIER end();
 

@@ -10,10 +10,7 @@
 #include <string>
 #include "GeometryBuffer.h"
 
-//std::string SceneModel::file_path_("asset/models/cube.004.fbx");
 std::string SceneModel::file_path_("asset/models/suzanne.obj");
-//std::string SceneModel::file_path_("D:/Study/C++/directx12-lib/directx12-lib/asset/models/CornellBox-Sphere.mtl");
-
 void SceneModel::init(ID3D12Device* device)
 {
 	this->camera_ = std::make_shared<Camera>();
@@ -41,14 +38,14 @@ void SceneModel::update()
 		is_change_model_ = false;
 	}
 
-	//ƒJƒƒ‰‚ÌXV
-	//this->camera_->update();
-
 	Model::ModelConf conf = {};
 	DirectX::XMStoreFloat4x4(&conf.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f)));
 	DirectX::XMStoreFloat4x4(&conf.view, DirectX::XMMatrixTranspose(this->camera_->getViewMatrix()));
 	DirectX::XMStoreFloat4x4(&conf.projection, DirectX::XMMatrixTranspose(this->camera_->getProjectionMatrix()));
 	this->model->setConf(conf);
+
+	this->model->setCameraPosition(this->camera_->getEye());
+
 	this->model->update();
 }
 
@@ -126,16 +123,5 @@ void SceneModel::updateImguiMenu(RenderContext* rc, ImGuiManager* igm)
 
 	ImGui::End();
 
-
-	int i = 0;
-	for (auto& g : this->model->getGeometryBuffer()) {
-		//g->debugDraw(rc, igm, i);
-		this->model->getGeometryBuffer()[0]->debugDraw(rc, igm, i);
-		i++;
-	}
-
-
-	//this->model->getGeometryBuffer()[0]->debugDraw(rc, igm);
-	//this->model->getGeometryBuffer()[1]->debugDraw(rc, igm, 0);
-
+	this->model->debugDraw(rc, igm);
 }

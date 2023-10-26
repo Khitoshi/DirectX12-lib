@@ -8,15 +8,11 @@
 class SceneDefault final : public Scene
 {
 public:
-    SceneDefault() {};
-    ~SceneDefault() {};
+	SceneDefault() {};
+	~SceneDefault() {};
 
-    //‰Šú‰»ˆ—
-    void init(ID3D12Device* device)override {};
-    //I—¹ˆ—
-    void finalize()override {};
-    //XVˆ—
-    void update()override {};
-    //•`‰æˆ—
-    void render(RenderContext* rc)override {};
+	void init(ID3D12Device* device)override {};
+	void finalize()override {};
+	void update()override {};
+	void render(RenderContext* rc)override {};
 };

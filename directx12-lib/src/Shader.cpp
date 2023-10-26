@@ -6,15 +6,6 @@
 #include <fstream>
 #include <atlbase.h>
 
-/// <summary>
-/// シェーダーの読み込み
-/// </summary>
-/// <param name="filePath">シェーダーファイルパス</param>
-/// <param name="entryFuncName">シェーダーエントリー関数名</param>
-/// <param name="shaderModel">シェーダーバージョン</param>
-/// <returns>
-/// 正常にコンパイルされたシェーダー
-/// </returns>
 void Shader::load(ShaderConf conf)
 {
 #ifdef _DEBUG
@@ -26,7 +17,7 @@ void Shader::load(ShaderConf conf)
 
 	//ファイルパスの変換
 	wchar_t wfxFilePath[256] = { L"" };
-	//mbstowcs(wfxFilePath, filePath, 256);
+
 	mbstowcs_s(nullptr, wfxFilePath, conf.file_path.c_str(), 256);
 
 	//シェーダーのコンパイル

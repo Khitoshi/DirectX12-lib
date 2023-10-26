@@ -47,7 +47,6 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
 	for (auto& rt : OffScreenRenderTargetCacheManager::getInstance().getRenderTargetList())
 	{
 		//前回とリソースとスロットが違う場合はSRVを新しく作成する
-		//TODO:汚いのでリファクタリングする
 		auto it = this->handle_chache_.find(slot);
 		if (it == this->handle_chache_.end() || it->second != rt->getResource()) {
 			D3D12_CPU_DESCRIPTOR_HANDLE handle = this->cbv_srv_uav_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
@@ -68,7 +67,6 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
 	gpu_handle.ptr += static_cast<unsigned long long>(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)) * 1;
 	rc->setGraphicsRootDescriptorTable(1, gpu_handle);
 
-	//ドローコール
 	rc->drawInstanced(4);
 }
 
@@ -150,8 +148,6 @@ void CompositeRenderTarget::initRootSignature(ID3D12Device* device)
 
 void CompositeRenderTarget::initShader(ID3D12Device* device)
 {
-	//TODO :動的にシェーダーを作成するようにする
-	//作成したシェーダーはキャッシュする
 	{//頂点シェーダーロード
 		Shader::ShaderConf conf = {};
 		conf.file_path = "./src/shaders/MultiPathCompositingVS.hlsl";
@@ -223,7 +219,7 @@ void CompositeRenderTarget::initVertexBuffer(ID3D12Device* device)
 	vertices[3] = Vertex({ 1.0f,  1.0f, 0.0f }, { 1,0 }); // 右上
 
 	VertexBuffer::VertexBufferConf vb_conf = {};
-	vb_conf.size = static_cast<UINT>(vertices.size() * sizeof(Vertex));  // 修正点
+	vb_conf.size = static_cast<UINT>(vertices.size() * sizeof(Vertex));
 	vb_conf.stride = sizeof(Vertex);
 
 	this->vertex_buffer_ = VertexBufferFactory::create(vb_conf, device);

@@ -14,13 +14,11 @@ void IndexBuffer::init(ID3D12Device* device)
 		nullptr,
 		IID_PPV_ARGS(getResourceAddress()));
 
-	//インデックスバッファのビューを作成。
+	//インデックスバッファのビューを作成
 	this->index_buffer_view_.BufferLocation = getGPUVirtualAddress();
 
-	//ストライドは４バイト固定。
-	//this->stride_in_bytes_ = 4;
+	//ストライドは４バイト固定
 	this->stride_in_bytes_ = this->conf_.stride;
-	//this->index_buffer_view_.Format = DXGI_FORMAT_R32_UINT;
 	this->index_buffer_view_.Format = DXGI_FORMAT_R16_UINT;
 	this->index_buffer_view_.SizeInBytes = this->conf_.stride * this->conf_.count;
 }

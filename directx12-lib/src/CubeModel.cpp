@@ -11,10 +11,7 @@
 #include "RenderContext.h"
 #include "GraphicsConfigurator.h"
 
-/// <summary>
-/// 初期化処理
-/// </summary>
-/// <param name="device"></param>
+
 void CubeModel::init(ID3D12Device* device)
 {
 	this->loadShader();
@@ -28,61 +25,34 @@ void CubeModel::init(ID3D12Device* device)
 	this->initDepthStencil(device);
 }
 
-/// <summary>
-/// 更新処理
-/// </summary>
 void CubeModel::update()
 {
 	this->constant_buffer_->map<CubeModelConf>(&this->conf_, 1);
 }
 
-/// <summary>
-/// 描画処理
-/// </summary>
-/// <param name="rc"></param>
+
 void CubeModel::draw(RenderContext* rc)
 {
-	{
-		////オフスクリーンレンダーターゲットで書き込みできる状態にする
-		//auto renderTarget = this->off_screen_render_target_->getRTVHeap();
-		//auto resource = this->off_screen_render_target_->getResource();
-		//auto depth_stencil = this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-		////ビューポートとシザリング矩形の設定
-		//rc->transitionOffScreenRenderTargetBegin(resource);
-		//rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depth_stencil);
-	}
 	this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
-	//ルートシグネチャを設定。
 	rc->setRootSignature(this->root_signature_.get());
-	//パイプラインステートを設定。
 	rc->setPipelineState(this->pso_.get());
-	//プリミティブのトポロジーを設定。
 	rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//頂点バッファを設定。
 	rc->setVertexBuffer(this->vertex_buffer_.get());
-	//インデックスバッファを設定
 	rc->setIndexBuffer(this->index_buffer_.get());
 
 	//定数バッファを設定
-	//rc->setConstantBufferView(this->constant_buffer_.get());
 	std::vector<DescriptorHeap*>ds;
 	ds.push_back(this->descriptor_heap_.get());
 	rc->setDescriptorHeaps(ds);
 	rc->setGraphicsRootDescriptorTable(0, this->descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 
-	//ドローコール
 	rc->drawIndexed(this->num_indices_);
 
-	//オフスクリーンレンダーターゲットの書き込みを終了する。
 	this->off_screen_render_target_->endRender(rc);
 	OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(off_screen_render_target_.get());
 }
 
-/// <summary>
-/// ルートシグネチャの初期化
-/// </summary>
-/// <param name="device"></param>
 void CubeModel::initRootSignature(ID3D12Device* device)
 {
 	RootSignature::RootSignatureConf rootSignatureConf = {};
@@ -97,18 +67,11 @@ void CubeModel::initRootSignature(ID3D12Device* device)
 	this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
 }
 
-/// <summary>
-/// ディスクリプタヒープの作成
-/// </summary>
-/// <param name="device"></param>
 void CubeModel::initDescriptorHeap(ID3D12Device* device)
 {
 	this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
 }
 
-/// <summary>
-/// シェーダーの読み込み
-/// </summary>
 void CubeModel::loadShader()
 {
 	{
@@ -127,10 +90,6 @@ void CubeModel::loadShader()
 	}
 }
 
-/// <summary>
-/// パイプラインステートオブジェクトの初期化
-/// </summary>
-/// <param name="device"></param>
 void CubeModel::initPipelineStateObject(ID3D12Device* device)
 {
 	D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
@@ -189,37 +148,27 @@ void CubeModel::initPipelineStateObject(ID3D12Device* device)
 	this->pso_ = PSOCacheManager::getInstance().getOrCreate(device, conf);
 }
 
-/// <summary>
-/// 頂点バッファの初期化
-/// </summary>
-/// <param name="device"></param>
 void CubeModel::initVertexBuffer(ID3D12Device* device)
 {
 	//頂点データ
-	this->vertices_[0] = { {-0.75f, -0.75f, 0.0f }, { 0, 1 } };    // 左下前
-	this->vertices_[1] = { {-0.75f, 0.75f,  0.0f }, { 0, 0 } };     // 左上前
-	this->vertices_[2] = { {0.75f,  0.75f,  0.0f }, { 1, 0 } };      // 右上前
-	this->vertices_[3] = { {0.75f,  -0.75f, 0.0f }, { 1, 1 } };     // 右下前
-	this->vertices_[4] = { {-0.75f, -0.75f, -1.0f },{ 0, 1 } };   // 左下奥
-	this->vertices_[5] = { {-0.75f, 0.75f,  -1.0f },{ 0, 0 } };    // 左上奥
-	this->vertices_[6] = { {0.75f,  0.75f,  -1.0f },{ 1, 0 } };     // 右上奥
-	this->vertices_[7] = { {0.75f,  -0.75f, -1.0f },{ 1, 1 } };    // 右下奥
+	this->vertices_[0] = { {-0.75f, -0.75f, 0.0f }, { 0, 1 } };// 左下前
+	this->vertices_[1] = { {-0.75f, 0.75f,  0.0f }, { 0, 0 } };// 左上前
+	this->vertices_[2] = { {0.75f,  0.75f,  0.0f }, { 1, 0 } };// 右上前
+	this->vertices_[3] = { {0.75f,  -0.75f, 0.0f }, { 1, 1 } };// 右下前
 
-	//頂点バッファの設定
+	this->vertices_[4] = { {-0.75f, -0.75f, -1.0f },{ 0, 1 } };// 左下奥
+	this->vertices_[5] = { {-0.75f, 0.75f,  -1.0f },{ 0, 0 } };// 左上奥
+	this->vertices_[6] = { {0.75f,  0.75f,  -1.0f },{ 1, 0 } };// 右上奥
+	this->vertices_[7] = { {0.75f,  -0.75f, -1.0f },{ 1, 1 } };// 右下奥
+
 	VertexBuffer::VertexBufferConf conf = {};
 	conf.size = sizeof(this->vertices_);
 	conf.stride = sizeof(Vertex);
 
-	//初期化
 	this->vertex_buffer_ = VertexBufferFactory::create(conf, device);
-	//コピー
 	this->vertex_buffer_->map<Vertex>(this->vertices_, 8);
 }
 
-/// <summary>
-/// インデックスバッファの初期化
-/// </summary>
-/// <param name="device"></param>
 void CubeModel::initIndexBuffer(ID3D12Device* device)
 {
 	//インデックスデータ
@@ -232,24 +181,16 @@ void CubeModel::initIndexBuffer(ID3D12Device* device)
 	0, 3, 7, 7, 4, 0  // 下面
 	};
 
-	//インデックスバッファの設定
 	this->num_indices_ = sizeof(indices) / sizeof(unsigned short);
 	IndexBuffer::IndexBufferConf indexBufferConf = {};
 	indexBufferConf.size = sizeof(indices) * this->num_indices_;// 4 bytes * 要素数 indices
 	indexBufferConf.stride = sizeof(unsigned short);
 	indexBufferConf.count = this->num_indices_;
 
-	//初期化
 	this->index_buffer_ = IndexBufferFactory::create(indexBufferConf, device);
-	//コピー
-	//this->index_buffer_->copy(static_cast<uint16_t*>(indices));
 	this->index_buffer_->map(indices, this->num_indices_);
 }
 
-/// <summary>
-/// 定数バッファの初期化
-/// </summary>
-/// <param name="device"></param>
 void CubeModel::initConstantBuffer(ID3D12Device* device)
 {
 	ConstantBuffer::ConstantBufferConf conf = {};
@@ -260,10 +201,6 @@ void CubeModel::initConstantBuffer(ID3D12Device* device)
 	constant_buffer_->map<CubeModelConf>(&this->conf_, 1);
 }
 
-/// <summary>
-/// オフスクリーンレンダーターゲットの初期化
-/// </summary>
-/// <param name="device"></param>
 void CubeModel::initOffScreenRenderTarget(ID3D12Device* device)
 {
 	OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
@@ -296,10 +233,6 @@ void CubeModel::initOffScreenRenderTarget(ID3D12Device* device)
 	this->off_screen_render_target_ = OffScreenRenderTargetFactory::create(osrtConf, device);
 }
 
-/// <summary>
-/// 深度ステンシルの初期化
-/// </summary>
-/// <param name="device"></param>
 void CubeModel::initDepthStencil(ID3D12Device* device)
 {
 	DepthStencil::DepthStencilConf ds_conf = {};

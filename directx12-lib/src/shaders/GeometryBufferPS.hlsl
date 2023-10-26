@@ -1,58 +1,42 @@
 #include "./GeometryBuffer.hlsli"
+
+
 /*
 *
-*	Poisition
+*	Position
 *
 */
-float4 PSPosition(float4 pos : SV_POSITION) : SV_TARGET0
+float4 PSPosition(VSPositionOutput o) : SV_TARGET0
 {
-    return pos;
+    return o.world_pos;
 }
-
-
 
 /*
 *
 *	Normal
 *
 */
-float4 PSNormal(VSNormalOutput o) : SV_TARGET1
+float4 PSNormal(VSNormalOutput o) : SV_TARGET0
 {
     return o.normal;
 }
-
-
-
-/*
-*
-*	Texcoord
-*
-*/
-float4 PSTexcoord(VSTexcoordOutput o) : SV_TARGET2
-{
-    return o.texcoord;
-}
-
-
-
-/*
-*
-*	Tangent
-*
-*/
-float4 PSTangent(VSTangentOutput o) : SV_TARGET3
-{
-    return o.tangent;
-}
-
-
 
 /*
 *
 *	Color
 *
 */
-float4 PSColor(VSColorOutput o) : SV_TARGET4
+float4 PSColor(VSColorOutput o) : SV_TARGET0
 {
     return o.color;
+}
+
+/*
+*
+*   Albedo
+*
+*/
+float4 PSAlbedo(VSAlbedoOutput o) : SV_TARGET0
+{
+    return o.albedo;
 }

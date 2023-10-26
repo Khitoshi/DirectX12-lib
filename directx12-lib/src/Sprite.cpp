@@ -14,10 +14,6 @@
 #include "DescriptorHeapFactory.h"
 #include "TextureCacheManager.h"
 
-/// <summary>
-/// 初期化処理
-/// </summary>
-/// <param name="conf">テクスチャの設定</param>
 void Sprite::init(ID3D12Device* device, const char* texture_file_path)
 {
 	initRootSignature(device);
@@ -31,51 +27,25 @@ void Sprite::init(ID3D12Device* device, const char* texture_file_path)
 	initDepthStencil(device);
 }
 
-/// <summary>
-/// 描画処理
-/// </summary>
-/// <param name="rc"></param>
 void Sprite::draw(RenderContext* rc)
 {
-	{
-		////オフスクリーンレンダーターゲットで書き込みできる状態にする
-		//auto renderTarget = this->off_screen_render_target_->getRTVHeap();
-		//auto resource = this->off_screen_render_target_->getResource();
-		//auto depth_stencil = this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-		////ビューポートとシザリング矩形の設定
-		//rc->transitionOffScreenRenderTargetBegin(resource);
-		//rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depth_stencil);
-		//this->off_screen_render_target_->beginRender(rc);
-	}
 	this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
 
-	//ルートシグネチャを設定
 	rc->setRootSignature(this->root_signature_.get());
-	//パイプラインステートを設定
 	rc->setPipelineState(this->pso_.get());
-	//プリミティブのトポロジーを設定
 	rc->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//頂点バッファを設定
 	rc->setVertexBuffer(this->vertex_buffer_.get());
-	//インデックスバッファを設定
 	rc->setIndexBuffer(this->index_buffer_.get());
-	//ディスクリプタヒープを設定
 	rc->setDescriptorHeap(this->descriptor_heap_.get());
 	rc->setGraphicsRootDescriptorTable(0, this->descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 
-	//ドローコール
 	rc->drawIndexed(this->num_indices_);
 
-	//オフスクリーンレンダーターゲットの書き込みを終了する。
 	this->off_screen_render_target_->endRender(rc);
 	OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(off_screen_render_target_.get());
 }
 
-/// <summary>
-/// ルートシグニチャの初期化
-/// </summary>
-/// <param name="conf"></param>
 void Sprite::initRootSignature(ID3D12Device* device)
 {
 	RootSignature::RootSignatureConf rootSignatureConf = {};
@@ -86,24 +56,16 @@ void Sprite::initRootSignature(ID3D12Device* device)
 	rootSignatureConf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	rootSignatureConf.num_sampler = 1;
 	rootSignatureConf.num_srv = 1;
-	//rootSignatureConf.offset_in_descriptors_from_table_start_srv = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 	rootSignatureConf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	this->root_signature_ = RootSignatureCacheManager::getInstance().getOrCreate(device, rootSignatureConf);
 }
 
-/// <summary>
-/// ディスクリプタヒープの作成
-/// </summary>
-/// <param name="device"></param>
 void Sprite::initDescriptorHeap(ID3D12Device* device)
 {
 	this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1);
 }
 
-/// <summary>
-/// シェーダーのロード(コンパイル)
-/// </summary>
 void Sprite::initShader()
 {
 	{
@@ -122,10 +84,7 @@ void Sprite::initShader()
 	}
 }
 
-/// <summary>
-/// psoの初期化
-/// </summary>
-/// <param name="conf"></param>
+
 void Sprite::initPipelineStateObject(ID3D12Device* device)
 {
 	D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
@@ -156,10 +115,6 @@ void Sprite::initPipelineStateObject(ID3D12Device* device)
 	this->pso_ = PSOCacheManager::getInstance().getOrCreate(device, conf);
 }
 
-/// <summary>
-/// 頂点バッファの初期化
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void Sprite::initVertexBuffer(ID3D12Device* device)
 {
 	//頂点データ
@@ -187,10 +142,6 @@ void Sprite::initVertexBuffer(ID3D12Device* device)
 	this->vertex_buffer_->map(this->vertices_, 4);
 }
 
-/// <summary>
-/// インデックスバッファの初期化
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void Sprite::initIndexBuffer(ID3D12Device* device)
 {
 	//インデックスデータ
@@ -211,10 +162,6 @@ void Sprite::initIndexBuffer(ID3D12Device* device)
 	this->index_buffer_->map(static_cast<uint16_t*>(indices), 6);
 }
 
-/// <summary>
-/// テクスチャの初期化
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void Sprite::initTexture(ID3D12Device* device, const char* texture_file_path)
 {
 	//テクスチャの初期化
@@ -223,10 +170,6 @@ void Sprite::initTexture(ID3D12Device* device, const char* texture_file_path)
 	this->texture_->createSRV(device, this->descriptor_heap_.get(), 0);
 }
 
-/// <summary>
-/// オフスクリーンレンダーターゲットの初期化
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void Sprite::initOffScreenRenderTarget(ID3D12Device* device)
 {
 	OffScreenRenderTarget::OffScreenRenderTargetConf osrtConf = {};
@@ -259,10 +202,6 @@ void Sprite::initOffScreenRenderTarget(ID3D12Device* device)
 	this->off_screen_render_target_ = OffScreenRenderTargetFactory::create(osrtConf, device);
 }
 
-/// <summary>
-/// 深度ステンシルの初期化
-/// </summary>
-/// <param name="device">GPUデバイス</param>
 void Sprite::initDepthStencil(ID3D12Device* device)
 {
 	DepthStencil::DepthStencilConf ds_conf = {};
@@ -272,10 +211,6 @@ void Sprite::initDepthStencil(ID3D12Device* device)
 	this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, device);
 }
 
-/// <summary>
-/// 頂点バッファのセット&コピー
-/// </summary>
-/// <param name="vertices">頂点情報</param>
 void Sprite::setVertices(Vertex vertices[4])
 {
 	this->vertices_[0] = vertices[0];
@@ -285,15 +220,8 @@ void Sprite::setVertices(Vertex vertices[4])
 	this->vertex_buffer_->map(this->vertices_, 4);
 }
 
-/// <summary>
-/// テクスチャを設定する
-/// </summary>
-/// <param name="device">GPUデバイス</param>
-/// <param name="texture_file_path">テクスチャのファイルパス</param>
 void Sprite::setTexture(ID3D12Device* device, const char* texture_file_path)
 {
-	//テクスチャの初期化
 	this->texture_ = TextureCacheManager::getInstance().getOrCreate(device, texture_file_path);
-	//ディスクリプタヒープに登録
 	this->texture_->createSRV(device, this->descriptor_heap_.get(), 0);
 }

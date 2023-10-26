@@ -650,9 +650,6 @@
     <ClInclude Include="src\ConstantBuffer.h">
       <Filter>src\Graphics\CBV</Filter>
     </ClInclude>
-    <ClInclude Include="src\CBVManager.h">
-      <Filter>src\Graphics\CBV</Filter>
-    </ClInclude>
     <ClInclude Include="src\DepthStencil.h">
       <Filter>src\Graphics\DepthStencil</Filter>
     </ClInclude>

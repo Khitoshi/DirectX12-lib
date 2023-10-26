@@ -6,10 +6,7 @@
 #include "GraphicsConfigurator.h"
 #include <imgui/imgui.h>
 #include "InputManager.h"
-/// <summary>
-/// 初期化処理
-/// </summary>
-/// <param name="device"></param>
+
 void SceneTexture3dCube::init(ID3D12Device* device)
 {
 	this->camera_ = std::make_shared<Camera>();
@@ -26,21 +23,13 @@ void SceneTexture3dCube::init(ID3D12Device* device)
 	this->cube_model_->init(device, "asset/img/Lena.png");
 }
 
-/// <summary>
-/// 終了化処理
-/// </summary>
 void SceneTexture3dCube::finalize()
 {
 }
 
-/// <summary>
-/// 更新処理
-/// </summary>
+
 void SceneTexture3dCube::update()
 {
-	//this->camera_->update(windowWidth, windowHeight);
-
-	//if (is_change_camera_) {
 
 	TextureCubeModel::TextureCubeModelConf conf = {};
 	DirectX::XMStoreFloat4x4(&conf.model, DirectX::XMMatrixTranspose(DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f)));
@@ -50,22 +39,13 @@ void SceneTexture3dCube::update()
 	this->cube_model_->setConf(conf);
 	this->cube_model_->update();
 
-	//is_change_camera_ = false;
-	//}
 }
 
-/// <summary>
-/// 描画処理
-/// </summary>
-/// <param name="rc"></param>
 void SceneTexture3dCube::render(RenderContext* rc)
 {
 	this->cube_model_->draw(rc);
 }
 
-/// <summary>
-/// デバッグ用のimguiのmenuを表示
-/// </summary>
 void SceneTexture3dCube::updateImguiMenu(RenderContext* rc, ImGuiManager* igm)
 {
 	ImGui::Begin("3dCube");

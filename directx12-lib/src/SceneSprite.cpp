@@ -5,10 +5,7 @@
 
 std::string SceneSprite::file_path_("asset/img/Lena.png");
 
-/// <summary>
-/// 初期化処理
-/// </summary>
-/// <param name="device">GPUデバイス</param>
+
 void SceneSprite::init(ID3D12Device* device)
 {
 	this->device_ = device;
@@ -45,18 +42,11 @@ void SceneSprite::update()
 
 }
 
-/// <summary>
-/// 描画処理
-/// </summary>
-/// <param name="rc"></param>
 void SceneSprite::render(RenderContext* rc)
 {
 	this->sprite_->draw(rc);
 }
 
-/// <summary>
-/// sceneで使用するimguiのメニュー更新処理
-/// </summary>
 void SceneSprite::updateImguiMenu(RenderContext* rc, ImGuiManager* igm)
 {
 	ImGui::Begin("Sprite");
@@ -112,10 +102,6 @@ void SceneSprite::updateImguiMenu(RenderContext* rc, ImGuiManager* igm)
 			this->is_change_vertex_ = true;
 		}
 	}
-
-	//static bool isRotation = false;
-	//if (ImGui::Checkbox("Rotation", &isRotation))imageFeatures |= FEATURE_ROTATE;
-	//else imageFeatures &= ~FEATURE_ROTATE;
 
 	ImGui::End();
 }

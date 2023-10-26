@@ -5,8 +5,8 @@
 class Json
 {
 private:
-    Json() {};
-    ~Json() {};
+	Json() {};
+	~Json() {};
 public:
-    static nlohmann::json load(const char* file_path);
+	static nlohmann::json load(const char* file_path);
 };

@@ -24,16 +24,12 @@ public:
 	{};
 	~Scene3dCube() {};
 
-	//初期化処理
 	void init(ID3D12Device* device)override;
-	//終了処理
 	void finalize()override;
-	//更新処理
 	void update()override;
-	//描画処理
 	void render(RenderContext* rc)override;
-	//imguiのmenuを表示
 	void updateImguiMenu(RenderContext* rc, ImGuiManager* igm)override;
+
 private:
 	std::shared_ptr<CubeModel> cube_model_;
 	std::shared_ptr<Camera> camera_;

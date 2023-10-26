@@ -1,18 +1,12 @@
 
 #include "./GeometryBuffer.hlsli"
 
-/*
-*
-*	Poisition
-*
-*/
-float4 VSPosition(float4 pos : POSITION):SV_POSITION
+cbuffer MVW_Matrix : register(b0)
 {
-    float4 normalized_pos = (pos + 1.0f) / 2.0f;
-    //float4 normalized_pos = normalize(pos);
-    return normalized_pos;
+    float4x4 model;
+    float4x4 view;
+    float4x4 projection;
 }
-
 
 
 /*
@@ -20,59 +14,83 @@ float4 VSPosition(float4 pos : POSITION):SV_POSITION
 *	Normal
 *
 */
-VSNormalOutput VSNormal(float4 pos : POSITION, float4 normal : NORMAL)
+VSPositionOutput VSPosition(float3 position : POSITION)
 {
+    float4 pos = float4(position, 1.0f);
+    //ワールド空間に配置
+    pos = mul(pos, model);
+    //ビュー空間に配置
+    pos = mul(pos, view);
+    //3d空間から2d空間に配置
+    pos = mul(pos, projection);
+    
+    VSPositionOutput o;
+    o.world_pos = pos;
+    o.pos = pos;
+    return o;
+}
+
+
+/*
+*
+*	Normal
+*
+*/
+VSNormalOutput VSNormal(float3 position : POSITION, float4 normal : NORMAL)
+{
+    float4 pos = float4(position, 1.0f);
+    //ワールド空間に配置
+    pos = mul(pos, model);
+    //ビュー空間に配置
+    pos = mul(pos, view);
+    //3d空間から2d空間に配置
+    pos = mul(pos, projection);
+
     VSNormalOutput o;
-    //o.pos = pos;
-    o.pos = (pos + 1.0f) / 2.0f;
+    o.pos = pos;
     o.normal = normal;
     return o;
 }
-
-
-
-/*
-*
-*	Texcoord
-*
-*/
-VSTexcoordOutput VSTexcoord(float4 pos : POSITION, float4 texcoord : TEXCOORD)
-{
-    VSTexcoordOutput o;
-    //o.pos = pos;
-    o.pos = (pos + 1.0f) / 2.0f;
-    o.texcoord = texcoord;
-    return o;
-}
-
-
-
-/*
-*
-*	Tangent
-*
-*/
-VSTangentOutput VSTangent(float4 pos : POSITION, float4 tangent : TANGENT)
-{
-    VSTangentOutput o;
-    //o.pos = pos;
-    o.pos = (pos + 1.0f) / 2.0f;
-    o.tangent = tangent;
-    return o;
-}
-
-
 
 /*
 *
 *	Color
 *
 */
-VSColorOutput VSColor(float4 pos : POSITION, float4 color : COLOR)
+VSColorOutput VSColor(float3 position : POSITION, float4 color : COLOR)
 {
+    float4 pos = float4(position, 1.0f);
+    //ワールド空間に配置
+    pos = mul(pos, model);
+    //ビュー空間に配置
+    pos = mul(pos, view);
+    //3d空間から2d空間に配置
+    pos = mul(pos, projection);
+
     VSColorOutput o;
-    //o.pos = pos;
-    o.pos = (pos + 1.0f) / 2.0f;
+    o.pos = pos;
     o.color = color;
+    return o;
+}
+
+
+/*
+*
+*	Albedo
+*
+*/
+VSAlbedoOutput VSAlbedo(float3 position : POSITION, float4 aldedo : DIFFUSE_COLOR)
+{
+    float4 pos = float4(position, 1.0f);
+    //ワールド空間に配置
+    pos = mul(pos, model);
+    //ビュー空間に配置
+    pos = mul(pos, view);
+    //3d空間から2d空間に配置
+    pos = mul(pos, projection);
+
+    VSAlbedoOutput o;
+    o.pos = pos;
+    o.albedo = aldedo;
     return o;
 }

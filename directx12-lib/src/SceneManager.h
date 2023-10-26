@@ -1,11 +1,9 @@
 #pragma once
-//#include "d3dx12.h"
 #include <vector>
 #include <memory>
 #include <concepts>
 #include "Scene.h"
 #include <imgui/imgui.h>
-//#include "SceneDefault.h"
 #include "SceneTriangle.h"
 #include "SceneSprite.h"
 #include "Scene3dCube.h"
@@ -14,28 +12,18 @@
 #include <functional>
 #include "InputManager.h"
 
-/// <summary>
-/// シーン管理クラス
-/// </summary>
 class SceneManager
 {
 private:
 	SceneManager() :currentScene() {};
 	~SceneManager() {};
 public:
-	/// <summary>
-	/// シングルトンなインスタンスを取得
-	/// </summary>
-	/// <returns></returns>
 	static SceneManager& getInstance()
 	{
 		static SceneManager instance;
 		return instance;
 	}
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
 	void clear()
 	{
 		if (this->currentScene) {
@@ -52,9 +40,6 @@ public:
 		}
 	}
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
 	void update()
 	{
 		if (currentScene) {
@@ -62,10 +47,6 @@ public:
 		}
 	}
 
-	/// <summary>
-	/// 描画処理
-	/// </summary>
-	/// <param name="conf"></param>
 	void render(RenderContext* rc)
 	{
 		if (currentScene) {
@@ -73,15 +54,10 @@ public:
 		}
 	}
 
-	/// <summary>
-	/// シーン変更処理
-	/// </summary>
-	/// <param name="conf">描画に必要な設定</param>
 	void changeScene(ID3D12Device* device)
 	{
 		if (!isSceneChange) return;
 
-		//同じシーンの場合は変更しない
 		if (typeid(*currentScene) == typeid(*nextScene)) {
 			isSceneChange = false;
 			return;
@@ -95,9 +71,6 @@ public:
 		isSceneChange = false;
 	}
 
-	/// <summary>
-	/// シーン選択
-	/// </summary>
 	void sceneSelect()
 	{
 		ImGui::Begin("Scene Manager");
@@ -114,15 +87,9 @@ public:
 		ImGui::End();
 	}
 
-	/// <summary>
-	/// シーン登録
-	/// </summary>
-	/// <param name="scene"></param>
 	void registerScene()
 	{
 		sceneFactories = {
-			//シーンを追加する場合はここに追加
-			//{"Default",     []() { return std::make_shared<SceneDefault>(); }},
 			{"Triangle",    []() { return std::make_shared<SceneTriangle>(); }},
 			{"Sprite",      []() { return std::make_shared<SceneSprite>(); }},
 			{"Cube",      []() { return std::make_shared<Scene3dCube>(); }},
