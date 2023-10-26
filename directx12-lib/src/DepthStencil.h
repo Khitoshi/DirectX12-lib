@@ -9,7 +9,9 @@ using namespace Microsoft::WRL;
 
 class DescriptorHeap;
 
-
+/// <summary>
+/// 深度ステンシルのラッピングクラス
+/// </summary>
 class DepthStencil :public Descriptor
 {
 	friend class DepthStencilFactory;

@@ -16,7 +16,12 @@ std::vector<unsigned short> FetchIndices(const aiMesh* src);
 Material FetchMaterial(const char* filename, const aiScene* scene, const aiMaterial* src);
 void CreateTextureFile(const char* filename, const aiScene* scene, const aiMaterial* src);
 
-
+/*
+*
+*
+* ƒ}ƒeƒŠƒAƒ‹‚²‚Æ‚É•ª‚¯‚ç‚ê‚½mesh‚ð•Ô‚·
+*
+*/
 std::vector<Mesh> AssimpLoader::Load(const char* model_file_path, bool inverse_u, bool inverse_v)
 {
 	if (model_file_path == nullptr) {

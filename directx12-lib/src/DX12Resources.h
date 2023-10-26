@@ -50,24 +50,12 @@ public:
 	{}
 	~DX12Resources() {}
 
-	//初期化処理
 	void init(HWND hWnd);
-
-	//レンダリング開始処理
 	void beginRender();
-
-	//レンダリング終了処理
 	void endRender();
-
-	//描画の終了を待機する
 	void deinit();
 	void waitForGPU();
 
-	//void OnSizeChanged(const UINT width, const UINT height, bool minimized);
-	void onSizeChanged();
-	void toggleFullscreen();
-
-	//void OnSizeChanged();
 	void setWindowSizeChanged(bool is_window_size_changed) { is_window_size_changed_ = is_window_size_changed; }
 
 private://生成系

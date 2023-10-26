@@ -6,19 +6,11 @@
 #include "SRVFactory.h"
 
 
-/// <summary>
-/// テクスチャ読み込み
-/// </summary>
-/// <param name="device">GPUデバイス</param>
-/// <param name="texture_file_path">テスクチャのファイルパス</param>
 void Texture::Load(ID3D12Device* device, const char* texture_file_path)
 {
-	//ファイルパスをワイド文字に変換
 	wchar_t w_file_Path[256];
-	//MultiByteToWideChar(CP_ACP, 0, texture_file_path, -1, w_file_Path, _countof(w_file_Path));
 	MultiByteToWideChar(CP_UTF8, 0, texture_file_path, -1, w_file_Path, _countof(w_file_Path));
 
-	//DirectXTexを使ってテクスチャを読み込む
 	DirectX::ScratchImage scratch_img = {};
 	if (FAILED(LoadFromWICFile(w_file_Path, DirectX::WIC_FLAGS_NONE, &this->meta_data_, scratch_img))) {
 		throw std::runtime_error("failed to load texture");
@@ -50,17 +42,6 @@ void Texture::Load(ID3D12Device* device, const char* texture_file_path)
 	tex_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 	this->srv_ = SRVFactory::create(device, &tex_heap_prop, &tex_desc);
-	//this->srv_ = std::make_unique<SRV>();
-	//this->srv_->init(device, tex_heap_prop, tex_desc);
-
-	//テクスチャの転送
-	/*
-	this->descriptor_->writeToSubresource(
-		0,
-		img->pixels,
-		static_cast<UINT>(img->rowPitch),
-		static_cast<UINT>(img->slicePitch));
-	*/
 
 	this->srv_->writeToSubresource(
 		0,
@@ -73,25 +54,3 @@ void Texture::createSRV(ID3D12Device* device, DescriptorHeap* descriptor_heap, c
 {
 	this->srv_->createSRV(device, this->meta_data_.format, descriptor_heap, slot);
 }
-
-/// <summary>
-/// シェーダーリソースビューの作成
-/// </summary>
-/// <param name="device">GPUデバイス</param>
-/// <param name="descriptor_heap">リソースを格納したいディスクリプタヒープ</param>
-/// <param name="slot">リソースを格納したいポインタの位置</param>
-/*
-void Texture::CreateShaderResourceView(ID3D12Device* device, DescriptorHeap* descriptor_heap, const UINT slot)
-{
-	//通常テクスチャビュー作成
-	D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
-	srv_desc.Format = this->meta_data_.format;//RGBA(0.0f～1.0fに正規化)
-	srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-	srv_desc.Texture2D.MipLevels = 1;
-	auto handle = descriptor_heap->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-	handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * slot;
-
-	this->descriptor_->createSRV(device, srv_desc, handle);
-}
-*/

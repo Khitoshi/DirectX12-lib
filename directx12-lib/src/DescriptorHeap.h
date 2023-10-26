@@ -4,7 +4,6 @@
 using namespace Microsoft::WRL;
 
 
-
 class DescriptorHeap
 {
 	friend class DescriptorHeapFactory;

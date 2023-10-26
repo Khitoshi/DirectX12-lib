@@ -4,26 +4,24 @@
 using namespace Microsoft::WRL;
 
 /// <summary>
-/// コマンドアロケーター
+/// コマンドアロケーターラッピングクラス
 /// </summary>
 class CommandAllocator
 {
-    friend class CommandAllocatorFactory;
+	friend class CommandAllocatorFactory;
 private:
-    CommandAllocator() :command_allocator_() {};
+	CommandAllocator() :command_allocator_() {};
 public:
-    ~CommandAllocator() {};
+	~CommandAllocator() {};
 
-    //リセット
-    void reset();
+	void reset();
 
-private:
-    //初期化
-    void init(ID3D12Device* device);
+private://初期化系
+	void init(ID3D12Device* device);
+
 public://取得系
-    //コマンドアロケーターの取得
-    ID3D12CommandAllocator* GetAllocator() { return command_allocator_.Get(); }
+	ID3D12CommandAllocator* GetAllocator() { return command_allocator_.Get(); }
 
 private:
-    ComPtr<ID3D12CommandAllocator> command_allocator_;  //コマンドアロケータ
+	ComPtr<ID3D12CommandAllocator> command_allocator_;
 };

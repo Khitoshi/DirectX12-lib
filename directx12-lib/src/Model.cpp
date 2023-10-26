@@ -13,46 +13,82 @@
 #include "ConstantBufferFactory.h"
 #include "TextureCacheManager.h"
 #include "RenderContext.h"
+#include "GeometryBuffer.h"
 #include "GraphicsConfigurator.h"
 #include <stdexcept>
 #include <math.h>
 
+#include "PhongShading.h"
+
 void Model::init(ID3D12Device* device, const char* model_file_path)
 {
 	this->device_ = device;
-	this->initRootSignature(device);
-	this->loadShader();
-	this->initPipelineStateObject(device);
+
 	this->loadModel(device, model_file_path);
+	this->loadShader();
 	this->initDescriptorHeap(device);
-	this->initConstantBuffer(device);
-	this->initTexture(device);
 	this->initVertexBuffer(device);
 	this->initIndexBuffer(device);
+	this->initConstantBuffer(device);
+	this->initTexture(device);
+	this->initRootSignature(device);
+	this->initPipelineStateObject(device);
+
 	this->initOffScreenRenderTarget(device);
 	this->initDepthStencil(device);
+
+	this->initGBuffers(device);
+
+
+	{
+		PhongShading::Camera camera = {};
+		camera.position = this->camera_position_;
+
+		PhongShading::Light light = {};
+		light.color = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
+		light.direction = DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f);
+		//light.position = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
+		phong_shading_ = std::make_shared<PhongShading>(camera, light);
+		phong_shading_->init(device);
+	}
+
 }
 
 void Model::update()
 {
 	this->constant_buffer_->map(&this->conf_, 1);
+
+	for (auto& g : this->geometry_buffer_) {
+		g->update(
+			GeometryBuffer::Conf::Matrix(
+				this->conf_.model,
+				this->conf_.view,
+				this->conf_.projection
+			)
+		);
+	}
+
+	PhongShading::Camera camera = {};
+	camera.position = this->camera_position_;
+
+	phong_shading_->update(
+		&camera,
+		this->off_screen_render_target_.get(),
+		this->geometry_buffer_[0].get(),
+		this->geometry_buffer_[1].get(),
+		this->geometry_buffer_[2].get(),
+		this->geometry_buffer_[3].get()
+	);
 }
 
 void Model::draw(RenderContext* rc)
 {
-	{
-		////オフスクリーンレンダーターゲットで書き込みできる状態にする
-		//auto renderTarget = this->off_screen_render_target_->getRTVHeap();
-		//auto resource = this->off_screen_render_target_->getResource();
-		//auto depth_stencil = this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-		////ビューポートとシザリング矩形の設定
-		//rc->transitionOffScreenRenderTargetBegin(resource);
-		//rc->simpleStart(renderTarget->GetCPUDescriptorHandleForHeapStart(), depth_stencil);
-		//this->off_screen_render_target_->beginRender(rc);
+	for (int i = 0; i < this->geometry_buffer_.size(); i++) {
+		//gbufferに情報を書き込む
+		this->geometry_buffer_[i]->draw(rc);
 	}
+
 	this->off_screen_render_target_->beginRender(rc, this->depth_stencil_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
-
-
 	for (size_t i = 0; i < this->meshes_.size(); i++)
 	{
 		rc->setRootSignature(this->root_signature_.get());
@@ -61,19 +97,33 @@ void Model::draw(RenderContext* rc)
 		rc->setVertexBuffer(this->vertex_buffers_[i].get());
 		rc->setIndexBuffer(this->index_buffers_[i].get());
 
-		rc->setDescriptorHeap(this->srv_cbv_uav_descriptor_heap_.get());
-		auto handle = this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
-		rc->setGraphicsRootDescriptorTable(0, handle);//model行列等
-		handle.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (1 + i);
-		rc->setGraphicsRootDescriptorTable(1, handle);//メッシュの色
-		rc->setGraphicsRootDescriptorTable(2, this->meshes_[i].material.handle_gpu);//テクスチャ
+		rc->setDescriptorHeap(this->descriptor_heap_.get());
 
+		//model行列等
+		D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle = this->descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+		rc->setGraphicsRootDescriptorTable(0, gpu_handle);
+
+		//テクスチャ
+		rc->setGraphicsRootDescriptorTable(1, this->meshes_[i].material.handle_gpu);
 
 		rc->drawIndexed(this->num_indices_[i]);
 	}
 
 	this->off_screen_render_target_->endRender(rc);
-	OffScreenRenderTargetCacheManager::getInstance().addRenderTargetList(off_screen_render_target_.get());
+	this->phong_shading_->draw(rc);
+}
+
+void Model::debugDraw(RenderContext* rc, ImGuiManager* igm)
+{
+	if (geometry_buffer_.empty())return;
+
+	int i = 0;
+	for (auto& g : geometry_buffer_) {
+		g->debugDraw(rc, igm, i);
+		i++;
+	}
+	phong_shading_->debugDraw();
+
 }
 
 void Model::initRootSignature(ID3D12Device* device)
@@ -83,8 +133,8 @@ void Model::initRootSignature(ID3D12Device* device)
 	rootSignatureConf.texture_address_modeU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	rootSignatureConf.texture_address_modeV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	rootSignatureConf.texture_address_modeW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	rootSignatureConf.num_cbv = 2;
-	rootSignatureConf.num_srv = 1;
+	rootSignatureConf.num_cbv = num_cb_descriptors_;
+	rootSignatureConf.num_srv = num_srv_descriptors_;
 	rootSignatureConf.num_sampler = 1;
 	rootSignatureConf.root_signature_flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 	rootSignatureConf.visibility_cbv = D3D12_SHADER_VISIBILITY_VERTEX;
@@ -94,14 +144,17 @@ void Model::initRootSignature(ID3D12Device* device)
 
 void Model::initDescriptorHeap(ID3D12Device* device)
 {
-	this->srv_cbv_uav_descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, num_descriptors_);
+	num_cb_descriptors_ = 1;
+	//テクスチャの種類でメッシュの数が決まっているので
+	num_srv_descriptors_ = meshes_.size();
+
+	const UINT num_descriptors = num_cb_descriptors_ + num_srv_descriptors_;
+	this->descriptor_heap_ = DescriptorHeapFactory::create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, num_descriptors);
 }
 
 void Model::loadModel(ID3D12Device* device, const char* model_file_path)
 {
 	this->meshes_ = ModelMeshCacheManager::getInstance().getMeshes(model_file_path, false, true);
-	num_descriptors_ = static_cast<UINT>(1 + (meshes_.size() * 2));
-
 }
 
 void Model::loadShader()
@@ -126,10 +179,8 @@ void Model::initPipelineStateObject(ID3D12Device* device)
 {
 	D3D12_INPUT_ELEMENT_DESC inputElementDesc[] = {
 		{"POSITION",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
-		{"NORMAL",      0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
-		{"TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT,    0, 24,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
-		{"TANGENT",     0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
-		{"COLOR",       0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 44,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
+		{"TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT,    0, 12,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
+		{"TANGENT",     0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA  },
 	};
 
 	//深度ステンシルステート
@@ -174,6 +225,7 @@ void Model::initPipelineStateObject(ID3D12Device* device)
 	conf.desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	conf.desc.SampleMask = UINT_MAX;
 	conf.desc.RasterizerState = rasterizer_desc;
+	//conf.desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	conf.desc.DepthStencilState = ds_desc;
 	//conf.desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	conf.desc.InputLayout = { inputElementDesc, _countof(inputElementDesc) };
@@ -192,21 +244,34 @@ void Model::initPipelineStateObject(ID3D12Device* device)
 
 void Model::initVertexBuffer(ID3D12Device* device)
 {
+	struct Vertex
+	{
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT2 texcoord;
+		DirectX::XMFLOAT3 tangent;
+	};
+
 	//初期化
-	const size_t mesh_size = this->meshes_.size();
-	this->vertex_buffers_.resize(mesh_size);
-	for (size_t i = 0; i < mesh_size; i++) {
+	this->vertex_buffers_.clear();
+	this->vertex_buffers_.resize(this->meshes_.size());
+	for (size_t i = 0; i < this->meshes_.size(); i++) {
 		//頂点バッファの設定
 		auto& vertices = this->meshes_[i].vertices;
+		std::vector<Vertex> v(vertices.size());
+		for (int i = 0; i < v.size(); i++) {
+			v[i] = (Vertex(vertices[i].Position, vertices[i].UV, vertices[i].Tangent));
+			//v.push_back(Vertex(a.Position, a.UV, a.Tangent));
+		}
 
 		VertexBuffer::VertexBufferConf conf = {};
-		conf.size = static_cast<UINT>(sizeof(Vertex) * vertices.size());
+		conf.size = static_cast<UINT>(sizeof(Vertex) * v.size());
 		conf.stride = sizeof(Vertex);
 		auto vb = VertexBufferFactory::create(conf, device);
-		vb->map(vertices.data(), vertices.size());
+		vb->map(v.data(), v.size());
 
 		this->vertex_buffers_[i] = vb;
 	}
+
 }
 
 void Model::initIndexBuffer(ID3D12Device* device)
@@ -237,49 +302,24 @@ void Model::initIndexBuffer(ID3D12Device* device)
 
 void Model::initConstantBuffer(ID3D12Device* device)
 {
-	{
-		ConstantBuffer::ConstantBufferConf conf = {};
-		conf.size = sizeof(ModelConf);
-		conf.descriptor_heap = this->srv_cbv_uav_descriptor_heap_.get();
-		conf.slot = 0;
-		this->constant_buffer_ = ConstantBufferFactory::create(device, conf);
+	ConstantBuffer::ConstantBufferConf conf = {};
+	conf.size = sizeof(ModelConf);
+	conf.descriptor_heap = this->descriptor_heap_.get();
+	conf.slot = 0;
+	this->constant_buffer_ = ConstantBufferFactory::create(device, conf);
 
-		this->constant_buffer_->map(&this->conf_, 1);
-	}
-
-
-	{
-		struct MaterialConf
-		{
-			DirectX::XMFLOAT4 diffuse_color; // 拡散色
-
-		};
-
-		mesh_color_constant_buffers_.resize(this->meshes_.size());
-		for (size_t i = 0; i < this->meshes_.size(); i++) {
-			MaterialConf materialConf = {};
-			materialConf.diffuse_color = this->meshes_[i].material.diffuse_color;
-
-			ConstantBuffer::ConstantBufferConf conf = {};
-			conf.size = sizeof(MaterialConf);
-			conf.descriptor_heap = this->srv_cbv_uav_descriptor_heap_.get();
-			conf.slot = static_cast<UINT>(1 + i);
-			mesh_color_constant_buffers_[i] = ConstantBufferFactory::create(device, conf);
-
-			mesh_color_constant_buffers_[i]->map(&materialConf, 1);
-		}
-	}
-
+	this->constant_buffer_->map(&this->conf_, 1);
 }
 
 void Model::initTexture(ID3D12Device* device)
 {
 	for (size_t i = 0; i < meshes_.size(); i++) {
 		auto tex = TextureCacheManager::getInstance().getOrCreate(device, meshes_[i].material.diffuse_map_name.c_str());
-		//tex->CreateShaderResourceView(device, this->srv_cbv_uav_descriptor_heap_.get(), static_cast<UINT>(meshes_.size() + 1 + i));
-		tex->createSRV(device, this->srv_cbv_uav_descriptor_heap_.get(), static_cast<UINT>(meshes_.size() + 1 + i));
-		auto handle = this->srv_cbv_uav_descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
-		handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * (this->meshes_.size() + 1 + i);
+
+		const UINT slot = this->num_cb_descriptors_ + i;
+		tex->createSRV(device, this->descriptor_heap_.get(), static_cast<UINT>(slot));
+		auto handle = this->descriptor_heap_->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+		handle.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * static_cast<unsigned long>(slot);
 		this->meshes_[i].material.handle_gpu = handle;
 	}
 }
@@ -301,8 +341,8 @@ void Model::initOffScreenRenderTarget(ID3D12Device* device)
 		D3D12_RESOURCE_DESC desc = {};
 		desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		desc.Alignment = 0;
-		desc.Width = GraphicsConfigurator::getWindowWidth();
-		desc.Height = GraphicsConfigurator::getWindowHeight();
+		desc.Width = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
+		desc.Height = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
 		desc.DepthOrArraySize = 1;
 		desc.MipLevels = 1;
 		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -316,12 +356,129 @@ void Model::initOffScreenRenderTarget(ID3D12Device* device)
 	this->off_screen_render_target_ = OffScreenRenderTargetFactory::create(osrtConf, device);
 }
 
+void Model::initGBuffers(ID3D12Device* device)
+{
+	//メモ: meshの要素数 * メッシュのメンバ数
+	this->geometry_buffer_.clear();
+	for (auto& mesh : this->meshes_) {
+		std::vector<GeometryBuffer::Conf::Vertex> positions;
+		std::vector<GeometryBuffer::Conf::Vertex> normals;
+		std::vector<GeometryBuffer::Conf::Vertex> colors;
+		std::vector<GeometryBuffer::Conf::Vertex> albedoes;
+
+		for (auto& vertex : mesh.vertices) {
+			GeometryBuffer::Conf::Vertex position = {};
+			position.position.x = vertex.Position.x;
+			position.position.y = vertex.Position.y;
+			position.position.z = vertex.Position.z;
+			positions.push_back(position);
+
+			GeometryBuffer::Conf::Vertex normal = {};
+			normal.data.x = vertex.Normal.x;
+			normal.data.y = vertex.Normal.y;
+			normal.data.z = vertex.Normal.z;
+			normal.data.w = 1.0f;
+			normal.position.x = vertex.Position.x;
+			normal.position.y = vertex.Position.y;
+			normal.position.z = vertex.Position.z;
+			normals.push_back(normal);
+
+			GeometryBuffer::Conf::Vertex color = {};
+			color.data.x = vertex.Color.x;
+			color.data.y = vertex.Color.y;
+			color.data.z = vertex.Color.z;
+			color.data.w = vertex.Color.w;
+			color.position.x = vertex.Position.x;
+			color.position.y = vertex.Position.y;
+			color.position.z = vertex.Position.z;
+			colors.push_back(color);
+
+			GeometryBuffer::Conf::Vertex albedo = {};
+			albedo.data.x = mesh.material.diffuse_color.x;
+			albedo.data.y = mesh.material.diffuse_color.y;
+			albedo.data.z = mesh.material.diffuse_color.z;
+			albedo.data.w = mesh.material.diffuse_color.w;
+			albedo.position.x = vertex.Position.x;
+			albedo.position.y = vertex.Position.y;
+			albedo.position.z = vertex.Position.z;
+			albedoes.push_back(albedo);
+		}
+
+		{
+			this->geometry_buffer_.push_back(
+				std::make_shared<GeometryBuffer>(
+					GeometryBuffer::Conf(
+						GeometryBuffer::Conf::Semantic::POSITION,
+						positions,
+						mesh.indices,
+						GeometryBuffer::Conf::Matrix(
+							this->conf_.model,
+							this->conf_.view,
+							this->conf_.projection
+						)
+					)
+				)
+			);
+
+			this->geometry_buffer_.push_back(
+				std::make_shared<GeometryBuffer>(
+					GeometryBuffer::Conf(
+						GeometryBuffer::Conf::Semantic::NORMAL,
+						normals,
+						mesh.indices,
+						GeometryBuffer::Conf::Matrix(
+							this->conf_.model,
+							this->conf_.view,
+							this->conf_.projection
+						)
+					)
+				)
+			);
+
+			this->geometry_buffer_.push_back(
+				std::make_shared<GeometryBuffer>(
+					GeometryBuffer::Conf(
+						GeometryBuffer::Conf::Semantic::COLOR,
+						colors,
+						mesh.indices,
+						GeometryBuffer::Conf::Matrix(
+							this->conf_.model,
+							this->conf_.view,
+							this->conf_.projection
+						)
+					)
+				)
+			);
+
+			this->geometry_buffer_.push_back(
+				std::make_shared<GeometryBuffer>(
+					GeometryBuffer::Conf(
+						GeometryBuffer::Conf::Semantic::ALBEDO,
+						albedoes,
+						mesh.indices,
+						GeometryBuffer::Conf::Matrix(
+							this->conf_.model,
+							this->conf_.view,
+							this->conf_.projection
+						)
+					)
+				)
+			);
+
+		}
+	}
+
+	for (auto& gbuffer : this->geometry_buffer_) {
+		gbuffer->init(device);
+	}
+}
+
 void Model::initDepthStencil(ID3D12Device* device)
 {
 	DepthStencil::DepthStencilConf ds_conf = {};
 	ds_conf.frame_buffer_count = 1;
-	ds_conf.width = GraphicsConfigurator::getWindowWidth();
-	ds_conf.height = GraphicsConfigurator::getWindowHeight();
+	ds_conf.width = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
+	ds_conf.height = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
 	this->depth_stencil_ = DepthStencilCacheManager::getInstance().getOrCreate(ds_conf, device);
 }
 

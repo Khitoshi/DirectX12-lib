@@ -83,5 +83,4 @@ private:
 	D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc_;
 
 	std::map<UINT, ID3D12Resource*> handle_chache_;
-
 };

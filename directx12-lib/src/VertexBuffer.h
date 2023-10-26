@@ -4,19 +4,14 @@
 
 using namespace Microsoft::WRL;
 
-/// <summary>
-/// 頂点バッファ生成用&copyするクラス
-/// </summary>
 class VertexBuffer :public Descriptor
 {
 	friend class VertexBufferFactory;
 public:
-	/// <summary>
-	/// 頂点バッファ生成時に使用する設定
-	/// </summary>
+
 	struct VertexBufferConf {
-		UINT size;               //頂点バッファのサイズ
-		UINT stride;             //1頂点のサイズ
+		UINT size;
+		UINT stride;
 	};
 
 private:

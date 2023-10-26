@@ -39,8 +39,6 @@ LRESULT windowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 		ScreenToClient(hwnd, &currentMousePos);
 		InputManager::Instance().OnMouseMove(currentMousePos.x, currentMousePos.y);
 		break;
-
-		//TODO:マウスのボタンが押された時の処理を別の場所に移動する
 	case WM_LBUTTONDOWN://マウスの左ボタンが押された
 		InputManager::Instance().onMouseLeftButtonDown();
 		break;
@@ -60,17 +58,7 @@ LRESULT windowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	case WM_EXITSIZEMOVE://ウィンドウの位置変更終了
 		HighResolutionTimer::getInstance().Start();
 		break;
-	case WM_SIZE://ウィンドウのサイズ変更
-		//if (wparam == SIZE_MINIMIZED)/*最小化された*/ HighResolutionTimer::getInstance().Stop();
-		//else if (wparam == SIZE_RESTORED)/*最小化から復帰*/HighResolutionTimer::getInstance().Start();
-		//else if (wparam == SIZE_MAXIMIZED)/*最大化された*/HighResolutionTimer::getInstance().Start();
-
-		//if (resouce) {
-		//    RECT clientRect = {};
-		//    GetClientRect(hwnd, &clientRect);
-		//    resouce->OnSizeChanged(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top, wparam == SIZE_MINIMIZED);
-		//}
-
+	case WM_SIZE:
 		break;
 
 	case WM_KEYDOWN:
@@ -149,39 +137,37 @@ void Window::create() {
 
 	//windowクラスのパラメータ設定
 	WNDCLASSEX wc{};
-	wc.cbSize = sizeof(WNDCLASSEX);		//構造体サイズ
-	wc.style = CS_CLASSDC;				//ウィンドウのスタイル
+	wc.cbSize = sizeof(WNDCLASSEX);				//構造体サイズ
+	wc.style = CS_CLASSDC;						//ウィンドウのスタイル
 	wc.lpfnWndProc = (WNDPROC)windowProcedure;	//ウィンドウプロシージャへのポインター
-	wc.cbClsExtra = 0;						//構造体の後に割り当てる余分なバイト数
-	wc.cbWndExtra = 0;						//インスタンスの後に割り当てる余分なバイト数
-	wc.hInstance = GetModuleHandle(0);		//プロシージャを含むインスタンスへのハンドル
-	wc.hIcon = NULL;						//クラスアイコンへのハンドル(NULL = defaultが表示)
-	wc.hCursor = NULL;						//カーソルへのハンドル(NULL = ウィンドウに移動するたびにアプリケーションでカーソルの図形を明示的に設定する必要がある)
-	wc.hbrBackground = NULL;						//背景ブラシへのハンドル(NULL = 独自背景が必要)
+	wc.cbClsExtra = 0;							//構造体の後に割り当てる余分なバイト数
+	wc.cbWndExtra = 0;							//インスタンスの後に割り当てる余分なバイト数
+	wc.hInstance = GetModuleHandle(0);			//プロシージャを含むインスタンスへのハンドル
+	wc.hIcon = NULL;							//クラスアイコンへのハンドル(NULL = defaultが表示)
+	wc.hCursor = NULL;							//カーソルへのハンドル(NULL = ウィンドウに移動するたびにアプリケーションでカーソルの図形を明示的に設定する必要がある)
+	wc.hbrBackground = NULL;					//背景ブラシへのハンドル(NULL = 独自背景が必要)
 	wc.lpszMenuName = NULL;						//既定のメニューのマクロ(NULL = 規定メニュー無し)
-	wc.lpszClassName = appName;	//ウィンドウクラスの名前を指定
-	wc.hIconSm = NULL;						//アイコンへのハンドル(NULL = 自動で適切なサイズのアイコンを検索)
+	wc.lpszClassName = appName;					//ウィンドウクラスの名前を指定
+	wc.hIconSm = NULL;							//アイコンへのハンドル(NULL = 自動で適切なサイズのアイコンを検索)
 	//ウィンドウクラスの登録
 	RegisterClassEx(&wc);
 
 
 	DWORD dwStyle = WS_OVERLAPPEDWINDOW;
-	//RECT rect = { 0, 0, windowWidth, windowHeight };
-	//AdjustWindowRect(&rect, dwStyle, FALSE);
 
 	//window生成 & 新しいウィンドウへのハンドルをreturn
 	this->hwnd_ = CreateWindow(
-		appName,	//ウィンドウクラスの名前
-		appName,	//ウィンドウの名前,ウィンドウクラスの名前と別名でok
-		dwStyle,	            //ウィンドウスタイル
-		this->conf_.x,		    //ウィンドウ表示位置:x
-		this->conf_.y,		    //ウィンドウ表示位置:y
-		GraphicsConfigurator::getWindowWidth(),	        //ウィンドウのサイズ:幅
-		GraphicsConfigurator::getWindowHeight(),	        //ウィンドウのサイズ:高さ
-		NULL,					//親ウィンドウのハンドル
-		NULL,					//メニューのハンドル
-		this->hInstance_,		//インスタンスのハンドル
-		NULL					//作成時の引数保存用ポインタ
+		appName,																	//ウィンドウクラスの名前
+		appName,																	//ウィンドウの名前,ウィンドウクラスの名前と別名でok
+		dwStyle,																	//ウィンドウスタイル
+		this->conf_.x,																//ウィンドウ表示位置:x
+		this->conf_.y,																//ウィンドウ表示位置:y
+		GraphicsConfigurator::getInstance().getConfigurationData().window_width,	//ウィンドウのサイズ:幅
+		GraphicsConfigurator::getInstance().getConfigurationData().window_height,	//ウィンドウのサイズ:高さ
+		NULL,																		//親ウィンドウのハンドル
+		NULL,																		//メニューのハンドル
+		this->hInstance_,															//インスタンスのハンドル
+		NULL																		//作成時の引数保存用ポインタ
 	);
 
 	//ウィンドウハンドル生成チェック

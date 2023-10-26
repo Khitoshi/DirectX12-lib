@@ -67,7 +67,6 @@ void CompositeRenderTarget::render(RenderContext* rc, ID3D12Device* device)
 	gpu_handle.ptr += static_cast<unsigned long long>(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)) * 1;
 	rc->setGraphicsRootDescriptorTable(1, gpu_handle);
 
-	//ドローコール
 	rc->drawInstanced(4);
 }
 
@@ -109,8 +108,8 @@ void CompositeRenderTarget::createRenderTarget(ID3D12Device* device)
 	D3D12_RESOURCE_DESC desc = {};
 	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	desc.Alignment = 0;
-	desc.Height = GraphicsConfigurator::getWindowHeight();
-	desc.Width = GraphicsConfigurator::getWindowWidth();
+	desc.Height = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
+	desc.Width = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
 	desc.DepthOrArraySize = 1;
 	desc.MipLevels = 1;
 	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -126,7 +125,7 @@ void CompositeRenderTarget::createRenderTarget(ID3D12Device* device)
 	prop.CreationNodeMask = 1;
 	prop.VisibleNodeMask = 1;
 
-	D3D12_CLEAR_VALUE clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, GraphicsConfigurator::getBackgroundColor());
+	D3D12_CLEAR_VALUE clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, GraphicsConfigurator::getInstance().getConfigurationData().background_color);
 
 	createCommittedResource(device, prop, D3D12_HEAP_FLAG_NONE, desc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clear_value);
 	device->CreateRenderTargetView(getResource(), nullptr, this->rtv_descriptor_heap_->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
@@ -149,8 +148,6 @@ void CompositeRenderTarget::initRootSignature(ID3D12Device* device)
 
 void CompositeRenderTarget::initShader(ID3D12Device* device)
 {
-	//TODO :動的にシェーダーを作成するようにする
-	//作成したシェーダーはキャッシュする
 	{//頂点シェーダーロード
 		Shader::ShaderConf conf = {};
 		conf.file_path = "./src/shaders/MultiPathCompositingVS.hlsl";
@@ -222,7 +219,7 @@ void CompositeRenderTarget::initVertexBuffer(ID3D12Device* device)
 	vertices[3] = Vertex({ 1.0f,  1.0f, 0.0f }, { 1,0 }); // 右上
 
 	VertexBuffer::VertexBufferConf vb_conf = {};
-	vb_conf.size = static_cast<UINT>(vertices.size() * sizeof(Vertex));  // 修正点
+	vb_conf.size = static_cast<UINT>(vertices.size() * sizeof(Vertex));
 	vb_conf.stride = sizeof(Vertex);
 
 	this->vertex_buffer_ = VertexBufferFactory::create(vb_conf, device);

@@ -33,6 +33,7 @@
     <ClCompile Include="src\CommandQueue.cpp" />
     <ClCompile Include="src\Descriptor.cpp" />
     <ClCompile Include="src\DescriptorHeapManager.cpp" />
+    <ClCompile Include="src\GeometryBuffer.cpp" />
     <ClCompile Include="src\GraphicsConfigurator.cpp" />
     <ClCompile Include="src\CompositeRenderTarget.cpp" />
     <ClCompile Include="src\ConstantBuffer.cpp" />
@@ -51,6 +52,7 @@
     <ClCompile Include="src\InputManager.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\OffScreenRenderTarget.cpp" />
+    <ClCompile Include="src\PhongShading.cpp" />
     <ClCompile Include="src\PipelineStateObject.cpp" />
     <ClCompile Include="src\RenderTarget.cpp" />
     <ClCompile Include="src\RootSignature.cpp" />
@@ -168,7 +170,6 @@
     <ClInclude Include="src\AssimpLoader.h" />
     <ClInclude Include="src\Cache.h" />
     <ClInclude Include="src\CameraController.h" />
-    <ClInclude Include="src\CBVManager.h" />
     <ClInclude Include="src\ConstantBufferFactory.h" />
     <ClInclude Include="src\CubeModel.h" />
     <ClInclude Include="src\Camera.h" />
@@ -178,6 +179,7 @@
     <ClInclude Include="src\CommandQueueFactory.h" />
     <ClInclude Include="src\Descriptor.h" />
     <ClInclude Include="src\DescriptorHeapManager.h" />
+    <ClInclude Include="src\GeometryBuffer.h" />
     <ClInclude Include="src\GraphicsConfigurator.h" />
     <ClInclude Include="src\CompositeRenderTarget.h" />
     <ClInclude Include="src\CompositeRenderTargetFactory.h" />
@@ -214,6 +216,7 @@
     <ClInclude Include="src\MouseInputListener.h" />
     <ClInclude Include="src\OffScreenRenderTargetCacheManager.h" />
     <ClInclude Include="src\OffScreenRenderTargetFactory.h" />
+    <ClInclude Include="src\PhongShading.h" />
     <ClInclude Include="src\PipelineStateObject.h" />
     <ClInclude Include="src\PipelineStateObjectFactory.h" />
     <ClInclude Include="src\PSOCacheManager.h" />
@@ -315,6 +318,14 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
     </FxCompile>
+    <FxCompile Include="src\shaders\GeometryBufferVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSNormal</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="src\shaders\MultiPathCompositingPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -334,6 +345,30 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VSMain</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="src\shaders\PhongPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\PhongVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\GeometryBufferPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PSNormal</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="src\shaders\RotationPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
@@ -427,7 +462,9 @@
     <None Include="src\shaders\3dModel.hlsli" />
     <None Include="src\shaders\Cube.hlsli" />
     <None Include="src\shaders\FullScreenQuad.hlsli" />
+    <None Include="src\shaders\GeometryBuffer.hlsli" />
     <None Include="src\shaders\MultiPathCompositing.hlsli" />
+    <None Include="src\shaders\Phong.hlsli" />
     <None Include="src\shaders\Rotation.hlsli" />
     <None Include="src\shaders\Sprite.hlsli" />
     <None Include="src\shaders\TextureCube.hlsli" />

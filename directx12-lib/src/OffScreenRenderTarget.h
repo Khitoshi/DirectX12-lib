@@ -72,6 +72,5 @@ private:
 	std::shared_ptr<DescriptorHeap> rtv_descriptor_heap_;
 	D3D12_VIEWPORT viewport_;
 
-	//TODO:íœ‚·‚é
 	ID3D12Device* device_;
 };

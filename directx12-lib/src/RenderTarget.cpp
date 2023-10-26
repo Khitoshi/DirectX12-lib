@@ -10,16 +10,14 @@ void RenderTarget::init(ID3D12Device* device)
 		if (FAILED(swap_chain_->GetBuffer(this->buffer_, IID_PPV_ARGS(getResourceAddress())))) {
 			throw std::runtime_error("FAILED Descriptor::createCommittedResource GetBuffer");
 		}
-
-		//device->CreateRenderTargetView(getResource(), nullptr, this->handle_);
 	}
-	else {//TODO:汚いのでリファクタリングする
+	else {
 		//レンダリングターゲットビューの作成
 		D3D12_RESOURCE_DESC desc = {};
 		desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		desc.Alignment = 0;
-		desc.Height = GraphicsConfigurator::getWindowHeight();
-		desc.Width = GraphicsConfigurator::getWindowWidth();
+		desc.Height = GraphicsConfigurator::getInstance().getConfigurationData().window_height;
+		desc.Width = GraphicsConfigurator::getInstance().getConfigurationData().window_width;
 		desc.DepthOrArraySize = 1;
 		desc.MipLevels = 1;
 		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -35,7 +33,7 @@ void RenderTarget::init(ID3D12Device* device)
 		prop.CreationNodeMask = 1;
 		prop.VisibleNodeMask = 1;
 
-		D3D12_CLEAR_VALUE clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, GraphicsConfigurator::getBackgroundColor());
+		D3D12_CLEAR_VALUE clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, GraphicsConfigurator::getInstance().getConfigurationData().background_color);
 
 		createCommittedResource(device, prop, D3D12_HEAP_FLAG_NONE, desc, this->resouce_status_, &clear_value);
 	}
